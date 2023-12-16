@@ -35,17 +35,10 @@ This project is containerized using Docker and orchestrated using Docker Compose
 
 2. **Configure your Google API Keys in docker-compose.yml:**
 
-   In the `docker-compose.yml` file, locate the `backend` service configuration. Add your Google API keys to the `environment` section as shown below. Replace `APIKEY1, APIKEY2, APIKEY3` with your actual Google API keys, separating each key with a comma.
+   In the `.env` file, replace `APIKEY1, APIKEY2, APIKEY3` with your actual Google API keys, separating each key with a comma.
 
    ```dockerfile
-   backend:
-       build:
-         context: ./backend
-       ports:
-         - 8081:8081
-       environment:
-         - SPRING_ELASTICSEARCH_URIS=http://es:9200
-         - API_KEYS="APIKEY1,APIKEY2,APIKEY3"
+   API_KEYS="APIKEY1,APIKEY2,APIKEY3"
    ```
 
 3. **Build and Run the Docker Compose Stack**:
@@ -58,9 +51,9 @@ This project is containerized using Docker and orchestrated using Docker Compose
 
 4. **Access the Application**:
 
-   - Frontend: Open a web browser and navigate to [http://localhost:8080](http://localhost:8080)
+   - Frontend: Open a web browser and navigate to [http://localhost:80](http://localhost:80)
    - Backend API Documentation: Navigate to [http://localhost:8081/docs](http://localhost:8081/docs)
-   - Elasticsearch: Accessible at [http://localhost:9200](http://localhost:9200)
+   - Elasticsearch: Accessible at [http://localhost:443](http://localhost:443)
    - Kibana: Navigate to [http://localhost:5601](http://localhost:5601)
    	- NOTE: The visualisation panel needs to be configured by yourself.
 
