@@ -1,0 +1,157 @@
+<template>
+  <el-container>
+    <el-header style="margin-top: 10px;">
+      <el-row align="middle" justify-content="end">
+        <el-col :span="3">
+
+          <!-- Toggle Button -->
+          <el-button @click="toggleCollapsed" text size="large">
+            <el-icon v-if="state.collapsed" size="large">
+              <Expand />
+            </el-icon>
+            <el-icon v-else size="large">
+              <Fold />
+            </el-icon>
+          </el-button>
+
+          <!-- TUM Logo -->
+          <img :src="require('@/assets/tum_logo.png')" alt="TUM Logo"
+            style="height: 30px; width: auto; margin-left: 10px;">
+        </el-col>
+
+        <!-- Search Bar -->
+        <el-col :span="8" :offset="6">
+          <SearchBar @search="handleSearch"/>
+        </el-col>
+
+        <!-- Login Component -->
+        <el-col :span="7">
+          <LoginCommponent />
+        </el-col>
+      </el-row>
+    </el-header>
+
+    <el-container>
+
+      <el-aside :width="state.collapsed ? '80px' : '150px'" class="sidebar">
+        <a-menu v-model:openKeys="state.openKeys" v-model:selectedKeys="state.selectedKeys" mode="inline"
+          :inline-collapsed="state.collapsed" :items="items"></a-menu>
+      </el-aside>
+
+      <el-main>
+        <!-- Content for Videos -->
+        <div v-if="state.selectedKeys[0] === '1'">
+          <VideoList :videos="videos"/>
+        </div>
+
+        <!-- Content for Hot Videos-->
+        <div v-else-if="state.selectedKeys[0] === '2'">
+          Hot Videos
+        </div>
+
+        <!-- Content for Profile -->
+        <div v-else-if="state.selectedKeys[0] === '3'">
+          Profile
+        </div>
+
+        <!-- Content for Settings -->
+        <div v-else-if="state.selectedKeys[0] === '4'">
+          Setting
+        </div>
+      </el-main>
+    </el-container>
+  </el-container>
+</template>
+
+<script setup>
+import SearchBar from '@/components/SearchBar.vue';
+import LoginCommponent from '@/components/LoginComponent.vue';
+import VideoList from './components/VideoList.vue';
+import apiClient from '@/config/apiClient';
+import { reactive, watch, h, ref, onMounted } from 'vue';
+import globalState from '@/config/globalState';
+import {
+  PieChartOutlined,
+  FireOutlined,
+  SettingOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons-vue';
+import { Fold, Expand } from '@element-plus/icons-vue';
+const state = reactive({
+  collapsed: false,
+  selectedKeys: ['1'],
+  openKeys: ['sub1'],
+  preOpenKeys: ['sub1'],
+});
+const items = reactive([
+  {
+    key: '1',
+    icon: () => h(VideoCameraOutlined),
+    label: 'Videos',
+    title: 'Videos',
+  },
+  {
+    key: '2',
+    icon: () => h(FireOutlined),
+    label: 'Hot',
+    title: 'Hot',
+  },
+  {
+    key: '3',
+    icon: () => h(PieChartOutlined),
+    label: 'Profile',
+    title: 'Profile',
+  },
+  {
+    key: '4',
+    icon: () => h(SettingOutlined),
+    label: 'Settings',
+    title: 'Settings',
+  },
+]);
+watch(
+  () => state.openKeys,
+  (_val, oldVal) => {
+    state.preOpenKeys = oldVal;
+  },
+);
+const toggleCollapsed = () => {
+  state.collapsed = !state.collapsed;
+  state.openKeys = state.collapsed ? [] : state.preOpenKeys;
+};
+
+
+// Search Videos
+const videos = ref([]);
+onMounted(() => {
+  globalState.userId = JSON.parse(localStorage.getItem('userId'));
+  handleSearch('');
+
+});
+const handleSearch = async (query) => {
+  try {
+    // const response = await apiClient.searchVideos(query);
+    const response = query=="" ? await apiClient.getVideos() : await apiClient.searchVideos(query);
+    console.log(query);
+    
+    if (response.status === 200) {
+      videos.value = response.data;
+    } else {
+      console.error('Error getting videos:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error getting videos:', error);
+  }
+};
+</script>
+
+<style>
+.el-aside {
+  height: 100%;
+}
+
+.el-main {
+  height: 100%;
+}
+
+</style>
