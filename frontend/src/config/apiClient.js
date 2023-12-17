@@ -28,6 +28,7 @@ export default {
 
     async searchVideos(keyword, page = 0) {
         try {
+            console.log('Searching videos for keyword:', keyword);
             let response = await apiClient.get(`/videos/search?keyword=${keyword}&page=${page}`);
             return response.data;
         }

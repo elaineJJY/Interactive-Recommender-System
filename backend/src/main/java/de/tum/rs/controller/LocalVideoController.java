@@ -43,10 +43,12 @@ public class LocalVideoController {
 	}
 
 	@GetMapping("/search")
-	@Operation(summary = "Get videos by title", description = "Returns videos stored in the database with the given title.")
-	public List<YouTubeVideo> getVideosByTitle(@Parameter(example = "shorts") String title, @RequestParam(defaultValue = "0")int page){
-		List<YouTubeVideo> videos = videoRepository.findByKeyword(title, PageRequest.of(0, 20)).getContent();
-		log.info("Found {} videos", videos.size());
+	@Operation(summary = "Search videos from elastic search", description = "Returns videos stored in the database.")
+	public List<YouTubeVideo> searchVideos(@Parameter(example = "shorts") @RequestParam String keyword,
+		@Parameter(example = "0") @RequestParam int page) {
+		List<YouTubeVideo> videos = videoRepository.findByKeyword(keyword, PageRequest.of(page, 20)).getContent();
+
+		log.info("Found {} videos with keyword {}", videos.size(), keyword);
 		return videos;
 	}
 

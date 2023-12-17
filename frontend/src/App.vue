@@ -15,13 +15,13 @@
           </el-button>
 
           <!-- TUM Logo -->
-          <img :src="require('@/assets/tum_logo.png')" alt="TUM Logo"
-            style="height: 30px; width: auto; margin-left: 10px;">
+          <!-- <img :src="require('@/assets/tum_logo.png')" alt="TUM Logo"
+            style="height: 30px; width: auto; margin-left: 10px;"> -->
         </el-col>
 
         <!-- Search Bar -->
         <el-col :span="8" :offset="6">
-          <SearchBar @search="handleSearch"/>
+          <SearchBar @search="handleSearch" />
         </el-col>
 
         <!-- Login Component -->
@@ -41,7 +41,7 @@
       <el-main>
         <!-- Content for Videos -->
         <div v-if="state.selectedKeys[0] === '1'">
-          <VideoList :videos="videos"/>
+          <VideoList :videos="videos" />
         </div>
 
         <!-- Content for Hot Videos-->
@@ -77,12 +77,14 @@ import {
   VideoCameraOutlined,
 } from '@ant-design/icons-vue';
 import { Fold, Expand } from '@element-plus/icons-vue';
+
 const state = reactive({
-  collapsed: false,
+  collapsed: true,
   selectedKeys: ['1'],
   openKeys: ['sub1'],
   preOpenKeys: ['sub1'],
 });
+
 const items = reactive([
   {
     key: '1',
@@ -138,7 +140,7 @@ const getRecommendations = async () => {
 };
 const handleSearch = async (query) => {
   try {
-    videos.value = query=="" ? await apiClient.getRecommendations() : await apiClient.searchVideos(query);
+    videos.value = query == "" ? await apiClient.getRecommendations() : await apiClient.searchVideos(query);
   } catch (error) {
     console.error('Error getting videos:', error);
   }
@@ -153,5 +155,4 @@ const handleSearch = async (query) => {
 .el-main {
   height: 100%;
 }
-
 </style>

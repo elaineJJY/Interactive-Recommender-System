@@ -75,6 +75,15 @@ Recommended Solution:
 scp /path/to/local/Interactive-Recommender-System/backend/target/rs-0.0.1-SNAPSHOT.jar  user@vm-address:/path/to/remote/Interactive-Recommender-System/backend/target
 ```
 
+#### Elasticsearch Crashes on Startup
+When deploying Elasticsearch, especially in resource-constrained environments, it's common to encounter situations where the service crashes shortly after startup. This can be due to insufficient memory allocation, high workload demands, or misconfigurations.
+
+Recommended Solution:
+Manual Restart: Sometimes, a simple restart can resolve temporary issues. Use the following command to restart Elasticsearch:
+```bash
+docker restart [container_name]
+```
+
 ## License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](https://chat.openai.com/c/LICENSE) file for details.
