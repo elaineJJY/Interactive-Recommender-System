@@ -1,5 +1,7 @@
 package de.tum.rs.controller;
 
+import de.tum.rs.dao.User;
+import de.tum.rs.repository.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -17,23 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
 	@Autowired
-	private ElasticsearchOperations elasticsearchOperations;
-
-	private static final String INDEX_PREFIX = "profile.";
+	private UserRepository userRepository;
 
 	@PostMapping
-	public ResponseEntity<?> loginUser(@RequestBody String userId) {
+	public ResponseEntity<?> loginUser(@RequestBody User user) {
 
-		String indexName = INDEX_PREFIX + userId;
-
-		// Check if the index exists
-		boolean indexExists = elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).exists();
-
-		if (!indexExists) {
-			// If the index doesn't exist, create it
-			elasticsearchOperations.indexOps(IndexCoordinates.of(indexName)).create();
-			log.info("Created index: " + indexName);
-		}
+		userRepository.save(user);
 
 		return ResponseEntity.ok().body("Login successful!");
 	}

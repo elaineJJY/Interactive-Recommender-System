@@ -1,6 +1,7 @@
 <template>
     <div class="video-component">
-        <iframe id="video-player" ref="videoFrame" :src="buildURL(videoInfo.id)" :title="videoInfo.snippet.title" frameborder="0"
+        <iframe id="video-player" ref="videoFrame" :src="buildURL(videoInfo.id)" :title="videoInfo.snippet.title"
+            frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen class="video-frame"></iframe>
         <!-- <div class="video-info-card">
@@ -28,14 +29,14 @@
                         <InfoCircleFilled />
                     </template>
                 </a-button>
-                <a-button shape="circle" size="large">
+                <a-button shape="circle" size="large" @click="submitLikeFeedback">
                     <template #icon>
-                        <LikeFilled />
+                        <LikeTwoTone :two-tone-color="likeClicked ? '#f5222d' : '#000000'" />
                     </template>
                 </a-button>
-                <a-button shape="circle" size="large">
+                <a-button shape="circle" size="large" @click="submitDislikeFeedback">
                     <template #icon>
-                        <DislikeFilled />
+                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#eb2f96' : '#000000'" />
                     </template>
                 </a-button>
             </a-space-compact>
@@ -46,13 +47,18 @@
 <script setup>
 /* global YT */
 import { defineProps, onMounted, onUnmounted, ref } from 'vue';
-import { InfoCircleFilled, LikeFilled, DislikeFilled } from '@ant-design/icons-vue';
-defineProps({
+import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone } from '@ant-design/icons-vue';
+import apiClient from '@/config/apiClient';
+const props = defineProps({
     videoInfo: {
         type: Object,
         required: true,
     },
 });
+
+const likeClicked = ref(false);
+const dislikeClicked = ref(false);
+
 
 const videoFrame = ref(null);
 
@@ -111,6 +117,26 @@ function onPlayerStateChange(event) {
     }
 }
 
+function submitLikeFeedback() {
+    likeClicked.value = !likeClicked.value;
+    if (dislikeClicked.value) dislikeClicked.value = false;
+    const feedback = {
+        videoId: props.videoInfo.id,
+        rating: 1
+    };
+    apiClient.submitFeedback(feedback);
+}
+
+function submitDislikeFeedback() {
+    dislikeClicked.value = !dislikeClicked.value;
+    // Reset like button if it was clicked
+    if (likeClicked.value) likeClicked.value = false;
+    const feedback = {
+        videoId: props.videoInfo.id,
+        rating: -1
+    };
+    apiClient.submitFeedback(feedback);
+}
 
 </script>
 

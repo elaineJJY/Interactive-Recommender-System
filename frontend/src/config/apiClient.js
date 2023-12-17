@@ -12,7 +12,7 @@ const apiClient = axios.create({
 
 export default {
     login(userId) {
-        return apiClient.post('/login', { userId });
+        return apiClient.post('/login', { userId: userId });
     },
     async getRecommendations() {
 
@@ -34,6 +34,18 @@ export default {
         }
         catch (error) {
             console.error('Error searching videos:', error);
+            throw error;
+        }
+    },
+    async submitFeedback(feedback) {
+        try {
+            feedback.userId = globalState.userId;
+            feedback.timestamp = new Date().toISOString();
+            let response = await apiClient.post(`/feedback`, feedback);
+            return response.data;
+        }
+        catch (error) {
+            console.error('Error saving feedback:', error);
             throw error;
         }
     },
