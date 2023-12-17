@@ -1,9 +1,8 @@
 <template>
   <el-container>
-    <el-header style="margin-top: 10px;">
+    <el-header style="margin-top: 5px;">
       <el-row align="middle" justify-content="end">
         <el-col :span="3">
-
           <!-- Toggle Button -->
           <el-button @click="toggleCollapsed" text size="large">
             <el-icon v-if="state.collapsed" size="large">
@@ -41,7 +40,7 @@
       <el-main>
         <!-- Content for Videos -->
         <div v-if="state.selectedKeys[0] === '1'">
-          <VideoList :videos="videos" />
+          <VideoList :videos="videos" @videoListEnded="getRecommendations"/>
         </div>
 
         <!-- Content for Hot Videos-->
@@ -133,7 +132,8 @@ onMounted(() => {
 
 const getRecommendations = async () => {
   try {
-    videos.value = await apiClient.getRecommendations();
+    // add all videos to the videos array
+    videos.value.push(...(await apiClient.getRecommendations()));
   } catch (error) {
     console.error('Error getting videos:', error);
   }

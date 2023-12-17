@@ -1,22 +1,54 @@
 <template>
-    <div>
-        <el-row :gutter="5">
-            <el-col :span="8" v-for="(video, index) in videos" :key="index">
-                <VideoComponent :videoInfo="video" />
-            </el-col>
-        </el-row>
+    <div class="tiktok-scroll-container">
+            <div v-for="(video, index) in videos" :key="index" class="video-row">
+                <VideoComponent :videoInfo="video"  @videoEnded="handleVideoEnded"/>
+                <div v-if="index < videos.length - 1" class="divider"></div>
+            </div>
     </div>
 </template>
 
+
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps,ref } from 'vue';
 
 import VideoComponent from './VideoComponent.vue';
-
-// Define the 'videos' prop
 defineProps({
     videos: Array
 });
-
-
+const currentIndex = ref(0);
+function handleVideoEnded() {
+    console.log("handle");
+    if (currentIndex.value < this.videos.length - 1) {
+        currentIndex.value++;
+        console.log("video:"+currentIndex.value);
+    } else {
+        // eslint-disable-next-line no-undef
+        emit('videoListEnded');
+    }
+}
 </script>
+
+
+<style>
+.tiktok-scroll-container {
+    overflow-y: scroll;
+    /* Enable vertical scrolling */
+    height: 100vh;
+    /* Full viewport height */
+    scroll-snap-type: y mandatory;
+    /* Enable snap scrolling */
+}
+
+.video-row {
+    height: 100vh;
+    scroll-snap-align: start;
+}
+
+.divider {
+    height: 1px;
+    background-color: grey;
+    width: 50%;
+    margin: 0 auto;
+    margin-top: 50px;
+}
+</style>

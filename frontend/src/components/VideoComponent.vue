@@ -1,28 +1,52 @@
 <template>
-    <el-card :body-style="{ padding: '0px' }">
-        <div class="video-wrapper">
-            <iframe :src="buildURL(videoInfo.id)" :title="videoInfo.snippet.title" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen></iframe>
-        </div>
-        <div style="padding: 14px">
-            <span>{{ videoInfo.snippet.title }}</span>
+    <div class="video-component">
+        <iframe id="video-player" ref="videoFrame" :src="buildURL(videoInfo.id)" :title="videoInfo.snippet.title" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen class="video-frame"></iframe>
+        <!-- <div class="video-info-card">
+
             <div class="bottom">
-                <!-- <span>{{ videoInfo.snippet.description }}</span> -->
-                <el-button text class="button">
-                    <el-icon class="info-icon">
+                <div>
+                    <span class="info-icon">
                         <InfoFilled />
-                    </el-icon>
-                    <span class="info-text">Info</span>
-                </el-button>
+                    </span>
+                    <span class="info-text">{{ videoInfo.snippet.title }}</span>
+                </div>
+                <div>
+                    <span class="info-icon">
+                        <LikeFilled />
+                    </span>
+                    <span class="info-text">{{ videoInfo.statistics.likeCount }}</span>
+                </div>
             </div>
+            
+        </div> -->
+        <div class="video-button-list">
+            <a-space-compact direction="vertical" size="large">
+                <a-button shape="circle" size="large">
+                    <template #icon>
+                        <InfoCircleFilled />
+                    </template>
+                </a-button>
+                <a-button shape="circle" size="large">
+                    <template #icon>
+                        <LikeFilled />
+                    </template>
+                </a-button>
+                <a-button shape="circle" size="large">
+                    <template #icon>
+                        <DislikeFilled />
+                    </template>
+                </a-button>
+            </a-space-compact>
         </div>
-    </el-card>
+    </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-import { InfoFilled } from '@element-plus/icons-vue';
+/* global YT */
+import { defineProps, onMounted, onUnmounted, ref } from 'vue';
+import { InfoCircleFilled, LikeFilled, DislikeFilled } from '@ant-design/icons-vue';
 defineProps({
     videoInfo: {
         type: Object,
@@ -30,51 +54,97 @@ defineProps({
     },
 });
 
+const videoFrame = ref(null);
+
 function buildURL(videoId) {
-    return `https://www.youtube.com/embed/${videoId}`;
+    return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}`;
 }
+
+let observer;
+onMounted(() => {
+    if (videoFrame.value) {
+        observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    videoFrame.value.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                } else {
+                    videoFrame.value.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        observer.observe(videoFrame.value);
+    }
+
+});
+onUnmounted(() => {
+    if (observer) {
+        observer.disconnect();
+    }
+});
+
+// eslint-disable-next-line no-unused-vars
+let player;
+onMounted(() => {
+    if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    window.onYouTubeIframeAPIReady = () => {
+        player = new YT.Player('video-player', {
+            events: {
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    };
+});
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        // eslint-disable-next-line no-undef
+        // emit('videoEnded');
+    }
+}
+
+
 </script>
 
 <style scoped>
-/* Ensure the video wrapper maintains a 16:9 aspect ratio */
-.video-wrapper {
-    position: relative;
-    width: 100%;
-    padding-bottom: 56.25%;
-    /* 16:9 aspect ratio (9 / 16 * 100%) */
-}
-
-iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/* Style for the button and other elements */
-.bottom {
-    margin-top: 13px;
-    line-height: 12px;
+.video-component {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    height: 85vh;
+    margin: 0 auto;
+    max-width: 90%;
 }
 
-.button {
-    padding: 5px;
-    min-height: auto;
+.video-frame {
+    width: 45vh;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
-/* Style for the Info icon and text */
-.info-icon {
-    margin-right: 5px;
-    /* Add spacing between the icon and text */
-    color: #2c70b4c5;
+.video-button-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    width: 5%;
+    height: 100%;
+    padding-bottom: 20px;
+    margin-left: 10px;
 }
 
-.info-text {
-    color: #2c70b4c5;
-    /* Change the text color to light blue */
+.a-space {
+    margin-bottom: 60px;
+    font-size: 20px;
 }
 </style>
