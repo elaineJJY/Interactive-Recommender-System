@@ -36,7 +36,7 @@
                 </a-button>
                 <a-button shape="circle" size="large" @click="submitDislikeFeedback">
                     <template #icon>
-                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#eb2f96' : '#000000'" />
+                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#52c41a' : '#000000'" />
                     </template>
                 </a-button>
             </a-space-compact>

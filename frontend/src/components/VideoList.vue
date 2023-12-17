@@ -33,22 +33,23 @@ function handleVideoEnded() {
 .tiktok-scroll-container {
     overflow-y: scroll;
     /* Enable vertical scrolling */
-    height: 100vh;
+    height: 100%;
     /* Full viewport height */
     scroll-snap-type: y mandatory;
     /* Enable snap scrolling */
 }
 
 .video-row {
-    height: 100vh;
+    height: 100%;
     scroll-snap-align: start;
 }
 
 .divider {
     height: 1px;
-    background-color: grey;
-    width: 50%;
+    background-color: rgba(221, 221, 221, 0.614);
+    width: 60%;
     margin: 0 auto;
     margin-top: 50px;
+    margin-bottom: 50px;
 }
 </style>

@@ -29,7 +29,7 @@ This project is containerized using Docker and orchestrated using Docker Compose
 
 1. **Clone the Repository**:
    
-   Download the rs-0.0.1-SNAPSHOT.jar and put it into folder `Interactive-Recommender-System/backend/target`
+   Download the rs-0.0.1-SNAPSHOT.jar from `Release` and put it into folder `Interactive-Recommender-System/backend/target`
    ```bash
    cd Interactive-Recommender-System
    ```
