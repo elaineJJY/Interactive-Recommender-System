@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import javax.annotation.Nullable;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Log4j2
@@ -32,13 +34,22 @@ public class LocalVideoController {
 
 	@GetMapping("/recommendations")
 	@Operation(summary = "Get recommendations using model", description = "Returns recommendations stored in the database.")
-	public List<YouTubeVideo> getRecommendations(String userId) {
+	public List<YouTubeVideo> getRecommendations(@Nullable String userId) {
 		int page = random.nextInt(100);
 		Page<YouTubeVideo> videoPage = videoRepository.findAll(PageRequest.of(page, 20));
 		List<YouTubeVideo> videos = videoPage.getContent();
 		log.info("Got {} recommendations", videos.size());
 		return videos;
 	}
+
+	@GetMapping("/search")
+	@Operation(summary = "Get videos by title", description = "Returns videos stored in the database with the given title.")
+	public List<YouTubeVideo> getVideosByTitle(@Parameter(example = "shorts") String title, @RequestParam(defaultValue = "0")int page){
+		List<YouTubeVideo> videos = videoRepository.findByKeyword(title, PageRequest.of(0, 20)).getContent();
+		log.info("Found {} videos", videos.size());
+		return videos;
+	}
+
 
 	@GetMapping("/all")
 	@Operation(summary = "Get videos from elastic search in pages", description = "Returns all videos stored in the database.")
