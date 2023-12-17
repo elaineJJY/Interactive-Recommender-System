@@ -29,24 +29,17 @@ This project is containerized using Docker and orchestrated using Docker Compose
 
 1. **Clone the Repository**:
    
-   Download the rs-0.0.1-SNAPSHOT.jar and put it into folder "Interactive-Recommender-System/backend/target"
+   Download the rs-0.0.1-SNAPSHOT.jar and put it into folder `Interactive-Recommender-System/backend/target`
    ```bash
    cd Interactive-Recommender-System
    ```
 
 2. **Configure your Google API Keys in docker-compose.yml:**
 
-   In the `docker-compose.yml` file, locate the `backend` service configuration. Add your Google API keys to the `environment` section as shown below. Replace `APIKEY1, APIKEY2, APIKEY3` with your actual Google API keys, separating each key with a comma.
+   In the `.env` file, replace `APIKEY1, APIKEY2, APIKEY3` with your actual Google API keys, separating each key with a comma. You can also define which port to use for your services
 
-   ```dockerfile
-   backend:
-       build:
-         context: ./backend
-       ports:
-         - 8081:8081
-       environment:
-         - SPRING_ELASTICSEARCH_URIS=http://es:9200
-         - API_KEYS="APIKEY1,APIKEY2,APIKEY3"
+   ```bash
+   API_KEYS="APIKEY1,APIKEY2,APIKEY3"
    ```
 
 3. **Build and Run the Docker Compose Stack**:
