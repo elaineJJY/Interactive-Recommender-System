@@ -4,127 +4,36 @@ import axios from 'axios';
 import JSZip from 'jszip';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8081',
+    baseURL: process.env.API_BASE_URL || 'http://localhost:8081',
     headers: {
         'Content-Type': 'application/json'
     }
 });
 
-const API_KEY = 'AIzaSyCScOmixSUEzSbl7AiTmw-oCWzH16RJNk0'; // Replace with your YouTube Data API key
-
 export default {
     login(userId) {
         return apiClient.post('/login', { userId });
-
-        // TODO: Remove this mock request
-        // globalState.userId = userId;
-        // return {
-        //     status: 200,
-        //     message: 'Login successful'
-        // }
     },
-    async getVideos() {
-       
+    async getRecommendations() {
+
         try {
-            let response;
-            if (globalState.userId) {
-                response = await apiClient.get(`/videos/recommendations?userId=${globalState.userId}`);
-            } else {
-                response = await apiClient.get('/videos/all');
-            }
-            return response;
+            let response = await apiClient.get(`/videos/recommendations?userId=${globalState.userId}`);
+
+            return response.data;
         } catch (error) {
             console.error('Error fetching videos:', error);
             throw error;
         }
     },
 
-    async searchVideos(keyword) {
-        return apiClient.get(`/youtube/search/${keyword}`);
-        // try {
-        //     const searchUrl = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&q=${encodeURIComponent(keyword)}&part=snippet&maxResults=${maxResults}`;
-        //     const searchResponse = await axios.get(searchUrl);
-
-        //     const videoIds = searchResponse.data.items.map(item => item.id.videoId).join(',');
-        //     const details = await this.getDetails(videoIds, regionCode);
-        //     const videos = details.map(detail => ({
-        //         url: `https://www.youtube.com/embed/${detail.id}`,
-        //         ...detail
-        //     }));
-
-        //     // for test: download video details separately
-        //     await this.createAndDownloadZip(videos, keyword + '.zip');
-
-        //     return {
-        //         status: 200,
-        //         data: videos
-        //     };
-        // } catch (error) {
-        //     console.error('Error fetching videos:', error);
-        //     return {
-        //         status: error.response ? error.response.status : 500,
-        //         message: error.message,
-        //         data: []
-        //     };
-        // }
-    },
-
-
-    async getDetails(videoIds, regionCode = 'DE') {
-        const detailsUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoIds}&key=${API_KEY}&part=snippet,topicDetails,statistics,status`;
+    async searchVideos(keyword, page = 0) {
         try {
-            const response = await axios.get(detailsUrl);
-            // this.downloadData(response.data, 'videoDetails.json'); // for test
-
-            var videoDetails = response.data.items.filter(video =>
-                video.status.embeddable &&
-                video.status.privacyStatus !== 'private' &&
-                (!video.status.regionRestriction ||
-                    (!video.status.regionRestriction.blocked ||
-                        !video.status.regionRestriction.blocked.includes(regionCode)))
-            );
-
-            
-
-            return videoDetails;
-        } catch (error) {
-            console.error('Error in getDetails:', error);
-            throw error;
+            let response = await apiClient.get(`/videos/search?keyword=${keyword}&page=${page}`);
+            return response.data;
         }
-    },
-
-
-    async fetchMostPopularVideos(maxResults = 50, regionCode = 'DE') {
-        try {
-            const popularVideosUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,status&chart=mostPopular&maxResults=${maxResults}&regionCode=${regionCode}&key=${API_KEY}`;
-            const response = await axios.get(popularVideosUrl);
-
-            const videos = response.data.items
-                .filter(video =>
-                    video.status.embeddable &&
-                    video.status.privacyStatus !== 'private' &&
-                    (!video.status.regionRestriction ||
-                        (!video.status.regionRestriction.blocked ||
-                            !video.status.regionRestriction.blocked.includes(regionCode)))
-                )
-                .map(video => ({
-                    url: `https://www.youtube.com/embed/${video.id}`,
-                    ...video
-                }));
-
-            // for test: download video details separately
-            await this.createAndDownloadZip(videos, 'mostPopularVideos.zip');
-            return {
-                status: 200,
-                data: videos
-            };
-        } catch (error) {
-            console.error('Error fetching most popular videos:', error);
-            return {
-                status: error.response ? error.response.status : 500,
-                message: error.message,
-                data: []
-            };
+        catch (error) {
+            console.error('Error searching videos:', error);
+            throw error;
         }
     },
     async downloadData(data, filename) {

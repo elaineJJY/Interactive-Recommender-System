@@ -125,20 +125,20 @@ const toggleCollapsed = () => {
 const videos = ref([]);
 onMounted(() => {
   globalState.userId = JSON.parse(localStorage.getItem('userId'));
-  handleSearch('');
+  getRecommendations();
 
 });
+
+const getRecommendations = async () => {
+  try {
+    videos.value = await apiClient.getRecommendations();
+  } catch (error) {
+    console.error('Error getting videos:', error);
+  }
+};
 const handleSearch = async (query) => {
   try {
-    // const response = await apiClient.searchVideos(query);
-    const response = query=="" ? await apiClient.getVideos() : await apiClient.searchVideos(query);
-    console.log(query);
-    
-    if (response.status === 200) {
-      videos.value = response.data;
-    } else {
-      console.error('Error getting videos:', response.statusText);
-    }
+    videos.value = query=="" ? await apiClient.getRecommendations() : await apiClient.searchVideos(query);
   } catch (error) {
     console.error('Error getting videos:', error);
   }

@@ -77,6 +77,8 @@ services:
       context: ./frontend
     ports:
       - ${FRONTEND_PORT}:8080
+    environment:
+      - API_BASE_URL=http://backend:8081
     depends_on:
       - backend
 
