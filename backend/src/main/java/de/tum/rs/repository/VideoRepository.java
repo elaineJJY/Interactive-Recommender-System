@@ -14,6 +14,18 @@ import org.springframework.stereotype.Repository;
 public interface VideoRepository extends ElasticsearchRepository<YouTubeVideo, String> {
 	Page<YouTubeVideo> findAll(Pageable pageable);
 
-	@Query("{\"query_string\" : {\"query\" : \"?0\"}}")
+
+	// if the keyword is in the title/description/tags, then return the video
+	@Query("{\n" +
+		"  \"bool\": {\n" +
+		"    \"should\": [\n" +
+		"      {\"wildcard\": {\"snippet.title\": \"*?0*\"}},\n" +
+		"      {\"wildcard\": {\"snippet.description\": \"*?0*\"}},\n" +
+		"      {\"wildcard\": {\"snippet.tags\": \"*?0*\"}}\n" +
+		"    ],\n" +
+		"    \"minimum_should_match\": 1\n" +
+		"  }\n" +
+		"}")
 	Page<YouTubeVideo> findByKeyword(String keyword, Pageable pageable);
+
 }

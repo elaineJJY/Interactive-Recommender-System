@@ -16,11 +16,11 @@ RUN npm install
 COPY . .
 
 # set env variable
-ARG API_BASE_URL
-ENV VUE_APP_API_BASE_URL=$API_BASE_URL
+ARG VUE_APP_API_BASE_URL
+ENV VUE_APP_API_BASE_URL=$VUE_APP_API_BASE_URL
 
 # build app for production with minification
 RUN npm run build
 
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+CMD ["npm", "run", "serve"]
