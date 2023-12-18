@@ -46,9 +46,10 @@
 
 <script setup>
 /* global YT */
-import { defineProps, onMounted, onUnmounted, ref } from 'vue';
+import { defineProps, onMounted, onUnmounted, ref, defineEmits } from 'vue';
 import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone } from '@ant-design/icons-vue';
 import apiClient from '@/config/apiClient';
+
 const props = defineProps({
     videoInfo: {
         type: Object,
@@ -94,26 +95,35 @@ onUnmounted(() => {
 // eslint-disable-next-line no-unused-vars
 let player;
 onMounted(() => {
-    if (!window.YT) {
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    function loadYTScript() {
+        return new Promise((resolve) => {
+            if (!window.YT) {
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+                window.onYouTubeIframeAPIReady = () => resolve(window.YT);
+            } else {
+                resolve(window.YT);
+            }
+        });
     }
 
-    window.onYouTubeIframeAPIReady = () => {
+    loadYTScript().then(YT => {
         player = new YT.Player('video-player', {
             events: {
                 'onStateChange': onPlayerStateChange
             }
         });
-    };
+    }).catch(error => console.error('YouTube Iframe API failed to load:', error));
 });
 
+const emit = defineEmits(['videoEnded']);
 function onPlayerStateChange(event) {
     if (event.data === YT.PlayerState.ENDED) {
         // eslint-disable-next-line no-undef
-        // emit('videoEnded');
+        emit('videoEnded');
     }
 }
 

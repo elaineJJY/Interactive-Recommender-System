@@ -40,6 +40,9 @@ export default {
     async submitFeedback(feedback) {
         try {
             feedback.userId = globalState.userId;
+            if (!feedback.userId) {
+                throw new Error('User is not logged in');
+            }
             feedback.timestamp = new Date().toISOString();
             let response = await apiClient.post(`/feedback`, feedback);
             return response.data;

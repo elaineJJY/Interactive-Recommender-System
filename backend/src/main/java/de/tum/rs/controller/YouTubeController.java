@@ -111,17 +111,17 @@ public class YouTubeController {
 
 	@GetMapping("/searchBatch")
 	@Operation(summary = "Batch Video Search", description = "Search for videos based on multiple keywords. Keywords are separated by '|'. Returns a combined list of videos matching any of the specified keywords.")
-	public List<Video> searchVideosBatch(
+	public List<String> searchVideosBatch(
 		@Parameter(name = "prefix", description = "prefix for every keyword", example = "#shorts") @Nullable String prefix,
 		@Parameter(example = "Comedy | Challenge | DIY") String keywords,
 		@Parameter(example = "2023-01-01") String after,
 		@Parameter(example = "2023-02-01") String before,
 		@Parameter(example = "2", description = "The number of intervals to divide the time range between 'after' and 'before' dates. This determines how many times the search will be performed for each keyword within the specified date range, each time covering a different time interval.") int times)
 		throws IOException, ParseException {
-		List<Video> videos = new LinkedList<>();
+
 		String[] keywordArray = keywords.split("\\|");
 		prefix = prefix == null || prefix.equals("") ? "" : prefix + " ";
-
+		List<String> results = new LinkedList<>();
 		// calculate date ranges based on the given parameters after, before and times
 		List<String[]> dateRanges = calculateDateRanges(after, before, times);
 		for (String keyword : keywordArray) {
@@ -132,7 +132,9 @@ public class YouTubeController {
 					String currentBefore = dateRange[1];
 					List<Video> videosForKeyword = this.searchVideos(prefix + keyword, currentAfter,
 						currentBefore);
-					videos.addAll(videosForKeyword);
+					results.add("Found " + videosForKeyword.size() + " videos for keyword " + keyword
+						+ ", between " + currentAfter + " and " + currentBefore);
+
 				} catch (GoogleJsonResponseException e) {
 					boolean isApiKeyExhausted = e.getMessage()
 						.contains("The request cannot be completed because you have exceeded your");
@@ -145,12 +147,14 @@ public class YouTubeController {
 						String currentBefore = dateRange[1];
 						List<Video> videosForKeyword = this.searchVideos(prefix + keyword, currentAfter,
 							currentBefore);
-						videos.addAll(videosForKeyword);
+
+						results.add("Found " + videosForKeyword.size() + " videos for keyword " + keyword
+							+ ", between " + currentAfter + " and " + currentBefore);
 					}
 				}
 			}
 		}
-		return videos;
+		return results;
 	}
 
 

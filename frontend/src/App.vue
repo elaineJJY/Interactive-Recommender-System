@@ -1,6 +1,6 @@
 <template>
-  <el-container>
-    <el-header style="margin-top: 5px;">
+  <el-container style="height: 100vh;">
+    <el-header>
       <el-row align="middle" justify-content="end">
         <el-col :span="3">
           <!-- Toggle Button -->
@@ -30,7 +30,7 @@
       </el-row>
     </el-header>
 
-    <el-container>
+    <el-container style="margin-top: 60px; height: calc(100vh - 60px);">
 
       <el-aside :width="state.collapsed ? '80px' : '150px'" class="sidebar">
         <a-menu v-model:openKeys="state.openKeys" v-model:selectedKeys="state.selectedKeys" mode="inline"
@@ -148,11 +148,21 @@ const handleSearch = async (query) => {
 </script>
 
 <style>
+.el-header {
+  background-color: #fff;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  position: fixed;
+  width: 100%;
+  margin-top: 5px;
+}
 .el-aside {
   height: 100%;
+  overflow-y: auto;
 }
 
 .el-main {
   height: 100%;
+  overflow-y: auto;
 }
 </style>
