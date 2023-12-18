@@ -91,6 +91,7 @@ public class YouTubeController {
 		request.setVideoEmbeddable("true");
 		request.setVideoDuration("short");
 		request.setRegionCode(REGION_CODE);
+		request.setRelevanceLanguage("en");
 
 		if (after != null && !after.equals("")) {
 			request.setPublishedAfter(after + "T00:00:00Z");
