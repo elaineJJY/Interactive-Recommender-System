@@ -39,7 +39,7 @@ This project is containerized using Docker and orchestrated using Docker Compose
    In the `.env` file, replace `APIKEY1, APIKEY2, APIKEY3` with your actual Google API keys, separating each key with a comma. You can also define which port to use for your services
 
    ```bash
-   API_KEYS="APIKEY1,APIKEY2,APIKEY3"
+   API_KEYS=APIKEY1,APIKEY2,APIKEY3
    ```
 
 3. **Build and Run the Docker Compose Stack**:
