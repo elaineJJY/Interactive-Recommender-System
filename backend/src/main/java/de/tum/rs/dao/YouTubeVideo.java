@@ -1,15 +1,22 @@
 package de.tum.rs.dao;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.api.client.util.Key;
+import com.google.api.services.youtube.model.AccessPolicy;
 import com.google.api.services.youtube.model.ContentRating;
+import com.google.api.services.youtube.model.VideoContentDetailsRegionRestriction;
 import com.google.api.services.youtube.model.VideoTopicDetails;
 import java.util.List;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Data
 @Document(indexName = "videos")
+@JsonIgnoreProperties("_class")
 public class YouTubeVideo{
 
 	@Id
@@ -54,7 +61,8 @@ public class YouTubeVideo{
 
 	@Data
 	static class Thumbnails {
-		private Thumbnail defaultThumbnail;
+		@Field(name = "default", type = FieldType.Object)
+		private Thumbnail Default;
 		private Thumbnail high;
 		private Thumbnail maxres;
 		private Thumbnail medium;
@@ -90,11 +98,14 @@ public class YouTubeVideo{
 	static class ContentDetails {
 		private String caption;
 		private ContentRating contentRating;
+		private AccessPolicy countryRestriction;
 		private String definition;
 		private String dimension;
 		private String duration;
+		private Boolean hasCustomThumbnail;
 		private Boolean licensedContent;
 		private String projection;
+		private VideoContentDetailsRegionRestriction regionRestriction;
 	}
 }
 
