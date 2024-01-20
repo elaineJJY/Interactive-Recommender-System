@@ -81,7 +81,7 @@ public class YouTubeController {
 	public List<Video> searchVideos(@Parameter(example = "#shorts db") String keyword,
 		@Nullable @Parameter(example = "2023-12-01") String after,
 		@Nullable @Parameter(example = "2023-12-08") String before) throws IOException {
-
+		keyword = keyword.trim();
 		// create a request to search for videos
 		YouTube.Search.List request = youtube.search().list(Collections.singletonList("snippet"));
 		request.setQ(keyword);
@@ -114,13 +114,14 @@ public class YouTubeController {
 	@Operation(summary = "Batch Video Search", description = "Search for videos based on multiple keywords. Keywords are separated by '|'. Returns a combined list of videos matching any of the specified keywords.")
 	public List<String> searchVideosBatch(
 		@Parameter(name = "prefix", description = "prefix for every keyword", example = "#shorts") @Nullable String prefix,
-		@Parameter(example = "Comedy | Challenge | DIY") String keywords,
+		@Parameter(example = "Comedy | Challenge | DIY") @Nullable String keywords,
 		@Parameter(example = "2023-01-01") String after,
 		@Parameter(example = "2023-02-01") String before,
 		@Parameter(example = "2", description = "The number of intervals to divide the time range between 'after' and 'before' dates. This determines how many times the search will be performed for each keyword within the specified date range, each time covering a different time interval.") int times)
 		throws IOException, ParseException {
 
-		String[] keywordArray = keywords.split("\\|");
+		String[] keywordArray =
+			keywords == null || keywords.length() == 0 ? new String[]{""} : keywords.split("\\|");
 		prefix = prefix == null || prefix.equals("") ? "" : prefix + " ";
 		List<String> results = new LinkedList<>();
 		// calculate date ranges based on the given parameters after, before and times
@@ -133,24 +134,28 @@ public class YouTubeController {
 					String currentBefore = dateRange[1];
 					List<Video> videosForKeyword = this.searchVideos(prefix + keyword, currentAfter,
 						currentBefore);
-					results.add("Found " + videosForKeyword.size() + " videos for keyword " + keyword
-						+ ", between " + currentAfter + " and " + currentBefore);
+					results.add(
+						"Found " + videosForKeyword.size() + " videos for keyword " + keyword
+							+ ", between " + currentAfter + " and " + currentBefore);
 
 				} catch (GoogleJsonResponseException e) {
 					boolean isApiKeyExhausted = e.getMessage()
 						.contains("The request cannot be completed because you have exceeded your");
 					if (isApiKeyExhausted) {
 						apiController.switchToNextKey();
-						log.warn("API key exhausted, switching to next key: {}", apiController.getCurrentApiKey());
+						log.warn("API key exhausted, switching to next key: {}",
+							apiController.getCurrentApiKey());
 
 						// retry the request with the next API key
 						String currentAfter = dateRange[0];
 						String currentBefore = dateRange[1];
-						List<Video> videosForKeyword = this.searchVideos(prefix + keyword, currentAfter,
+						List<Video> videosForKeyword = this.searchVideos(prefix + keyword,
+							currentAfter,
 							currentBefore);
 
-						results.add("Found " + videosForKeyword.size() + " videos for keyword " + keyword
-							+ ", between " + currentAfter + " and " + currentBefore);
+						results.add(
+							"Found " + videosForKeyword.size() + " videos for keyword " + keyword
+								+ ", between " + currentAfter + " and " + currentBefore);
 					}
 				}
 			}
@@ -164,7 +169,8 @@ public class YouTubeController {
 			return new ArrayList<>();
 		}
 		YouTube.Videos.List request = youtube.videos()
-			.list(Collections.singletonList("snippet,topicDetails,statistics,status,contentDetails"));
+			.list(
+				Collections.singletonList("snippet,topicDetails,statistics,status,contentDetails"));
 		request.setId(videoIds);
 		request.setKey(apiController.getCurrentApiKey());
 
@@ -224,7 +230,6 @@ public class YouTubeController {
 //			&& video.getSnippet().getTags().size() > 0) {
 //			elasticsearchOperations.save(video, IndexCoordinates.of(SHORTS_INDEX_NAME));
 //		}
-
 
 //		saveToLocal(video); // save the video in local folder
 
