@@ -5,12 +5,14 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tum.rs.dao.YouTubeVideo;
 import de.tum.rs.repository.VideoRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
@@ -37,6 +39,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -174,6 +178,18 @@ public class TestController {
 			log.error("Error saving video to local folder", e);
 		}
 	}
+
+	@GetMapping("/all")
+	@Operation(summary = "Get videos from elastic search in pages", description = "Returns all videos stored in the database.")
+	@Async
+	public List<YouTubeVideo> getAllVideos(int page, int size) {
+		List<YouTubeVideo> videos = videoRepository.findAll(PageRequest.of(page, size))
+			.getContent();
+
+		log.info("Found {} videos", videos.size());
+		return videos;
+	}
+
 
 
 }

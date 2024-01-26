@@ -2,7 +2,7 @@ export default {
     install(app) {
         const globalState = {
             userId: null,
-            videos: [],
+            feedbacks: new Array()
         };
         app.config.globalProperties.$globalState = globalState;
     }

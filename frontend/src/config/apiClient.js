@@ -2,6 +2,7 @@
 import globalState from './globalState';
 import axios from 'axios';
 import JSZip from 'jszip';
+import { ElMessage } from 'element-plus';
 
 const apiClient = axios.create({
     baseURL: '/api',
@@ -11,14 +12,17 @@ const apiClient = axios.create({
 });
 
 export default {
+    register(userId) {
+        return apiClient.post('/users/register', { userId: userId });
+    },
     login(userId) {
-        return apiClient.post('/login', { userId: userId });
+        return apiClient.post('/users/login', { userId: userId });
     },
     async getRecommendations() {
 
         try {
             let response = await apiClient.get(`/videos/recommendations?userId=${globalState.userId}`);
-
+            console.log('getRecommendations', response.data);
             return response.data;
         } catch (error) {
             console.error('Error fetching videos:', error);
@@ -28,8 +32,8 @@ export default {
 
     async searchVideos(keyword, page = 0) {
         try {
-            console.log('Searching videos for keyword:', keyword);
             let response = await apiClient.get(`/videos/search?keyword=${keyword}&page=${page}`);
+            console.log(response.data);
             return response.data;
         }
         catch (error) {
@@ -41,11 +45,20 @@ export default {
         try {
             feedback.userId = globalState.userId;
             if (!feedback.userId) {
-                throw new Error('User is not logged in');
+                ElMessage.error('Please login first');
+                return false;
             }
             feedback.timestamp = new Date().toISOString();
-            let response = await apiClient.post(`/feedback`, feedback);
-            return response.data;
+            if(!globalState.feedbacks) {
+                globalState.feedbacks = new Array();
+            }
+            globalState.feedbacks.push(feedback);
+            if (globalState.feedbacks.length >= 5) {
+                await apiClient.post(`/feedback`, globalState.feedbacks);
+                globalState.feedbacks.length = 0;
+            }
+        
+            return true;
         }
         catch (error) {
             console.error('Error saving feedback:', error);

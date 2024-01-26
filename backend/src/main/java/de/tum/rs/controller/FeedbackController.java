@@ -1,9 +1,11 @@
 package de.tum.rs.controller;
 
+import java.util.List;
 import de.tum.rs.dao.Feedback;
 import de.tum.rs.repository.FeedbackRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +20,13 @@ public class FeedbackController {
 	private FeedbackRepository feedbackRepository;
 
 	@PostMapping
-	public void saveFeedback(@RequestBody Feedback feedback) {
-		feedback.generateId();
-		feedbackRepository.save(feedback);
+	@Async
+	public void saveFeedback(@RequestBody List<Feedback> feedbacks) {
+
+		feedbacks.stream().forEach(feedback -> {
+			feedback.generateId();
+			feedbackRepository.save(feedback);
+		});
+		log.info("Saving feedbacks: {}", feedbacks);
 	}
 }

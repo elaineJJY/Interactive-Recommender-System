@@ -15,18 +15,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Log4j2
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/users")
 public class LoginController {
 
 	@Autowired
 	private UserRepository userRepository;
 
 	@PostMapping
+	@RequestMapping("/login")
 	public ResponseEntity<?> loginUser(@RequestBody User user) {
+		log.info("User: {}", user);
 
-		userRepository.save(user);
+		if(userRepository.findByUserId(user.getUserId()).isPresent()) {
+			return ResponseEntity.ok().body("Login successful!");
+		}
+		log.info("User does not exist!");
+		return ResponseEntity.badRequest().body("User does not exist!");
+	}
 
-		return ResponseEntity.ok().body("Login successful!");
+	@PostMapping
+	@RequestMapping("/register")
+	public ResponseEntity<?> registerUser(@RequestBody User user) {
+
+		if(!userRepository.findByUserId(user.getUserId()).isPresent()) {
+			userRepository.save(user);
+			return ResponseEntity.ok().body("Registration successful!");
+		}
+		log.info("User already exists!");
+		return ResponseEntity.badRequest().body("User already exists!");
 	}
 
 

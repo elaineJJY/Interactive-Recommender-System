@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: 100vh;">
-    <el-header>
+    <el-header height="45px">
       <el-row align="middle" justify-content="end">
         <el-col :span="3">
           <!-- Toggle Button -->
@@ -40,7 +40,7 @@
       <el-main>
         <!-- Content for Videos -->
         <div v-if="state.selectedKeys[0] === '1'">
-          <VideoList :videos="videos" @videoListEnded="getRecommendations"/>
+          <VideoList :recommendations="recommendations" @videoListEnded="getRecommendations"/>
         </div>
 
         <!-- Content for Hot Videos-->
@@ -123,7 +123,7 @@ const toggleCollapsed = () => {
 
 
 // Search Videos
-const videos = ref([]);
+const recommendations = ref([]);
 onMounted(() => {
   globalState.userId = JSON.parse(localStorage.getItem('userId'));
   getRecommendations();
@@ -133,14 +133,14 @@ onMounted(() => {
 const getRecommendations = async () => {
   try {
     // add all videos to the videos array
-    videos.value.push(...(await apiClient.getRecommendations()));
+    recommendations.value.push(...(await apiClient.getRecommendations()));
   } catch (error) {
-    console.error('Error getting videos:', error);
+    console.error('Error getting recommendations:', error);
   }
 };
 const handleSearch = async (query) => {
   try {
-    videos.value = query == "" ? await apiClient.getRecommendations() : await apiClient.searchVideos(query);
+    recommendations.value = query == "" ? await apiClient.getRecommendations() : await apiClient.searchVideos(query);
   } catch (error) {
     console.error('Error getting videos:', error);
   }
@@ -154,8 +154,9 @@ const handleSearch = async (query) => {
   z-index: 1000;
   position: fixed;
   width: 100%;
-  margin-top: 5px;
+  margin-top: 2px;
 }
+
 .el-aside {
   height: 100%;
   overflow-y: auto;

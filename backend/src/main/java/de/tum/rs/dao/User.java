@@ -1,6 +1,9 @@
 package de.tum.rs.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.HashMap;
 import lombok.Data;
+import org.checkerframework.checker.optional.qual.OptionalBottom;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
@@ -12,4 +15,5 @@ public class User {
 	@Id
 	private String userId;
 
+	private HashMap<String, String> models;
 }
