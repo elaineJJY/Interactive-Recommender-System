@@ -14,7 +14,6 @@
     "element-plus": "^2.4.1",
     "jszip": "^3.10.1",
     "vue": "^3.2.13",
-    "vue-youtube": "^1.4.0",
     "youtube-vue3": "^0.1.15"
   },
   "devDependencies": {
