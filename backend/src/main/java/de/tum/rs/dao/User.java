@@ -15,5 +15,6 @@ public class User {
 	@Id
 	private String userId;
 
+	// Pablo defines
 	private HashMap<String, String> models;
 }

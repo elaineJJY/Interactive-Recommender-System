@@ -6,7 +6,6 @@
           :videoid="videoInfo.id"
           @ended="onEnded"
             autoplay="0"
-          :width="calcWidth('100%')" 
           :height="'100%'"
           style="border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);"
         />
@@ -44,15 +43,16 @@ const props = defineProps({
     explanation: String,
 });
 
-const emit = defineEmits(['videoEnded']);
+const emit = defineEmits(['videoEnded', 'updateIndex']);
 const likeClicked = ref(false);
 const dislikeClicked = ref(false);
 const youtubePlayer = ref(null); 
 const videoContainer = ref(null); 
 
-function calcWidth(height) {
-    return `calc(${height} * 1080 / 1920)`; 
-}
+// function calcWidth(height) {
+//     return `calc(${height} * 16 / 9 )`;
+//     // return `calc(${height} * 1 / 2 )`; 
+// }
 
 function onEnded() {
     emit('videoEnded');
@@ -98,6 +98,9 @@ onMounted(() => {
                         behavior: 'smooth',
                         block: 'center'
                     });
+
+                    emit('updateIndex'); 
+
                     
                 } else {
                     youtubePlayer.value.player.pauseVideo(); 

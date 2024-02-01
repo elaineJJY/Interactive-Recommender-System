@@ -3,22 +3,45 @@
         <VideoComponent 
             :videoInfo="recommendation.video" 
             :explanation="recommendation.explanation"
-            @videoEnded="() => handleVideoEnded(index)" />
+            @videoEnded="() => handleVideoEnded(index)" 
+            @updateIndex="handleUpdateIndex(index)"/>
         <div v-if="index < recommendations.length - 1" class="divider"></div>
     </div>
 </template>
 
 <script setup>
-import { defineProps, ref, onMounted, onUnmounted } from 'vue';
+import { defineProps, ref, onMounted, onUnmounted, defineEmits} from 'vue';
 import VideoComponent from './VideoComponent.vue';
+import { ElNotification } from 'element-plus';
+import { h } from 'vue';
+import { ElIcon } from 'element-plus';
+import { Loading } from '@element-plus/icons-vue';
 
-defineProps({
+const props = defineProps({
     recommendations: Array,
 });
 
 const videoElements = ref([]);
 let currentIndex = ref(0);
 let isScrolling = ref(false);
+
+const emit = defineEmits(['videoListEnded']);
+
+const handleUpdateIndex = (index) => {
+    currentIndex.value = index;
+    if (index >= props.recommendations.length - 1) {
+        // If it's the last video, get more recommendations
+     
+        ElNotification({
+            title: 'Loading more recommendations...',
+            message: h('i', { style: 'color: teal' }, 'We are recalculating the videos you might be interested in, based on your usage habits and modified preferences'),
+            icon: h(ElIcon, { size: 20 }, () => [h(Loading)]),
+            offset: 50,
+            duration: 5000,
+        })
+        emit('videoListEnded');
+    }
+};
 
 const handleVideoEnded = (index) => {
     scrollToNextVideo(index);
