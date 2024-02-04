@@ -6,6 +6,7 @@ import de.tum.rs.model.Recommendation;
 import de.tum.rs.repository.VideoRepository;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,8 @@ public class RecommenderEngine {
 	@Value("${python.rs.service.url}")
 	private String PYTHON_SERVICE_URL;
 	private final RestTemplate restTemplate = new RestTemplate();
+
+	@Autowired
 	private VideoRepository videoRepository;
 
 	public List<Recommendation> getDummyRecommendations() {
