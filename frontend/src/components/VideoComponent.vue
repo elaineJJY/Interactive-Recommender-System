@@ -5,7 +5,8 @@
         <YoutubeVue3 ref="youtubePlayer" 
           :videoid="videoInfo.id"
           @ended="onEnded"
-            autoplay="0"
+          autoplay="0"
+          controls=1
           :height="'100%'"
           style="border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);"
         />
@@ -37,7 +38,11 @@
 import { ref, defineProps, defineEmits, onMounted, onUnmounted, nextTick  } from 'vue';
 import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone } from '@ant-design/icons-vue';
 import apiClient from '@/config/apiClient';
+import globalState from '@/config/globalState';
 import { YoutubeVue3 } from 'youtube-vue3'
+import { ElMessage } from 'element-plus';
+
+
 const props = defineProps({
     videoInfo: Object,
     explanation: String,
@@ -54,35 +59,43 @@ const videoContainer = ref(null);
 //     // return `calc(${height} * 1 / 2 )`; 
 // }
 
+// feedback sent to the server when the video is ended
+let feedback = {
+    videoId: props.videoInfo.id,
+    rating: 0,
+    totalWatchTime: 0,
+};
+
 function onEnded() {
     emit('videoEnded');
 }
 
 const submitLikeFeedback = async () => {
-    const feedback = {
-        videoId: props.videoInfo.id,
-        rating: 1,
-    };
-    var isSubmitted = await apiClient.submitFeedback(feedback);
-
-    if (isSubmitted) {
-        likeClicked.value = !likeClicked.value;
-        if (dislikeClicked.value) dislikeClicked.value = false;
+    if (!globalState.userId) {
+        ElMessage.error('Please login first');
+        return false;
     }
+    feedback.rating = 5;
+    
+    likeClicked.value = !likeClicked.value;
+    if (dislikeClicked.value) dislikeClicked.value = false;
+    
 };
 
 const submitDislikeFeedback = async () => {
-    const feedback = {
-        videoId: props.videoInfo.id,
-        rating: -1,
-    };
-    var isSubmitted = await apiClient.submitFeedback(feedback);
-
-    if (isSubmitted) {
-        dislikeClicked.value = !dislikeClicked.value;
-        if (likeClicked.value) likeClicked.value = false;
+    if (!globalState.userId) {
+        ElMessage.error('Please login first');
+        return;
     }
+    feedback.rating = 0;
+    
+    dislikeClicked.value = !dislikeClicked.value;
+    if (likeClicked.value) likeClicked.value = false;
 };
+
+
+
+let watchStartTime = 0; 
 let observer;
 
 onMounted(() => {
@@ -92,6 +105,8 @@ onMounted(() => {
                 if (entry.intersectionRatio > 0.5) { // when 50% of the video is visible
                     
                     youtubePlayer.value.player.playVideo(); 
+                    youtubePlayer.value.player.unMute();
+                    watchStartTime = Date.now();
                     
                     // scroll to the center of the video automatically
                     entry.target.scrollIntoView({
@@ -104,6 +119,7 @@ onMounted(() => {
                     
                 } else {
                     youtubePlayer.value.player.pauseVideo(); 
+                    feedback.totalWatchTime = (Date.now() - watchStartTime);
                 }
             },
             { threshold: [0.5] } 
@@ -117,6 +133,9 @@ onMounted(() => {
 
 onUnmounted(() => {
     observer.disconnect(); 
+    alert('observer disconnected'+ props.videoInfo.id);
+    apiClient.submitFeedback(feedback);
+
 });
 
 </script>

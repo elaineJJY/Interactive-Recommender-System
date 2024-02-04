@@ -58,7 +58,7 @@ public class LocalVideoController {
 	@Async
 	public CompletableFuture<List<Recommendation>> getRecommendations(@Nullable String userId) {
 		return CompletableFuture.supplyAsync(() -> {
-			log.info("Getting recommendations for user {}", userId);
+
 			List<Recommendation> recommendations;
 			try {
 				recommendations = recommenderEngine.getRecommendations(userId);
@@ -67,8 +67,10 @@ public class LocalVideoController {
 						videoRepository.findById(recommendation.getVideoId()).get());
 				});
 			} catch (Exception e) {
+				log.error("Error getting recommendations from Python model", e);
+				log.info("Falling back to random recommendations");
 				int page = random.nextInt(500);
-				Page<YouTubeVideo> videoPage = videoRepository.findAll(PageRequest.of(page, 20));
+				Page<YouTubeVideo> videoPage = videoRepository.findAll(PageRequest.of(page, 10));
 				List<YouTubeVideo> videos = videoPage.getContent();
 				recommendations = Recommendation.from(videos, "Random generated recommendations");
 			}

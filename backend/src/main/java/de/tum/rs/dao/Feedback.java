@@ -14,10 +14,15 @@ public class Feedback {
 
 	@Id
 	private String id;
+	private Date timestamp;
 	private String userId;
 	private String videoId;
+
+	// user click-through history
 	private int rating;
-	private Date timestamp;
+	private String totalWatchTime;
+
+
 
 	public void generateId() {
 		this.id = this.userId + "_" + this.videoId;
