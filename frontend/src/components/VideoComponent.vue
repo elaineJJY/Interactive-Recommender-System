@@ -14,11 +14,34 @@
         <!-- Side button -->
         <div class="video-button-list">
             <a-space-compact direction="vertical" size="large">
-                <a-button shape="circle" size="large">
-                    <template #icon>
-                        <InfoCircleFilled />
+                <a-popover>
+                    <template #title>
+                        <span>Video Information & Explanation</span>
                     </template>
-                </a-button>
+                    <template #content>
+                        <div>
+                            <h4>Video Information</h4>
+                            <a-form model="explanation">
+                                <a-form-item
+                                    v-for="(value, key) in videoInfo"
+                                    :key="key"
+                                    :label="key.charAt(0).toUpperCase() + key.slice(1)">
+                                    <a-input :value="value" disabled></a-input>
+                                </a-form-item>
+                            </a-form>
+                        </div>
+                        <div>
+                            <h4>Explanation</h4>
+                            <p>{{explanation}}</p>
+                        </div>
+                    </template>
+                    <a-button shape="circle" size="large">
+                        <template #icon>
+                        <InfoCircleFilled />
+                        </template>
+                    </a-button>
+                </a-popover>
+                
                 <a-button shape="circle" size="large" @click="submitLikeFeedback">
                     <template #icon>
                         <LikeTwoTone :two-tone-color="likeClicked ? '#f5222d' : '#000000'" />
@@ -62,7 +85,7 @@ const videoContainer = ref(null);
 // feedback sent to the server when the video is ended
 let feedback = {
     videoId: props.videoInfo.id,
-    rating: 0,
+    rating: -1, // -1 means no feedback
     totalWatchTime: 0,
 };
 
@@ -133,7 +156,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     observer.disconnect(); 
-    alert('observer disconnected'+ props.videoInfo.id);
+    // alert('observer disconnected'+ props.videoInfo.id);
     apiClient.submitFeedback(feedback);
 
 });

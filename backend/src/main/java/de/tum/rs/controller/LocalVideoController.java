@@ -8,6 +8,7 @@ import com.google.api.services.youtube.model.Video;
 import de.tum.rs.dao.YouTubeVideo;
 import de.tum.rs.model.Recommendation;
 import de.tum.rs.repository.VideoRepository;
+import de.tum.rs.util.RecommendationBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import java.io.File;
@@ -72,7 +73,7 @@ public class LocalVideoController {
 				int page = random.nextInt(500);
 				Page<YouTubeVideo> videoPage = videoRepository.findAll(PageRequest.of(page, 10));
 				List<YouTubeVideo> videos = videoPage.getContent();
-				recommendations = Recommendation.from(videos, "Random generated recommendations");
+				recommendations = RecommendationBuilder.buildList(videos, "Random generated recommendations");
 			}
 			log.info("Got {} recommendations", recommendations.size());
 			return recommendations;
@@ -89,7 +90,7 @@ public class LocalVideoController {
 			List<YouTubeVideo> videos = videoRepository.findByKeyword(keyword,
 					PageRequest.of(page, 20))
 				.getContent();
-			List<Recommendation> recommendations = Recommendation.from(videos, "Search results");
+			List<Recommendation> recommendations = RecommendationBuilder.buildList(videos, "Search results");
 			log.info("Got {} search results for keyword {}", recommendations.size(), keyword);
 			return recommendations;
 		});

@@ -54,7 +54,8 @@ export default {
             }
             globalState.feedbacks.push(feedback);
             if (globalState.feedbacks.length >= 5) {
-                await apiClient.post(`/feedback`, globalState.feedbacks);
+                // await apiClient.post(`/feedback`, globalState.feedbacks);
+                console.log('submitFeedback', globalState.feedbacks);
                 globalState.feedbacks.length = 0;
             }
         
