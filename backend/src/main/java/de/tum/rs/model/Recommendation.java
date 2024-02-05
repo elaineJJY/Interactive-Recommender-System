@@ -14,11 +14,6 @@ public class Recommendation {
 	@Nullable
 	private YouTubeVideo video;
 
-	// json serialization
-	@Override
-	public String toString() {
-		
-	}
 
 
 
