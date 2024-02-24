@@ -1,6 +1,7 @@
 <template>
-    <div v-for="(recommendation, index) in recommendations" :key="index" class="video-row" :ref="setVideoRef(index)">
+    <div v-for="(recommendation, index) in recommendations" :key="index" class="video-row">
         <VideoComponent 
+            :ref="setVideoRef(index)"
             :videoInfo="recommendation.video" 
             :explanation="recommendation.explanation"
             @videoEnded="() => handleVideoEnded(index)" 
@@ -10,7 +11,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, onMounted, onUnmounted, defineEmits} from 'vue';
+import { defineProps, ref, onMounted, onUnmounted, defineEmits, nextTick} from 'vue';
 import VideoComponent from './VideoComponent.vue';
 import { ElNotification } from 'element-plus';
 import { h } from 'vue';
@@ -47,52 +48,85 @@ const handleVideoEnded = (index) => {
     scrollToNextVideo(index);
 };
 
-const scrollToNextVideo = (index) => {
-    if (isScrolling.value || index >= videoElements.value.length - 1) return;
-    isScrolling.value = true;
-    currentIndex.value = index + 1;
-    videoElements.value[currentIndex.value].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => (isScrolling.value = false), 1000);
-};
 
 const setVideoRef = (index) => (el) => {
     videoElements.value[index] = el;
 };
 
-const handleWheelOrKeyDown = (event) => {
-    if (event.type === 'wheel') {
-        // For mouse wheel event, deltaY is positive when scrolling down and negative when scrolling up
-        if (event.deltaY > 0) {
-            scrollToNextVideo(currentIndex.value); // Scroll down to the next video
-        } else {
-            scrollToPrevVideo(currentIndex.value); // Scroll up to the previous video
-        }
-    } else if (event.type === 'keydown') {
-        if (event.key === 'ArrowDown') {
-            scrollToNextVideo(currentIndex.value); // Scroll down to the next video
-        } else if (event.key === 'ArrowUp') {
-            scrollToPrevVideo(currentIndex.value); // Scroll up to the previous video
-        }
-    }
+let throttleTimer = false;
+const throttle = (callback, time) => {
+    if (throttleTimer) return;
+    throttleTimer = true;
+    setTimeout(() => {
+        callback();
+        throttleTimer = false;
+    }, time);
 };
+const handleWheelOrKeyDown = async (event) => {
+    await nextTick();
+    event.preventDefault();
+    throttle(async () => {
+        try {
+            var direction = event.type === 'wheel' ? event.deltaY > 0 ? 'down' : 'up' : event.key === 'ArrowDown' ? 'down' : 'up';
+            videoElements.value[currentIndex.value].recordInteraction(event.type + '-' + direction);
+        } catch (error) {
+            console.error(error);
+        }
+        if (event.type === 'wheel') {
+
+            // For mouse wheel event, deltaY is positive when scrolling down and negative when scrolling up
+            if (event.deltaY > 0) {
+                scrollToNextVideo(currentIndex.value); // Scroll down to the next video
+            } else {
+                scrollToPrevVideo(currentIndex.value); // Scroll up to the previous video
+            }
+        } else if (event.type === 'keydown') {
+
+            if (event.key === 'ArrowDown') {
+                scrollToNextVideo(currentIndex.value); // Scroll down to the next video
+            } else if (event.key === 'ArrowUp') {
+                scrollToPrevVideo(currentIndex.value); // Scroll up to the previous video
+            }
+        }
+
+    }, 0); 
+    
+    
+};
+
+const scrollToNextVideo = async (index) => {
+    if (isScrolling.value || index >= videoElements.value.length - 1) return;
+    isScrolling.value = true;
+    await nextTick();
+    try {
+        videoElements.value[currentIndex.value].submitFeedback();
+    } catch (error) {
+        console.error(error);
+    }
+
+    currentIndex.value = index + 1;
+    await nextTick();
+    videoElements.value[currentIndex.value].scrollIntoView();
+    setTimeout(() => (isScrolling.value = false), 1000);
+};
+
 
 const scrollToPrevVideo = (index) => {
     if (isScrolling.value || index <= 0) return; // Check if it is already scrolling or if it's the first video
     isScrolling.value = true;
     currentIndex.value = index - 1; // Update the current index to the previous video's index
-    videoElements.value[currentIndex.value].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    videoElements.value[currentIndex.value].scrollIntoView();
     setTimeout(() => (isScrolling.value = false), 1000); // Reset scrolling flag after 1 second
 };
 
 
 onMounted(() => {
-
-    // window.addEventListener('wheel', handleWheelOrKeyDown);
-    window.addEventListener('keydown', handleWheelOrKeyDown);
+    window.addEventListener('wheel', handleWheelOrKeyDown, { passive: false });
+    window.addEventListener('keydown', handleWheelOrKeyDown, { passive: false });
 });
 
 onUnmounted(() => {
-    // window.removeEventListener('wheel', handleWheelOrKeyDown);
+    window.removeEventListener('wheel', handleWheelOrKeyDown);
     window.removeEventListener('keydown', handleWheelOrKeyDown);
 });
 </script>

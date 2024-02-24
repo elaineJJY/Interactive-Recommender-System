@@ -66,9 +66,8 @@ public class RecommenderEngine {
 //		return recommendations;
 	}
 
-	public void saveFeedback(List<Feedback> feedbacks) {
-		// call localhost:8089/feedback [model]
-		// send List<Feedback> as request
-		throw new UnsupportedOperationException();
+	public void invokeUpdate(List<Feedback> feedbacks) {
+		String url = PYTHON_SERVICE_URL + "/feedback";
+		restTemplate.postForObject(url, feedbacks, Void.class);
 	}
 }

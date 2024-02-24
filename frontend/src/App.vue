@@ -148,6 +148,15 @@ const handleSearch = async (query) => {
 </script>
 
 <style>
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    -ms-overflow-style: none;  /* IE & Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
 .el-header {
   background-color: #fff;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);

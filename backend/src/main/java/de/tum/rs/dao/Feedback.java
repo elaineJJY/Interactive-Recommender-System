@@ -19,7 +19,7 @@ public class Feedback {
 	private String videoId;
 
 	// user click-through history
-	private int rating;
+	private int rating; // valid rating:[0,5], -1 means not rated
 	private String totalWatchTime;
 
 
