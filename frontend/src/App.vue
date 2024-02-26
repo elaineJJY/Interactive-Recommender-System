@@ -67,7 +67,7 @@ import SearchBar from '@/components/SearchBar.vue';
 import LoginCommponent from '@/components/LoginComponent.vue';
 import VideoList from './components/VideoList.vue';
 import apiClient from '@/config/apiClient';
-import { reactive, watch, h, ref, onMounted } from 'vue';
+import { reactive, watch, h, ref, onMounted, onUnmounted } from 'vue';
 import globalState from '@/config/globalState';
 import {
   PieChartOutlined,
@@ -145,6 +145,10 @@ const handleSearch = async (query) => {
     console.error('Error getting videos:', error);
   }
 };
+
+onUnmounted(() => {
+  apiClient.onWebClose();
+});
 </script>
 
 <style>

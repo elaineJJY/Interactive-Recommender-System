@@ -64,6 +64,7 @@ const throttle = (callback, time) => {
 };
 const handleWheelOrKeyDown = async (event) => {
     await nextTick();
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
     event.preventDefault();
     throttle(async () => {
         try {
@@ -111,10 +112,17 @@ const scrollToNextVideo = async (index) => {
 };
 
 
-const scrollToPrevVideo = (index) => {
+const scrollToPrevVideo = async (index) => {
     if (isScrolling.value || index <= 0) return; // Check if it is already scrolling or if it's the first video
     isScrolling.value = true;
+    await nextTick();
+    try {
+        videoElements.value[currentIndex.value].submitFeedback();
+    } catch (error) {
+        console.error(error);
+    }
     currentIndex.value = index - 1; // Update the current index to the previous video's index
+    await nextTick();
     videoElements.value[currentIndex.value].scrollIntoView();
     setTimeout(() => (isScrolling.value = false), 1000); // Reset scrolling flag after 1 second
 };
@@ -128,6 +136,7 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('wheel', handleWheelOrKeyDown);
     window.removeEventListener('keydown', handleWheelOrKeyDown);
+    videoElements.value[currentIndex.value].submitFeedback();
 });
 </script>
 

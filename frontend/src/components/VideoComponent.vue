@@ -85,7 +85,7 @@ let feedback = {
     videoId: props.videoInfo.id,
     rating: -1, // -1 means no feedback
     totalWatchTime: 0, // in seconds
-    interaction: new Array(),
+    interactions: new Array(),
 };
 
 const overlayStyle = ref({
@@ -93,15 +93,15 @@ const overlayStyle = ref({
     height: '680px',
 });
 
-const recordInteraction = (type) => {
-    const currentTime = youtubePlayer.value?.player.getCurrentTime() || 0;
+const recordInteraction = async (type) => {
+    const currentTime = await youtubePlayer.value?.player.getCurrentTime() || 0;
 
-    feedback.interaction.push({
+    feedback.interactions.push({
         type,
         time: currentTime
     });
 
-    // console.log("record interaction: ", type);
+    // console.log("record interaction: ", props.videoInfo.title+" "+type);
 }
 
 function onPaused() {
@@ -121,10 +121,11 @@ function onEnded() {
 }
 
 
-const submitFeedback = () => {
-    feedback.totalWatchTime = youtubePlayer.value?.player.getCurrentTime();
-    if (feedback.totalWatchTime >= 1) {
-        console.log("submit feedback for video: ", feedback);
+const submitFeedback = async () => {
+    feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
+    
+    if (feedback.totalWatchTime >= 1) {  // longer than 1 second
+        console.log("Cashed feedback for video: ", feedback);
         apiClient.submitFeedback(feedback);
     }
 }
@@ -269,7 +270,7 @@ onUnmounted(() => {
     left: 0;
     width: 100%;
     height: 92.5%;
-    z-index: 2;
+    /* z-index: 2; */
     /* background-color: rgba(0, 0, 0, 0.5); */
 }
 </style>

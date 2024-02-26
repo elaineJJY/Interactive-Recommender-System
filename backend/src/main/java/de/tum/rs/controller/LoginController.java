@@ -2,6 +2,7 @@ package de.tum.rs.controller;
 
 import de.tum.rs.dao.User;
 import de.tum.rs.repository.UserRepository;
+import java.util.Date;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -38,6 +39,7 @@ public class LoginController {
 	public ResponseEntity<?> registerUser(@RequestBody User user) {
 
 		if(!userRepository.findByUserId(user.getUserId()).isPresent()) {
+			user.setFeedbackLastUsed(new Date());
 			userRepository.save(user);
 			return ResponseEntity.ok().body("Registration successful!");
 		}

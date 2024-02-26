@@ -55,7 +55,7 @@ export default {
             globalState.feedbacks.push(feedback);
             if (globalState.feedbacks.length >= 5) {
                 //TODO: send feedback to server
-                // await apiClient.post(`/feedback`, globalState.feedbacks);
+                await apiClient.post(`/feedback`, globalState.feedbacks);
                 console.log('submitFeedback', globalState.feedbacks);
                 globalState.feedbacks = new Array();
             }
@@ -65,6 +65,11 @@ export default {
         catch (error) {
             console.error('Error saving feedback:', error);
             throw error;
+        }
+    },
+    async onWebClose() {    
+        if (globalState.feedbacks && globalState.feedbacks.length > 0) {
+            await apiClient.post(`/feedback`, globalState.feedbacks);
         }
     },
     async downloadData(data, filename) {
