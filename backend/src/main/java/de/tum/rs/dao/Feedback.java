@@ -9,6 +9,11 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+/**
+ * Feedback
+ * Each feedback is a record of a user's interaction with a video
+ * It will be stored in the feedback index when the user watches a video more than 1 seconds
+ */
 @Data
 @Document(indexName = "feedback")
 public class Feedback {
