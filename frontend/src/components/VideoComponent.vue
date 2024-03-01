@@ -50,7 +50,7 @@
             <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null">
                 <div>
                     <!-- Display only the first 5 tags -->
-                    <div class="tags-container">
+                    <div class="tags-container" v-if="videoInfo.snippet.tags">
                         <a-tag v-for="(tag, index) in videoInfo.snippet.tags.slice(0, 5)" :key="index" :color="getRandomColor(index)">
                         {{ tag }}
                         </a-tag>
@@ -135,7 +135,7 @@ const recordInteraction = async (type) => {
         time: currentTime
     });
 
-    // console.log("record interaction: ", props.videoInfo.title+" "+type);
+    // console.log("record interaction: ", props.videoInfo.snippet.title+" "+type);
 }
 
 function onPaused() {
@@ -159,7 +159,7 @@ const submitFeedback = async () => {
     feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
     
     if (feedback.totalWatchTime >= 1) {  // longer than 1 second
-        console.log("Cashed feedback for video: ", feedback);
+        // console.log("Cashed feedback for video: ", feedback);
         apiClient.submitFeedback(feedback);
     }
 }
@@ -199,8 +199,13 @@ const setDislikeFeedback = async () => {
     if (likeClicked.value) likeClicked.value = false;
 };
 
-const scrollIntoView = () => {
+const scrollIntoView = async () => {
+    if (showInfoModal.value && !isCollapsed.value) {
+        return false;
+    }
     videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    await new Promise(resolve => setTimeout(resolve, 500)); 
+    return true;
 }
 
 const handleWheel = (event) => {

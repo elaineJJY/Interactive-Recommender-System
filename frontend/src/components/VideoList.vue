@@ -63,8 +63,9 @@ const throttle = (callback, time) => {
     }, time);
 };
 const handleWheelOrKeyDown = async (event) => {
-    await nextTick();
     if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+    if (isScrolling.value) return;
+    await nextTick();
     event.preventDefault();
     throttle(async () => {
         try {
@@ -90,7 +91,7 @@ const handleWheelOrKeyDown = async (event) => {
             }
         }
 
-    }, 0); 
+    }, 500); 
     
     
 };
@@ -99,16 +100,21 @@ const scrollToNextVideo = async (index) => {
     if (isScrolling.value || index >= videoElements.value.length - 1) return;
     isScrolling.value = true;
     await nextTick();
+    
     try {
         videoElements.value[currentIndex.value].submitFeedback();
     } catch (error) {
         console.error(error);
     }
-
-    currentIndex.value = index + 1;
+    
     await nextTick();
-    videoElements.value[currentIndex.value].scrollIntoView();
-    setTimeout(() => (isScrolling.value = false), 1000);
+    
+    var success = await videoElements.value[index + 1].scrollIntoView();
+    
+    if (success) {
+        currentIndex.value = index + 1;
+    }
+    isScrolling.value = false;
 };
 
 
@@ -121,10 +127,13 @@ const scrollToPrevVideo = async (index) => {
     } catch (error) {
         console.error(error);
     }
-    currentIndex.value = index - 1; // Update the current index to the previous video's index
+    
     await nextTick();
-    videoElements.value[currentIndex.value].scrollIntoView();
-    setTimeout(() => (isScrolling.value = false), 1000); // Reset scrolling flag after 1 second
+    var success = await videoElements.value[index - 1].scrollIntoView();
+    if (success) {
+        currentIndex.value = index - 1;
+    }
+    isScrolling.value = false;
 };
 
 
