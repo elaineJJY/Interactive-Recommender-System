@@ -145,7 +145,6 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('wheel', handleWheelOrKeyDown);
     window.removeEventListener('keydown', handleWheelOrKeyDown);
-    videoElements.value[currentIndex.value].submitFeedback();
 });
 </script>
 

@@ -28,12 +28,12 @@
                 <!-- Like and Dislike Button -->
                 <a-button shape="circle" size="large" @click="setLikeFeedback">
                     <template #icon>
-                        <LikeTwoTone :two-tone-color="likeClicked ? '#f5222d' : '#000000'" />
+                        <LikeTwoTone :two-tone-color="likeClicked ? '#52c41a' : '#000000'" />
                     </template>
                 </a-button>
                 <a-button shape="circle" size="large" @click="setDislikeFeedback">
                     <template #icon>
-                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#52c41a' : '#000000'" />
+                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#f5222d' : '#000000'" />
                     </template>
                 </a-button>
 
@@ -73,16 +73,30 @@
             </a-modal>
 
             <!-- Rating Modal -->
-            <a-modal v-model:visible="showRatingModal" title="Rate" okText="Submit" cancelText="Cancel" @ok="onSubmitRatingModal">
+            <a-modal 
+                v-model:visible="showRatingModal" 
+                title="Rate" 
+                okText="Submit" 
+                cancelText="Cancel" 
+                @ok="onSubmitRatingModal" 
+                :width="400"
+            >
                 <div class="rate-container">
+                    <p style="color:gray; margin-bottom: -2px;">Your rating helps us deliver more relevant content.</p>
                     <a-rate v-model:value="rating" />
                 </div>
-                <div class="not-recommend-text">I do not wish to recommend similar videos</div>
-                <a-button-group class="options-group">
-                    <a-button>Option 1</a-button>
-                    <a-button>Option 2</a-button>
-                    <a-button>Option 3</a-button>
-                </a-button-group>
+                <div class="not-recommend-text">I don't want to see it.</div>
+                <p style="color:gray">We will reduce the recommendation of related videos based on the reasons you give us</p>
+                <a-space direction="vertical">
+                   <a-button
+                        v-for="(option, index) in options"
+                        :key="index"
+                        :class="{ 'selected-option': selectedOptions.includes(option.value), 'hover-option': !selectedOptions.includes(option.value) }"
+                        @click="toggleOption(option.value)"
+                    >
+                        {{ option.label }}
+                    </a-button>
+                </a-space>
             </a-modal>
 
         </div>
@@ -209,6 +223,9 @@ const scrollIntoView = async () => {
 }
 
 const handleWheel = (event) => {
+    if (showInfoModal.value && !isCollapsed.value) {
+        return;
+    }
     event.preventDefault();
     // scroll the window with reverse direction
     const scrollAmount = event.deltaY > 0 ? -100 : 100;
@@ -280,8 +297,8 @@ onMounted(() => {
 
 
 onUnmounted(() => { 
+    submitFeedback();
     observer.disconnect();
-
 });
 
 
@@ -323,6 +340,21 @@ const onSubmitRatingModal = () => {
     ElMessage.success('Thank you for your feedback!');
 };
 
+const options = [
+    { value: 'Option 1', label: 'Option 1' },
+    { value: 'Option 2', label: 'Option 2' },
+    { value: 'Option 3', label: 'Option 3' }
+];
+const selectedOptions = ref([]);
+const toggleOption = (option) => {
+    const index = selectedOptions.value.indexOf(option);
+    if (index === -1) {
+        selectedOptions.value.push(option);
+    } else {
+        selectedOptions.value.splice(index, 1);
+    }
+};
+
 </script>
 
 <style scoped>
@@ -345,7 +377,7 @@ const onSubmitRatingModal = () => {
     width: 5%;
     height: 100%;
     padding-bottom: 20px;
-    margin-left: 10px;
+    margin-left: 15px;
     z-index: 3;
 }
 
@@ -386,8 +418,27 @@ const onSubmitRatingModal = () => {
 
 .not-recommend-text {
     margin-top: 20px; /* Adds space above the text */
-    margin-bottom: 10px; /* Adds space below the text for separation from options */
+    margin-bottom: 5px; /* Adds space below the text for separation from options */
     font-weight: bold; /* Makes the text bold */
+    font-size: 17px; 
+}
+
+.selected-option {
+  background-color: rgb(179, 61, 68); 
+  border-color: rgb(179, 61, 68); 
+  color: white; 
+}
+
+.selected-option:hover {
+  color: #ffee8f; 
+}
+
+
+.hover-option:hover {
+  color:brown;
+  background-color: #f5f5f5; 
+  border-color: #d9d9d9;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 </style>
