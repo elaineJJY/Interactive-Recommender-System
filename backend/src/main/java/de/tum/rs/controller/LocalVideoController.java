@@ -71,7 +71,7 @@ public class LocalVideoController {
 				log.error("Error getting recommendations from Python model", e);
 				log.info("Falling back to random recommendations");
 				int page = random.nextInt(500);
-				Page<YouTubeVideo> videoPage = videoRepository.findAll(PageRequest.of(page, 10));
+				Page<YouTubeVideo> videoPage = videoRepository.findBySnippetTagsIsNotNull(PageRequest.of(page, 10));
 				List<YouTubeVideo> videos = videoPage.getContent();
 				recommendations = RecommendationBuilder.buildList(videos, "Random generated recommendations");
 			}

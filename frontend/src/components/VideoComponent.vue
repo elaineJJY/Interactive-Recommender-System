@@ -6,10 +6,7 @@
         <YoutubeVue3 ref="youtubePlayer" :videoid="videoInfo.id" @ended="onEnded" @paused="onPaused" @played="onPlayed"
             autoplay="0" controls=1 :height="'100%'" scrolling="no"
             style="border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); overflow-y: hidden;" />
-        <div class="overlay" 
-         :style="overlayStyle.value"
-         @wheel.prevent="handleWheel" 
-        >
+        <div class="overlay" :style="overlayStyle.value" @wheel.prevent="handleWheel">
         </div>
 
 
@@ -17,14 +14,14 @@
         <div class="video-button-list">
             <a-space-compact direction="vertical" size="large">
 
-                
+
                 <!-- Info Button -->
                 <a-button @click="showInfoModal = true" shape="circle" size="large">
                     <template #icon>
                         <InfoCircleFilled />
                     </template>
                 </a-button>
-                
+
                 <!-- Like and Dislike Button -->
                 <a-button shape="circle" size="large" @click="setLikeFeedback">
                     <template #icon>
@@ -39,32 +36,48 @@
 
                 <!-- Rating Button -->
                 <a-button @click="showRatingModal = true" shape="circle" size="large">
-                        <template #icon>
-                            <EllipsisOutlined />
-                        </template>
-                </a-button> 
-               
+                    <template #icon>
+                        <EllipsisOutlined />
+                    </template>
+                </a-button>
+
             </a-space-compact>
 
             <!-- Info Modal -->
             <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null">
-                <div>
+                <div class="description-container">
                     <!-- Display only the first 5 tags -->
                     <div class="tags-container" v-if="videoInfo.snippet.tags">
-                        <a-tag v-for="(tag, index) in videoInfo.snippet.tags.slice(0, 5)" :key="index" :color="getRandomColor(index)">
-                        {{ tag }}
-                        </a-tag>
+
+                        <a-popover v-for="(tag, index) in videoInfo.snippet.tags.slice(0, 5)" :key="index" placement="top"
+                            trigger="hover">
+                            <template #content>
+                                <div>
+                                    <p>Description of this topic group(graph)</p>
+                                    <a-space>
+                                        <a-button size="small" class="see-more-btn" :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(tag) }" @click="adaptTopicGroup(tag, 1)">See
+                                            more?</a-button>
+                                        <a-button size="small" class="see-less-btn" :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(tag) }" @click="adaptTopicGroup(tag, -1)">See
+                                            less?</a-button>
+                                    </a-space>
+                                </div>
+                            </template>
+                            <a-tag :color="getRandomColor(index)" class="custom-tag">
+                                {{ tag }}
+                            </a-tag>
+                        </a-popover>
                     </div>
                     <a-typography-paragraph>
                         <blockquote v-if="isCollapsed" @click="toggleCollapse">
-                        {{ truncatedDescription }}
-                        <span v-if="isLong" style="font-weight: bold; color: rgb(59, 151, 167);">...(click to see more)</span>
+                            {{ truncatedDescription }}
+                            <span v-if="isLong" style="font-weight: bold; color: rgb(59, 151, 167);">...(click to see
+                                more)</span>
                         </blockquote>
                         <blockquote v-else @click="toggleCollapse">
-                        {{ videoInfo.snippet.description }}
+                            {{ videoInfo.snippet.description }}
                         </blockquote>
                     </a-typography-paragraph>
-            
+
                     <div class="explanation-container">
                         <h3>Why this video is recommended:</h3>
                         <p>{{ explanation }}</p>
@@ -73,27 +86,21 @@
             </a-modal>
 
             <!-- Rating Modal -->
-            <a-modal 
-                v-model:visible="showRatingModal" 
-                title="Rate" 
-                okText="Submit" 
-                cancelText="Cancel" 
-                @ok="onSubmitRatingModal" 
-                :width="400"
-            >
+            <a-modal v-model:visible="showRatingModal" title="Rate" okText="Submit" cancelText="Cancel"
+                @ok="onSubmitRatingModal" :width="400">
                 <div class="rate-container">
                     <p style="color:gray; margin-bottom: -2px;">Your rating helps us deliver more relevant content.</p>
                     <a-rate v-model:value="rating" />
+                    <span v-if="rating > 0" style="margin-left: 16px;">Score: {{ rating }}</span>
+                    <span v-else style="margin-left: 16px;">You have not rated yet.</span>
                 </div>
                 <div class="not-recommend-text">I don't want to see it.</div>
-                <p style="color:gray">We will reduce the recommendation of related videos based on the reasons you give us</p>
+                <p style="color:gray">We will reduce the recommendation of related videos based on the reasons you give us
+                </p>
                 <a-space direction="vertical">
-                   <a-button
-                        v-for="(option, index) in options"
-                        :key="index"
+                    <a-button v-for="(option, index) in options" :key="index"
                         :class="{ 'selected-option': selectedOptions.includes(option.value), 'hover-option': !selectedOptions.includes(option.value) }"
-                        @click="toggleOption(option.value)"
-                    >
+                        @click="toggleOption(option.value)">
                         {{ option.label }}
                     </a-button>
                 </a-space>
@@ -104,12 +111,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, onMounted, onUnmounted, nextTick, defineExpose, computed} from 'vue';
-import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone,EllipsisOutlined } from '@ant-design/icons-vue';
+import { ref, defineProps, defineEmits, onMounted, onUnmounted, nextTick, defineExpose, computed,h } from 'vue';
+import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone, EllipsisOutlined, PlusSquareOutlined, MinusSquareFilled} from '@ant-design/icons-vue';
 import apiClient from '@/config/apiClient';
 import globalState from '@/config/globalState';
 import { YoutubeVue3 } from 'youtube-vue3'
 import { ElMessage } from 'element-plus';
+import { message, Tag } from 'ant-design-vue';
 
 
 const props = defineProps({
@@ -171,9 +179,12 @@ function onEnded() {
 
 const submitFeedback = async () => {
     feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
-    
+
     if (feedback.totalWatchTime >= 1) {  // longer than 1 second
         // console.log("Cashed feedback for video: ", feedback);
+        feedback.less = selectedLessTopicGroups.value;
+        feedback.more = selectedMoreTopicGroups.value;
+        feedback.dislikeReasons = selectedOptions.value;
         apiClient.submitFeedback(feedback);
     }
 }
@@ -183,14 +194,14 @@ const setLikeFeedback = async () => {
         ElMessage.error('Please login first');
         return false;
     }
-    if(likeClicked.value) { // if already clicked, then cancel the feedback
+    if (likeClicked.value) { // if already clicked, then cancel the feedback
         feedback.rating = 0;
         rating.value = 0;
     } else {
         feedback.rating = 5;
         rating.value = 5;
     }
-    
+
     likeClicked.value = !likeClicked.value;
     if (dislikeClicked.value) dislikeClicked.value = false;
 
@@ -201,7 +212,7 @@ const setDislikeFeedback = async () => {
         ElMessage.error('Please login first');
         return;
     }
-    if(dislikeClicked.value) { // if already clicked, then cancel the feedback
+    if (dislikeClicked.value) { // if already clicked, then cancel the feedback
         feedback.rating = 0;
         rating.value = 0;
     } else {
@@ -214,16 +225,16 @@ const setDislikeFeedback = async () => {
 };
 
 const scrollIntoView = async () => {
-    if (showInfoModal.value && !isCollapsed.value) {
+    if (showInfoModal.value) {
         return false;
     }
     videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    await new Promise(resolve => setTimeout(resolve, 500)); 
+    await new Promise(resolve => setTimeout(resolve, 500));
     return true;
 }
 
 const handleWheel = (event) => {
-    if (showInfoModal.value && !isCollapsed.value) {
+    if (showInfoModal.value) {
         return;
     }
     event.preventDefault();
@@ -237,16 +248,16 @@ async function updateOverlayStyle() {
     const iframe = await youtubePlayer.value.player.getIframe();
     var height = iframe.clientWidth;
     var width = iframe.clientWidth;
-    
-    
-    height = height || 680; 
+
+
+    height = height || 680;
     width = width || 480;
-    
-    const overlayHeight = height * 0.75; 
+
+    const overlayHeight = height * 0.75;
     overlayStyle.value.height = overlayHeight + 'px';
     overlayStyle.value.width = width + 'px';
     console.log("update overlay style: ", overlayStyle.value);
-    
+
 }
 
 defineExpose({
@@ -257,7 +268,7 @@ defineExpose({
 let observer;
 
 onMounted(() => {
-   
+
     nextTick(() => {
         observer = new IntersectionObserver(
             ([entry]) => {
@@ -287,7 +298,7 @@ onMounted(() => {
         if (videoContainer.value) {
             observer.observe(videoContainer.value);
         }
-        
+
     });
 
     // updateOverlayStyle();
@@ -296,24 +307,25 @@ onMounted(() => {
 
 
 
-onUnmounted(() => { 
+onUnmounted(() => {
     submitFeedback();
     observer.disconnect();
 });
 
-
-function getRandomColor(index) {
-    if (colors.value[index]) {
-        return colors.value[index];
-    }
-    var tag= props.videoInfo.snippet.tags[index];
+function calculateColor(tag) {
     var sum = 0;
     for (let i = 0; i < tag.length; i++) {
         sum += tag.charCodeAt(i); // Sum the ASCII values of the characters in the text
     }
     const i = sum % predefinedColors.length; // Use the sum to find an index within the colors array
-    colors.value[index] = predefinedColors[i];
     return predefinedColors[i];
+}
+function getRandomColor(index) {
+    if (!colors.value[index]) {
+        var tag = props.videoInfo.snippet.tags[index];
+        colors.value[index] = calculateColor(tag);
+    }
+    return colors.value[index];
 }
 
 // collapse the description in the modal
@@ -331,6 +343,55 @@ const truncatedDescription = computed(() => {
     }
     return props.videoInfo.snippet.description;
 });
+
+//TODO
+const selectedMoreTopicGroups = ref([]);
+const selectedLessTopicGroups = ref([]);
+const adaptTopicGroup = (tag, direction) => {
+    var info;
+    if (direction == 1) {
+        selectedLessTopicGroups.value = selectedLessTopicGroups.value.filter(item => item !== tag);
+        if (!selectedMoreTopicGroups.value.includes(tag)) {
+            selectedMoreTopicGroups.value.push(tag);
+            info = "You wii see more videos about the topic group: ";
+        }
+        else {
+            selectedMoreTopicGroups.value = selectedMoreTopicGroups.value.filter(item => item !== tag);
+            info = "You have canceled your selection about the topic group: ";
+        }
+        
+    } else {
+        selectedMoreTopicGroups.value = selectedMoreTopicGroups.value.filter(item => item !== tag);
+        if (!selectedLessTopicGroups.value.includes(tag)) {
+            selectedLessTopicGroups.value.push(tag);
+            info = "You wii see less videos about the topic group: ";
+        }
+        else {
+            selectedLessTopicGroups.value = selectedLessTopicGroups.value.filter(item => item !== tag);
+            info = "You have canceled your selection about the topic group: ";
+        }
+    }
+
+    var color = direction == 1 ? '#3aaf00' : 'rgb(216, 135, 135)';
+     var icon = direction === 1
+        ? h(PlusSquareOutlined, { style: { color: '#3aaf00' } })
+        : h(MinusSquareFilled, { style: { color: 'rgb(216, 135, 135)' } });
+    
+    message.open({
+        content: h('div', null, [
+            icon,
+            h('span', { style: { marginLeft: '4px' } }, [
+                h('span', { style: { color: color } },  info),
+                h(Tag, {
+                     color: calculateColor(tag),
+                    class: 'custom-tag' 
+                }, () => tag)
+            ])
+        ]),
+        icon: null,
+        duration: 3,
+    });
+};
 
 // Rating modal
 const rating = ref(0);
@@ -396,49 +457,110 @@ const toggleOption = (option) => {
     /* background-color: rgba(0, 0, 0, 0.5); */
 }
 
-.tags-container {
-  margin-bottom: 16px; /* Adds space below the entire tags container */
-  display: flex; /* Enables flexbox layout for the tags */
-  flex-wrap: wrap; /* Allows tags to wrap onto multiple lines */
-  gap: 8px 4px; /* Creates a gap between tags and between lines */
+.description-container {
+    max-height: 300px;
+    overflow-y: auto;
 }
 
+.tags-container {
+    margin: 5px;
+
+    margin-bottom: 16px;
+    /* Adds space below the entire tags container */
+    display: flex;
+    /* Enables flexbox layout for the tags */
+    flex-wrap: wrap;
+    /* Allows tags to wrap onto multiple lines */
+    gap: 8px 8px;
+    /* Creates a gap between tags and between lines */
+}
+
+.custom-tag {
+    transition: box-shadow 0.3s ease;
+}
+
+.custom-tag:hover {
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+}
+.see-more-btn {
+    color: #3aaf00;
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+.see-more-btn:hover{
+    background-color: rgb(48, 193, 156);
+    border-color: rgb(48, 193, 156);
+    color: white;
+}
+
+.see-more-btn-active{
+    background-color: rgb(48, 193, 156);
+    border-color: rgb(48, 193, 156);
+    color: white;
+}
+
+.see-less-btn {
+    color: #a83238;
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.see-less-btn:hover {
+    background-color: rgb(216, 135, 135);
+    border-color: rgb(216, 135, 135);
+    color: white;
+}
+.see-less-btn-active{
+    background-color: rgb(216, 135, 135);
+    border-color: rgb(216, 135, 135);
+    color: white;
+}
+
+
 .explanation-container h3 {
-  margin-top: 0; /* Removes the top margin from the heading if needed */
-  margin-bottom: 8px; /* Adds some space above the explanation text */
+    margin-top: 0;
+    /* Removes the top margin from the heading if needed */
+    margin-bottom: 8px;
+    /* Adds some space above the explanation text */
 }
 
 .explanation-container p {
-  margin-top: 10; /* Adjusts spacing as needed */
+    margin-top: 10;
+    /* Adjusts spacing as needed */
 }
 
 .rate-container {
-    margin-bottom: 20px; /* Adds space below the rating component */
+    margin-bottom: 20px;
+    /* Adds space below the rating component */
 }
 
 .not-recommend-text {
-    margin-top: 20px; /* Adds space above the text */
-    margin-bottom: 5px; /* Adds space below the text for separation from options */
-    font-weight: bold; /* Makes the text bold */
-    font-size: 17px; 
+    margin-top: 20px;
+    /* Adds space above the text */
+    margin-bottom: 5px;
+    /* Adds space below the text for separation from options */
+    font-weight: bold;
+    /* Makes the text bold */
+    font-size: 17px;
 }
 
 .selected-option {
-  background-color: rgb(179, 61, 68); 
-  border-color: rgb(179, 61, 68); 
-  color: white; 
+    background-color: rgb(179, 61, 68);
+    border-color: rgb(179, 61, 68);
+    color: white;
 }
 
 .selected-option:hover {
-  color: #ffee8f; 
+    color: #ffee8f;
 }
 
 
 .hover-option:hover {
-  color:brown;
-  background-color: #f5f5f5; 
-  border-color: #d9d9d9;
-  transition: background-color 0.3s, border-color 0.3s;
+    color: brown;
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    transition: background-color 0.3s, border-color 0.3s;
 }
-
 </style>

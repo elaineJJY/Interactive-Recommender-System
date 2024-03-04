@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 @Document(indexName = "videos")
 public interface VideoRepository extends ElasticsearchRepository<YouTubeVideo, String> {
 
+
 	Page<YouTubeVideo> findAll(Pageable pageable);
 
 	// if the keyword is in the title/description/tags, then return the video
@@ -29,6 +30,9 @@ public interface VideoRepository extends ElasticsearchRepository<YouTubeVideo, S
 		"  }\n" +
 		"}")
 	Page<YouTubeVideo> findByKeyword(String keyword, Pageable pageable);
+
+	// all the videos which tags are not empty
+	Page<YouTubeVideo> findBySnippetTagsIsNotNull(Pageable pageable);
 
 
 }

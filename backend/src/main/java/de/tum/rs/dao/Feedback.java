@@ -29,6 +29,10 @@ public class Feedback {
 	private float totalWatchTime;  // total watch time in seconds
 	private LinkedList<Interaction> interactions;
 
+	private LinkedList<String> more;
+	private LinkedList<String> less;
+	private LinkedList<String> dislikeReasons;
+
 	public void generateId() {
 		this.id = this.userId + "_" + this.videoId;
 	}
