@@ -76,7 +76,7 @@ public class RecommenderEngine {
 	 * @param feedbacks
 	 */
 	public void invokeUpdate(List<Feedback> feedbacks) {
-		log.info("Invoke model update with {} feedbacks: {}", feedbacks.size(), feedbacks);
+		log.info("Invoke model update with {} feedbacks", feedbacks.size());
 		String url = PYTHON_SERVICE_URL + "/feedback";
 		restTemplate.postForObject(url, feedbacks, Void.class);
 	}

@@ -3,9 +3,11 @@ package de.tum.rs.dao;
 
 import co.elastic.clients.util.DateTime;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import lombok.Data;
+import org.elasticsearch.core.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
@@ -29,9 +31,16 @@ public class Feedback {
 	private float totalWatchTime;  // total watch time in seconds
 	private LinkedList<Interaction> interactions;
 
-	private LinkedList<String> more;
-	private LinkedList<String> less;
-	private LinkedList<String> dislikeReasons;
+
+
+	@Nullable
+	private ArrayList<String> more;	// topic groups that the user is interested in
+
+	@Nullable
+	private ArrayList<String> less; // topic groups that the user is not interested in
+
+	@Nullable
+	private ArrayList<String> dislikeReasons;
 
 	public void generateId() {
 		this.id = this.userId + "_" + this.videoId;

@@ -142,6 +142,9 @@ let feedback = {
     rating: 0, // 0 means no feedback
     totalWatchTime: 0, // in seconds
     interactions: new Array(),
+    dislikeReasons: new Array(),
+    more: new Array(),
+    less: new Array(),
 };
 
 const overlayStyle = ref({
@@ -181,10 +184,9 @@ const submitFeedback = async () => {
     feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
 
     if (feedback.totalWatchTime >= 1) {  // longer than 1 second
-        // console.log("Cashed feedback for video: ", feedback);
+        console.log("Cashed feedback for video: ", feedback);
         feedback.less = selectedLessTopicGroups.value;
         feedback.more = selectedMoreTopicGroups.value;
-        feedback.dislikeReasons = selectedOptions.value;
         apiClient.submitFeedback(feedback);
     }
 }
@@ -200,6 +202,7 @@ const setLikeFeedback = async () => {
     } else {
         feedback.rating = 5;
         rating.value = 5;
+        recordInteraction('like');
     }
 
     likeClicked.value = !likeClicked.value;
@@ -218,6 +221,7 @@ const setDislikeFeedback = async () => {
     } else {
         feedback.rating = 1;
         rating.value = 1;
+        recordInteraction('dislike');
     }
 
     dislikeClicked.value = !dislikeClicked.value;
@@ -306,7 +310,6 @@ onMounted(() => {
 });
 
 
-
 onUnmounted(() => {
     submitFeedback();
     observer.disconnect();
@@ -347,7 +350,10 @@ const truncatedDescription = computed(() => {
 //TODO
 const selectedMoreTopicGroups = ref([]);
 const selectedLessTopicGroups = ref([]);
+
+// send the feedback to the topic group, 1 means want to see more, -1 means less
 const adaptTopicGroup = (tag, direction) => {
+    recordInteraction('adaptTopicGroup: ' + tag + ' ' + direction);
     var info;
     if (direction == 1) {
         selectedLessTopicGroups.value = selectedLessTopicGroups.value.filter(item => item !== tag);
@@ -395,10 +401,25 @@ const adaptTopicGroup = (tag, direction) => {
 
 // Rating modal
 const rating = ref(0);
+
+// save the rating and options to the feedback
 const onSubmitRatingModal = () => {
+
     showRatingModal.value = false;
-    feedback.rating = rating.value;
     ElMessage.success('Thank you for your feedback!');
+    
+    feedback.rating = rating.value;
+    if (rating.value > 0) {
+        recordInteraction('rating: ' + rating.value);
+    }
+    
+    // check if the options are changed and record the interaction & feedback
+    var optionIsChanged =  !(feedback.dislikeReasons.length === selectedOptions.value.length && feedback.dislikeReasons.every((value, index) => value === selectedOptions.value[index]));
+    if (optionIsChanged){
+        recordInteraction('dislikeReasons: ' + selectedOptions.value);
+        feedback.dislikeReasons = selectedOptions.value;
+    }
+    
 };
 
 const options = [
