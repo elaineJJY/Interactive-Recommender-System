@@ -2,6 +2,7 @@ package de.tum.rs.dao;
 
 
 import co.elastic.clients.util.DateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +19,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
  */
 @Data
 @Document(indexName = "feedback")
+@JsonIgnoreProperties("topic_preferences")
 public class Feedback {
 
 	@Id
