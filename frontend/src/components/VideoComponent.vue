@@ -46,24 +46,28 @@
             <!-- Info Modal -->
             <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null">
                 <div class="description-container">
-                    <!-- Display only the first 5 tags -->
-                    <div class="tags-container" v-if="videoInfo.snippet.tags">
+                    
+                    <div class="tags-container" v-if="topics">
 
-                        <a-popover v-for="(tag, index) in videoInfo.snippet.tags.slice(0, 5)" :key="index" placement="top"
-                            trigger="hover">
+                        <a-popover v-for="(topic, index) in topics" :key="index" placement="top"
+                            trigger="hover"
+                            style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
                             <template #content>
-                                <div>
-                                    <p>Description of this topic group(graph)</p>
-                                    <a-space>
-                                        <a-button size="small" class="see-more-btn" :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(tag) }" @click="adaptTopicGroup(tag, 1)">See
+                                <div >
+                                    <p>
+                                        <b>{{ topic.description }}</b>
+                                    </p>
+                                    <img class="topic-image" :src="require(`@/assets/topics/topic_${topic.id}_wordcloud.png`)" alt="Topic image">
+                                    <a-space >
+                                        <a-button size="small" class="see-more-btn" :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(topic.description) }" @click="adaptTopicGroup(index, 1)">See
                                             more?</a-button>
-                                        <a-button size="small" class="see-less-btn" :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(tag) }" @click="adaptTopicGroup(tag, -1)">See
+                                        <a-button size="small" class="see-less-btn" :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(topic.description) }" @click="adaptTopicGroup(index, -1)">See
                                             less?</a-button>
                                     </a-space>
                                 </div>
                             </template>
-                            <a-tag :color="getRandomColor(index)" class="custom-tag">
-                                {{ tag }}
+                            <a-tag :color="getColor(topic.id)" class="custom-tag">
+                                {{ topic.description }}
                             </a-tag>
                         </a-popover>
                     </div>
@@ -123,6 +127,7 @@ import { message, Tag } from 'ant-design-vue';
 const props = defineProps({
     videoInfo: Object,
     explanation: String,
+    topics: Array
 });
 
 const emit = defineEmits(['videoEnded', 'updateIndex']);
@@ -134,7 +139,6 @@ const videoContainer = ref(null);
 const showRatingModal = ref(false);
 const showInfoModal = ref(false);
 const predefinedColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
-var colors = ref([]);
 
 // feedback sent to the server when the video is ended
 let feedback = {
@@ -315,20 +319,9 @@ onUnmounted(() => {
     observer.disconnect();
 });
 
-function calculateColor(tag) {
-    var sum = 0;
-    for (let i = 0; i < tag.length; i++) {
-        sum += tag.charCodeAt(i); // Sum the ASCII values of the characters in the text
-    }
-    const i = sum % predefinedColors.length; // Use the sum to find an index within the colors array
-    return predefinedColors[i];
-}
-function getRandomColor(index) {
-    if (!colors.value[index]) {
-        var tag = props.videoInfo.snippet.tags[index];
-        colors.value[index] = calculateColor(tag);
-    }
-    return colors.value[index];
+
+function getColor(id) {
+    return predefinedColors[id % predefinedColors.length];
 }
 
 // collapse the description in the modal
@@ -352,28 +345,29 @@ const selectedMoreTopicGroups = ref([]);
 const selectedLessTopicGroups = ref([]);
 
 // send the feedback to the topic group, 1 means want to see more, -1 means less
-const adaptTopicGroup = (tag, direction) => {
-    recordInteraction('adaptTopicGroup: ' + tag + ' ' + direction);
+const adaptTopicGroup = (index, direction) => {
+    var topic = props.topics[index];
+    recordInteraction('adaptTopicGroup: topicId=' + topic.id + ' ' + direction);
     var info;
     if (direction == 1) {
-        selectedLessTopicGroups.value = selectedLessTopicGroups.value.filter(item => item !== tag);
-        if (!selectedMoreTopicGroups.value.includes(tag)) {
-            selectedMoreTopicGroups.value.push(tag);
+        selectedLessTopicGroups.value = selectedLessTopicGroups.value.filter(item => item !== topic.id);
+        if (!selectedMoreTopicGroups.value.includes(topic.id)) {
+            selectedMoreTopicGroups.value.push(topic.id);
             info = "You wii see more videos about the topic group: ";
         }
         else {
-            selectedMoreTopicGroups.value = selectedMoreTopicGroups.value.filter(item => item !== tag);
+            selectedMoreTopicGroups.value = selectedMoreTopicGroups.value.filter(item => item !== topic.id);
             info = "You have canceled your selection about the topic group: ";
         }
         
     } else {
-        selectedMoreTopicGroups.value = selectedMoreTopicGroups.value.filter(item => item !== tag);
-        if (!selectedLessTopicGroups.value.includes(tag)) {
-            selectedLessTopicGroups.value.push(tag);
+        selectedMoreTopicGroups.value = selectedMoreTopicGroups.value.filter(item => item !== topic.id);
+        if (!selectedLessTopicGroups.value.includes(topic.id)) {
+            selectedLessTopicGroups.value.push(topic.id);
             info = "You wii see less videos about the topic group: ";
         }
         else {
-            selectedLessTopicGroups.value = selectedLessTopicGroups.value.filter(item => item !== tag);
+            selectedLessTopicGroups.value = selectedLessTopicGroups.value.filter(item => item !== topic.id);
             info = "You have canceled your selection about the topic group: ";
         }
     }
@@ -389,9 +383,9 @@ const adaptTopicGroup = (tag, direction) => {
             h('span', { style: { marginLeft: '4px' } }, [
                 h('span', { style: { color: color } },  info),
                 h(Tag, {
-                     color: calculateColor(tag),
+                     color: getColor(topic.id),
                     class: 'custom-tag' 
-                }, () => tag)
+                }, () => topic.description)
             ])
         ]),
         icon: null,
@@ -485,15 +479,16 @@ const toggleOption = (option) => {
 
 .tags-container {
     margin: 5px;
+    margin-bottom: 16px;    /* Adds space below the entire tags container */
+    display: flex;  /* Enables flexbox layout for the tags */
+    flex-wrap: wrap;    /* Allows tags to wrap onto multiple lines */
+    gap: 8px 8px;    /* Creates a gap between tags and between lines */
+}
 
-    margin-bottom: 16px;
-    /* Adds space below the entire tags container */
-    display: flex;
-    /* Enables flexbox layout for the tags */
-    flex-wrap: wrap;
-    /* Allows tags to wrap onto multiple lines */
-    gap: 8px 8px;
-    /* Creates a gap between tags and between lines */
+.topic-image {
+    width: 200px;
+    display: block;
+    margin-bottom: 10px;
 }
 
 .custom-tag {
@@ -506,7 +501,7 @@ const toggleOption = (option) => {
 .see-more-btn {
     color: #3aaf00;
     background-color: #f5f5f5;
-    border-color: #d9d9d9;
+    border-color: #919191;
     transition: background-color 0.3s, border-color 0.3s;
 }
 .see-more-btn:hover{
@@ -524,7 +519,7 @@ const toggleOption = (option) => {
 .see-less-btn {
     color: #a83238;
     background-color: #f5f5f5;
-    border-color: #d9d9d9;
+    border-color:#919191;
     transition: background-color 0.3s, border-color 0.3s;
 }
 

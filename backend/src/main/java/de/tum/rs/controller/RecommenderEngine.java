@@ -1,10 +1,15 @@
 package de.tum.rs.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tum.rs.dao.Feedback;
 import de.tum.rs.model.Recommendation;
 import de.tum.rs.repository.VideoRepository;
 import de.tum.rs.util.RecommendationBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
@@ -22,35 +27,12 @@ public class RecommenderEngine {
 	private final RestTemplate restTemplate = new RestTemplate();
 
 	@Autowired
+	private RecommendationBuilder recommendationBuilder;
+
+	@Autowired
 	private VideoRepository videoRepository;
 
-//	public List<Recommendation> getDummyRecommendations() {
-//
-//		String url = PYTHON_SERVICE_URL + "/recommendations?num=" + 10;
-//
-//
-//		log.info("Getting recommendations from python model: {}", url);
-//		List<String> response = restTemplate.getForObject(url, List.class);
-//		log.info("Response: {}", response);
-//		List<Recommendation> recommendations = new LinkedList<>();
-//		for (String videoId : response) {
-//			log.info("VideoId: {}", videoId);
-//			Recommendation recommendation = new Recommendation();
-//			recommendation.setVideoId(videoId);
-//			recommendation.setExplanation("Dummy recommendation");
-//			recommendation.setVideo(videoRepository.findById(videoId).get());
-//			recommendations.add(recommendation);
-//		}
-//
-//
-////		List<Recommendation> recommendations = restTemplate.getForObject(url, List.class);
-////		recommendations.forEach(recommendation -> {
-////			log.info("Recommendation: {}", recommendation);
-////			recommendation.setVideo(videoRepository.findById(recommendation.getVideoId()).get());
-////		});
-//
-//		return recommendations;
-//	}
+	ObjectMapper mapper = new ObjectMapper();
 
 	/**
 	 * Get recommendations for the given user
@@ -61,11 +43,18 @@ public class RecommenderEngine {
 
 		String url = PYTHON_SERVICE_URL + "/recommendations?userId=" + userId;
 
-		List<Recommendation> recommendations = restTemplate.getForObject(url, List.class);
-		recommendations.forEach(recommendation -> {
-			log.info("Recommendation: {}", recommendation);
-			recommendation.setVideo(videoRepository.findById(recommendation.getVideoId()).get());
+		// serialize the response to a list of recommendations
+		List<LinkedHashMap<String, String>>response = restTemplate.getForObject(url, List.class);
+		List<Recommendation> recommendations = new LinkedList<>();
+		response.forEach(json -> {
+			Recommendation recommendation = new Recommendation();
+			recommendation.setVideoId(json.get("videoId"));
+			recommendation.setExplanation(json.get("explanation"));
+			recommendationBuilder.fillBlank(recommendation);
+			recommendations.add(recommendation);
 		});
+
+		log.info("Got {} recommendations for user {} using Model", recommendations.size(), userId);
 		return recommendations;
 	}
 

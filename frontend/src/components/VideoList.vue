@@ -4,6 +4,7 @@
             :ref="setVideoRef(index)"
             :videoInfo="recommendation.video" 
             :explanation="recommendation.explanation"
+            :topics="recommendation.topics"
             @videoEnded="() => handleVideoEnded(index)" 
             @updateIndex="handleUpdateIndex(index)"/>
         <div v-if="index < recommendations.length - 1" class="divider"></div>

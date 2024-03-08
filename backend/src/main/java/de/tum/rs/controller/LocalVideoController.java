@@ -51,7 +51,8 @@ public class LocalVideoController {
 	@Autowired
 	RecommenderEngine recommenderEngine;
 
-	private Random random = new Random();
+	@Autowired
+	private RecommendationBuilder recommendationBuilder;
 
 
 	@GetMapping("/recommendations")
@@ -59,21 +60,26 @@ public class LocalVideoController {
 	@Async
 	public CompletableFuture<List<Recommendation>> getRecommendations(@Nullable String userId) {
 		return CompletableFuture.supplyAsync(() -> {
-
 			List<Recommendation> recommendations;
 			try {
+				if(userId == null) {
+					throw new IllegalArgumentException("Not logged in");
+				}
 				recommendations = recommenderEngine.getRecommendations(userId);
 				recommendations.forEach(recommendation -> {
 					recommendation.setVideo(
 						videoRepository.findById(recommendation.getVideoId()).get());
 				});
-			} catch (Exception e) {
+			}
+			catch (IllegalArgumentException e) {
+				log.error("User not logged in", e);
+				log.info("Falling back to random recommendations");
+				recommendations = recommendationBuilder.getRandomRecommendations();
+			}
+			catch (Exception e) {
 				log.error("Error getting recommendations from Python model", e);
 				log.info("Falling back to random recommendations");
-				int page = random.nextInt(500);
-				Page<YouTubeVideo> videoPage = videoRepository.findBySnippetTagsIsNotNull(PageRequest.of(page, 10));
-				List<YouTubeVideo> videos = videoPage.getContent();
-				recommendations = RecommendationBuilder.buildList(videos, "Random generated recommendations");
+				recommendations = recommendationBuilder.getRandomRecommendations();
 			}
 			log.info("Got {} recommendations", recommendations.size());
 			return recommendations;
@@ -90,14 +96,11 @@ public class LocalVideoController {
 			List<YouTubeVideo> videos = videoRepository.findByKeyword(keyword,
 					PageRequest.of(page, 20))
 				.getContent();
-			List<Recommendation> recommendations = RecommendationBuilder.buildList(videos, "Search results");
+			List<Recommendation> recommendations = recommendationBuilder.buildList(videos, "Search results");
 			log.info("Got {} search results for keyword {}", recommendations.size(), keyword);
 			return recommendations;
 		});
 	}
-
-
-
 
 
 }
