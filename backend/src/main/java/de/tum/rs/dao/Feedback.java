@@ -7,9 +7,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import lombok.Data;
 import org.elasticsearch.core.Nullable;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 /**
@@ -19,7 +21,6 @@ import org.springframework.data.elasticsearch.annotations.Document;
  */
 @Data
 @Document(indexName = "feedback")
-@JsonIgnoreProperties("topic_preferences")
 public class Feedback {
 
 	@Id
@@ -33,6 +34,7 @@ public class Feedback {
 	private float totalWatchTime;  // total watch time in seconds
 	private LinkedList<Interaction> interactions;
 
+	private List<Double> topic_preferences; // topic preferences of the user
 
 
 	@Nullable
