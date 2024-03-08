@@ -1,6 +1,7 @@
 package de.tum.rs.dao;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import lombok.Builder.Default;
@@ -21,4 +22,6 @@ public class User {
 	private HashMap<String, String> models;
 
 	private Date feedbackLastUsed;
+
+	private ArrayList<Double> topic_preferences; // topic preferences of the user
 }

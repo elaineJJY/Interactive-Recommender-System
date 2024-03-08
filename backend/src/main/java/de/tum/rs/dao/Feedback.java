@@ -34,9 +34,6 @@ public class Feedback {
 	private float totalWatchTime;  // total watch time in seconds
 	private LinkedList<Interaction> interactions;
 
-	private List<Double> topic_preferences; // topic preferences of the user
-
-
 	@Nullable
 	private ArrayList<String> more;	// topic groups that the user is interested in
 
