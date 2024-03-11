@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: 100vh;">
-    <el-header height="45px">
+    <el-header height="50px">
       <el-row align="middle" justify-content="end">
         <el-col :span="3">
           <!-- Toggle Button -->

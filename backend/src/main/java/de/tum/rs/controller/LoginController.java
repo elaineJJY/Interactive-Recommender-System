@@ -38,6 +38,11 @@ public class LoginController {
 	@RequestMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody User user) {
 
+		if(user.getUserId().equals("") || user.getUserId() == null) {
+			log.info("User ID cannot be empty!");
+			return ResponseEntity.badRequest().body("User ID cannot be empty!");
+		}
+
 		if(!userRepository.findByUserId(user.getUserId()).isPresent()) {
 			user.setFeedbackLastUsed(new Date());
 			userRepository.save(user);

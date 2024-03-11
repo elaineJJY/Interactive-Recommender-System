@@ -51,7 +51,7 @@
 
                         <a-popover v-for="(topic, index) in topics" :key="index" placement="top"
                             trigger="hover"
-                            style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                            >
                             <template #content>
                                 <div >
                                     <p>
@@ -59,9 +59,9 @@
                                     </p>
                                     <img class="topic-image" :src="require(`@/assets/topics/topic_${topic.id}_wordcloud.png`)" alt="Topic image">
                                     <a-space >
-                                        <a-button size="small" class="see-more-btn" :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(topic.description) }" @click="adaptTopicGroup(index, 1)">See
+                                        <a-button size="small" class="see-more-btn" :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(topic.id) }" @click="adaptTopicGroup(index, 1)">See
                                             more?</a-button>
-                                        <a-button size="small" class="see-less-btn" :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(topic.description) }" @click="adaptTopicGroup(index, -1)">See
+                                        <a-button size="small" class="see-less-btn" :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(topic.id) }" @click="adaptTopicGroup(index, -1)">See
                                             less?</a-button>
                                     </a-space>
                                 </div>
