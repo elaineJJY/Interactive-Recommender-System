@@ -9,11 +9,15 @@
   },
   "dependencies": {
     "ant-design-vue": "^4.0.0-rc.6",
+    "apexcharts": "^3.48.0",
     "axios": "^1.5.1",
     "core-js": "^3.8.3",
+    "echarts": "^5.5.0",
     "element-plus": "^2.4.1",
     "jszip": "^3.10.1",
     "vue": "^3.2.13",
+    "vue-echarts": "^6.6.9",
+    "vue3-apexcharts": "^1.5.2",
     "youtube-vue3": "^0.1.15"
   },
   "devDependencies": {

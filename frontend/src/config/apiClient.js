@@ -18,6 +18,21 @@ export default {
     login(userId) {
         return apiClient.post('/users/login', { userId: userId });
     },
+    async getUser() {
+        globalState.userId = localStorage.getItem('userId');
+        if(globalState.userId) {
+            try {
+                let response = await apiClient.get(`/users/${globalState.userId}`);
+                return response.data;
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                throw error;
+            }
+        }
+        else {
+            ElMessage.error('Please login first');
+        }
+    },
     async getRecommendations() {
 
         try {

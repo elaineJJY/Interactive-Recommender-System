@@ -17,10 +17,16 @@
           <!-- <img :src="require('@/assets/tum_logo.png')" alt="TUM Logo"
             style="height: 30px; width: auto; margin-left: 10px;"> -->
         </el-col>
+        <el-col :span="6" >
+          <h1 style="font-size: 18px; font-weight: bold; margin-top: 5px;">
+            <span v-if="state.selectedKeys[0] === '1'">Videos</span>
+            <span v-else-if="state.selectedKeys[0] === '2'">User Profile</span>
+          </h1>
+        </el-col>
 
         <!-- Search Bar -->
-        <el-col :span="8" :offset="6">
-          <SearchBar @search="handleSearch" />
+        <el-col :span="8">
+          <SearchBar v-if="state.selectedKeys[0] === '1'" @search="handleSearch" />
         </el-col>
 
         <!-- Login Component -->
@@ -45,18 +51,9 @@
 
         <!-- Content for Hot Videos-->
         <div v-else-if="state.selectedKeys[0] === '2'">
-          Hot Videos
+          <UserProfile />
         </div>
 
-        <!-- Content for Profile -->
-        <div v-else-if="state.selectedKeys[0] === '3'">
-          Profile
-        </div>
-
-        <!-- Content for Settings -->
-        <div v-else-if="state.selectedKeys[0] === '4'">
-          Setting
-        </div>
       </el-main>
     </el-container>
   </el-container>
@@ -66,22 +63,21 @@
 import SearchBar from '@/components/SearchBar.vue';
 import LoginCommponent from '@/components/LoginComponent.vue';
 import VideoList from './components/VideoList.vue';
+import UserProfile from './components/UserProfile.vue';
 import apiClient from '@/config/apiClient';
 import { reactive, watch, h, ref, onMounted, onUnmounted } from 'vue';
 import globalState from '@/config/globalState';
 import {
-  PieChartOutlined,
-  FireOutlined,
   SettingOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons-vue';
 import { Fold, Expand } from '@element-plus/icons-vue';
 
 const state = reactive({
-  collapsed: true,
-  selectedKeys: ['1'],
+  collapsed: false,
+  selectedKeys: ['2'],
   openKeys: ['sub1'],
-  preOpenKeys: ['sub1'],
+  preOpenKeys: ['sub1']
 });
 
 const items = reactive([
@@ -93,22 +89,10 @@ const items = reactive([
   },
   {
     key: '2',
-    icon: () => h(FireOutlined),
-    label: 'Hot',
-    title: 'Hot',
-  },
-  {
-    key: '3',
-    icon: () => h(PieChartOutlined),
+    icon: () => h(SettingOutlined),
     label: 'Profile',
     title: 'Profile',
-  },
-  {
-    key: '4',
-    icon: () => h(SettingOutlined),
-    label: 'Settings',
-    title: 'Settings',
-  },
+  }
 ]);
 watch(
   () => state.openKeys,
@@ -116,6 +100,8 @@ watch(
     state.preOpenKeys = oldVal;
   },
 );
+
+
 const toggleCollapsed = () => {
   state.collapsed = !state.collapsed;
   state.openKeys = state.collapsed ? [] : state.preOpenKeys;

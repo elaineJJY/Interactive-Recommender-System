@@ -3,6 +3,7 @@ package de.tum.rs.model;
 import de.tum.rs.dao.Topic;
 import de.tum.rs.dao.TopicDistribution.TopicScore;
 import de.tum.rs.dao.YouTubeVideo;
+import de.tum.rs.dto.TopicDTO;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -27,20 +28,5 @@ public class Recommendation {
 	private List<TopicDTO> topics;
 
 
-	@Data
-	public static class TopicDTO {
-
-		private Integer id;
-		Double score;
-		private String description;
-		private LinkedHashMap<Object,Object> tokens;
-		public TopicDTO(Double score, Topic topic) {
-			this.score = score;
-			this.id = topic.getTopicNumber();
-			this.description = topic.getDescription();
-			this.tokens = topic.getTokens();
-
-		}
-	}
 
 }
