@@ -5,29 +5,63 @@
                 <div class="model-container">
                     <h2>Models</h2>
                     <a-typography-text strong style="color: gray;">
-                        <blockquote>Description: XXXXXX</blockquote>
+                        <blockquote>
+                            Here, you can tailor your video feed by modifying the balance among various recommendation
+                            models, shaping the selection of every 10-video batch to better match your interests.
+                        </blockquote>
                     </a-typography-text>
 
-                    <!-- each model -->
-                    <div class="model-slider-container" @mouseenter="isHovering[0] = true"
-                        @mouseleave="isHovering[0] = false" :class="{ 'hover-border-topic': isHovering[0] }"
-                        :tooltip-style="{ color: 'red', borderColor: 'red' }">
-                        <h4>
-                            Topic-Group:
-                        </h4>
-                        <el-slider v-model="value" size="large" color="red" />
+                    <!-- Models -->
+                    <div v-for="(val,index) in models" :key="index" class="model-slider-container"
+                        @mouseenter="isHovering[index] = true" @mouseleave="isHovering[index] = false"
+                        :class="{ 'hover-border-topic': isHovering[index] }">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="font-size: 16px; font-weight: bold;">Model {{ index + 1 }}</div>
+                            <a-button @click="showDetails[index] = true" shape="circle" :icon="h(InfoOutlined)"
+                                size="small">
+                            </a-button>
+                        </div>
 
+                        <el-input-number class="input-spacing" v-model="models[index]" :min="0"
+                            :max="maxModelValue(index)" :step="1" />
+                        <el-dialog v-model="showDetails[index]" title="Model Details" width="30%" center>
+                            <p>XXXXXX</p>
+                        </el-dialog>
                     </div>
 
-                    <el-slider v-model="value" size="large" />
-                    <el-slider v-model="value" size="large" />
+
+                    <div style="margin-top: 20px;">
+                        <h3>Remaining Points: {{ remainingPoints }}</h3>
+                    </div>
+
                 </div>
+
+
             </a-col>
 
             <a-col :span="18" @mouseenter="isHovering[0] = true" @mouseleave="isHovering[0] = false">
                 <div class="chart-container" :class="{ 'hover-border-topic': isHovering[0] }">
                     <h2>Topic Preferences</h2>
+
+                    <!-- Slider -->
+                    <div class="custom-slider-container">
+                        <a-row justify="center" align="middle">
+                            <a-col :span="5">
+                                <b>Pure exloitative</b>
+                            </a-col>
+                            <a-col :span="10">
+                                <a-slider :min="0" :max="100" defaultValue="50">
+                                </a-slider>
+                            </a-col>
+                            <a-col :span="5">
+                                <b>Pure explorative</b>
+                            </a-col>
+                        </a-row>
+                    </div>
+                    <!-- Charts -->
                     <div style="width: 100%; height: 400px" ref="chartRef" class="chart"></div>
+
+                    <!-- Sliders -->
                     <div class="sliders-container">
                         <a-row>
                             <a-col :span="12" v-for="(item, index) in userData.topic_preferences" :key="item.id">
@@ -60,17 +94,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, h, computed} from 'vue';
 import * as echarts from 'echarts';
 import apiClient from '@/config/apiClient';
+import { InfoOutlined } from '@ant-design/icons-vue';
 const chartRef = ref(null);
 const chartColors = ref([]);
+const isHovering = ref([]);
+const showDetails = ref([]);
+
 const userData = reactive({ topic_preferences: [] });
 const backup = reactive({ topic_preferences: [] });
-let isHovering = ref([]); 
+const models = ref([1, 2, 3]);
+
+const remainingPoints = computed(() => {
+    const total = models.value.reduce((acc, val) => acc + val, 0);
+    return 10 - total;
+});
+
+const maxModelValue = (index) => {
+    return models.value[index] + remainingPoints.value;
+};
 
 let chartInstance = null;
-
 const updateChartData = (id) => {
     const updatedData = userData.topic_preferences.map((pref, index) => ({
         name: pref.description,
@@ -91,7 +137,7 @@ const updateChartData = (id) => {
         const temp = updatedOption.series[0];
         for (let i = 0; i < temp.data.length; i++) {
             if (temp.data[i].selected) {
-                highlightChartSection(i,false);
+                highlightChartSection(i, false);
             }
         }
     }
@@ -106,6 +152,8 @@ const updateChartData = (id) => {
 
 
 };
+
+
 
 const highlightChartSection = (index, showTip = true) => {
     if (chartInstance) {
@@ -223,22 +271,23 @@ onMounted(async () => {
 .page-container {
     margin: -20px;
     background-color: #f0f2f5;
-    min-height: 92vh;    
+    min-height: 92vh;
     box-sizing: border-box;
- 
+
 }
 
 .chart {
-    margin-top: -80px;
+    margin-top: -60px;
+    margin-bottom: -40px;
 }
 
 .model-container {
     background-color: #fff;
     border-radius: 8px;
-    border: 1px solid #f0f0f0;
+    border: 3px solid #f0f0f0;
     margin-top: 10px;
     margin-bottom: 10px;
-    margin-left: 10px;  
+    margin-left: 10px;
     padding: 15px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -255,7 +304,7 @@ onMounted(async () => {
 .chart-container {
     background-color: #fff;
     border-radius: 8px;
-    border: 1px solid #f0f0f0;
+    border: 3px solid #f0f0f0;
     margin: 10px;
     padding: 15px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -263,5 +312,23 @@ onMounted(async () => {
 
 .hover-border-topic {
     border: 3px dashed #215f99 !important;
+}
+
+.input-spacing {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+.custom-slider-container{
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 20px;
+}
+.custom-slider-container .ant-slider {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.custom-slider-container .ant-slider-mark-text {
+    white-space: nowrap;
 }
 </style>
