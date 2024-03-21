@@ -17,7 +17,7 @@
           <!-- <img :src="require('@/assets/tum_logo.png')" alt="TUM Logo"
             style="height: 30px; width: auto; margin-left: 10px;"> -->
         </el-col>
-        <el-col :span="6" >
+        <el-col :span="6">
           <h1 style="font-size: 18px; font-weight: bold; margin-top: 5px;">
             <span v-if="state.selectedKeys[0] === '1'">Videos</span>
             <span v-else-if="state.selectedKeys[0] === '2'">User Profile</span>
@@ -26,7 +26,7 @@
 
         <!-- Search Bar -->
         <el-col :span="8">
-          <SearchBar v-if="state.selectedKeys[0] === '1'" @search="handleSearch" />
+          <!-- <SearchBar v-if="state.selectedKeys[0] === '1'" @search="handleSearch" /> -->
         </el-col>
 
         <!-- Login Component -->
@@ -36,7 +36,7 @@
       </el-row>
     </el-header>
 
-    <el-container style="margin-top: 60px; height: calc(100vh - 60px);">
+    <el-container style="margin-top: 50px; height: calc(100vh - 60px);">
 
       <el-aside :width="state.collapsed ? '80px' : '150px'" class="sidebar">
         <a-menu v-model:openKeys="state.openKeys" v-model:selectedKeys="state.selectedKeys" mode="inline"
@@ -46,7 +46,10 @@
       <el-main>
         <!-- Content for Videos -->
         <div v-if="state.selectedKeys[0] === '1'">
-          <VideoList :recommendations="recommendations" @videoListEnded="getRecommendations"/>
+         
+          
+          
+          <VideoList @videoListEnded="getRecommendations" />
         </div>
 
         <!-- Content for Hot Videos-->
@@ -60,13 +63,13 @@
 </template>
 
 <script setup>
-import SearchBar from '@/components/SearchBar.vue';
 import LoginCommponent from '@/components/LoginComponent.vue';
 import VideoList from './components/VideoList.vue';
 import UserProfile from './components/UserProfile.vue';
 import apiClient from '@/config/apiClient';
-import { reactive, watch, h, ref, onMounted, onUnmounted } from 'vue';
+import { reactive, watch, h, onMounted, onUnmounted } from 'vue';
 import globalState from '@/config/globalState';
+
 import {
   SettingOutlined,
   VideoCameraOutlined,
@@ -75,7 +78,7 @@ import { Fold, Expand } from '@element-plus/icons-vue';
 
 const state = reactive({
   collapsed: false,
-  selectedKeys: ['2'],
+  selectedKeys: ['1'],
   openKeys: ['sub1'],
   preOpenKeys: ['sub1']
 });
@@ -101,36 +104,16 @@ watch(
   },
 );
 
-
 const toggleCollapsed = () => {
   state.collapsed = !state.collapsed;
   state.openKeys = state.collapsed ? [] : state.preOpenKeys;
 };
 
-
-// Search Videos
-const recommendations = ref([]);
 onMounted(() => {
   globalState.userId = JSON.parse(localStorage.getItem('userId'));
-  getRecommendations();
-
+  
 });
 
-const getRecommendations = async () => {
-  try {
-    // add all videos to the videos array
-    recommendations.value.push(...(await apiClient.getRecommendations()));
-  } catch (error) {
-    console.error('Error getting recommendations:', error);
-  }
-};
-const handleSearch = async (query) => {
-  try {
-    recommendations.value = query == "" ? await apiClient.getRecommendations() : await apiClient.searchVideos(query);
-  } catch (error) {
-    console.error('Error getting videos:', error);
-  }
-};
 
 onUnmounted(() => {
   apiClient.onWebClose();
@@ -165,4 +148,5 @@ body {
   height: 100%;
   overflow-y: auto;
 }
+
 </style>

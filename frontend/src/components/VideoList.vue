@@ -1,27 +1,25 @@
 <template>
+    <a-spin size="large" class="spin-overlay" v-if="recommendations.length === 0"></a-spin>
     <div v-for="(recommendation, index) in recommendations" :key="index" class="video-row">
-        <VideoComponent 
-            :ref="setVideoRef(index)"
-            :videoInfo="recommendation.video" 
-            :explanation="recommendation.explanation"
-            :topics="recommendation.topics"
-            @videoEnded="() => handleVideoEnded(index)" 
-            @updateIndex="handleUpdateIndex(index)"/>
+        <VideoComponent :ref="setVideoRef(index)" :videoInfo="recommendation.video"
+            :explanation="recommendation.explanation" :topics="recommendation.topics"
+            @videoEnded="() => handleVideoEnded(index)" @updateIndex="handleUpdateIndex(index)" />
         <div v-if="index < recommendations.length - 1" class="divider"></div>
     </div>
 </template>
 
 <script setup>
-import { defineProps, ref, onMounted, onUnmounted, defineEmits, nextTick} from 'vue';
+import { ref, onMounted, onUnmounted, defineEmits, nextTick} from 'vue';
 import VideoComponent from './VideoComponent.vue';
 import { ElNotification } from 'element-plus';
 import { h } from 'vue';
 import { ElIcon } from 'element-plus';
 import { Loading } from '@element-plus/icons-vue';
+import apiClient from '@/config/apiClient';
 
-const props = defineProps({
-    recommendations: Array,
-});
+// const props = defineProps({
+//     recommendations: Array,
+// });
 
 const videoElements = ref([]);
 let currentIndex = ref(0);
@@ -29,9 +27,22 @@ let isScrolling = ref(false);
 
 const emit = defineEmits(['videoListEnded']);
 
+const recommendations = ref([]);
+onMounted(() => {
+    getRecommendations();
+});
+const getRecommendations = async () => {
+    try {
+        // add all videos to the videos array
+        recommendations.value.push(...(await apiClient.getRecommendations()));
+    } catch (error) {
+        console.error('Error getting recommendations:', error);
+    }
+};
+
 const handleUpdateIndex = (index) => {
     currentIndex.value = index;
-    if (index >= props.recommendations.length - 1) {
+    if (index >= recommendations.value.length - 1) {
         // If it's the last video, get more recommendations
      
         ElNotification({
@@ -41,6 +52,7 @@ const handleUpdateIndex = (index) => {
             offset: 50,
             duration: 5000,
         })
+        getRecommendations();
         emit('videoListEnded');
     }
 };
@@ -162,5 +174,17 @@ onUnmounted(() => {
     margin: 0 auto;
     margin-top: 50px;
     margin-bottom: 50px;
+}
+
+.spin-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
 }
 </style>

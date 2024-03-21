@@ -1,30 +1,61 @@
 <template>
-    <div class="chart-container">
-        <div style="width: 100%; height: 400px" ref="chartRef" class="chart"></div>
-        <div class="sliders-container">
-            <a-row>
-                <a-col :span="12" v-for="(item, index) in userData.topic_preferences" :key="item.id">
-                    <a-row align="middle">
-                        <a-col :span="10">
-                            <a-tag>{{ item.description }}</a-tag>
-                        </a-col>
-                        <a-col :span="8">
-                            <a-slider v-model:value="item.score" :min="0" :max="1" :step="0.01"
-                                @change="() => updateChartData(index)" @afterChange="() => downplayChartSection(index)"
-                                :tipFormatter="value => `${(value * 100).toFixed(0)}%`" />
-                        </a-col>
-                        <a-col :span="4">
-                            {{ (item.score * 100).toFixed(0) }}%
-                        </a-col>
-                    </a-row>
+    <div class="page-container">
+        <a-row align="top" justify="space-between">
+            <a-col :span="6">
+                <div class="model-container">
+                    <h2>Models</h2>
+                    <a-typography-text strong style="color: gray;">
+                        <blockquote>Description: XXXXXX</blockquote>
+                    </a-typography-text>
 
-                </a-col>
-            </a-row>
+                    <!-- each model -->
+                    <div class="model-slider-container" @mouseenter="isHovering[0] = true"
+                        @mouseleave="isHovering[0] = false" :class="{ 'hover-border-topic': isHovering[0] }"
+                        :tooltip-style="{ color: 'red', borderColor: 'red' }">
+                        <h4>
+                            Topic-Group:
+                        </h4>
+                        <el-slider v-model="value" size="large" color="red" />
 
-        </div>
+                    </div>
 
+                    <el-slider v-model="value" size="large" />
+                    <el-slider v-model="value" size="large" />
+                </div>
+            </a-col>
 
-
+            <a-col :span="18" @mouseenter="isHovering[0] = true" @mouseleave="isHovering[0] = false">
+                <div class="chart-container" :class="{ 'hover-border-topic': isHovering[0] }">
+                    <h2>Topic Preferences</h2>
+                    <div style="width: 100%; height: 400px" ref="chartRef" class="chart"></div>
+                    <div class="sliders-container">
+                        <a-row>
+                            <a-col :span="12" v-for="(item, index) in userData.topic_preferences" :key="item.id">
+                                <a-row align="middle">
+                                    <a-col :span="14">
+                                        <a-tag :style="{ borderColor: chartColors[index] }"
+                                            @mouseover="highlightChartSection(index)"
+                                            @mouseleave="downplayChartSection(index)">
+                                            {{ item.description }}
+                                        </a-tag>
+                                    </a-col>
+                                    <a-col :span="8">
+                                        <a-slider v-model:value="item.score" :min="0" :max="1" :step="0.01"
+                                            @change="() => updateChartData(index)"
+                                            @afterChange="() => downplayChartSection(index)"
+                                            :tipFormatter="value => `${(value * 100).toFixed(0)}%`"
+                                            :style="{ color: chartColors[index] }" />
+                                    </a-col>
+                                    <a-col :span="1">
+                                        {{ (item.score * 100).toFixed(0) }}%
+                                    </a-col>
+                                </a-row>
+                            </a-col>
+                        </a-row>
+                    </div>
+                </div>
+            </a-col>
+        </a-row>
     </div>
 </template>
 
@@ -33,8 +64,10 @@ import { ref, onMounted, reactive } from 'vue';
 import * as echarts from 'echarts';
 import apiClient from '@/config/apiClient';
 const chartRef = ref(null);
+const chartColors = ref([]);
 const userData = reactive({ topic_preferences: [] });
 const backup = reactive({ topic_preferences: [] });
+let isHovering = ref([]); 
 
 let chartInstance = null;
 
@@ -44,8 +77,8 @@ const updateChartData = (id) => {
         value: pref.score * 100,
         selected: index == id,
     }));
-    
-    
+
+
 
     const updatedOption = {
         series: [{
@@ -58,16 +91,7 @@ const updateChartData = (id) => {
         const temp = updatedOption.series[0];
         for (let i = 0; i < temp.data.length; i++) {
             if (temp.data[i].selected) {
-                chartInstance.dispatchAction({
-                    type: 'highlight',
-                    seriesIndex: 0,
-                    dataIndex: i
-                });
-                chartInstance.dispatchAction({
-                    type: 'showTip',
-                    seriesIndex: 0,
-                    dataIndex: i
-                });
+                highlightChartSection(i,false);
             }
         }
     }
@@ -79,8 +103,25 @@ const updateChartData = (id) => {
     for (var j = 0; j < userData.topic_preferences.length; j++) {
         userData.topic_preferences[j].score = userData.topic_preferences[j].score / sum;
     }
-   
-    
+
+
+};
+
+const highlightChartSection = (index, showTip = true) => {
+    if (chartInstance) {
+        chartInstance.dispatchAction({
+            type: 'highlight',
+            seriesIndex: 0,
+            dataIndex: index
+        });
+        if (showTip) {
+            chartInstance.dispatchAction({
+                type: 'showTip',
+                seriesIndex: 0,
+                dataIndex: index
+            });
+        }
+    }
 };
 
 
@@ -91,11 +132,11 @@ const downplayChartSection = (index) => {
             seriesIndex: 0,
             dataIndex: index
         });
-        chartInstance.dispatchAction({
-            type: 'showTip',
-            seriesIndex: 0,
-            dataIndex: index
-        });
+        // chartInstance.dispatchAction({
+        //     type: 'showTip',
+        //     seriesIndex: 0,
+        //     dataIndex: index
+        // });
     }
 };
 
@@ -127,6 +168,11 @@ onMounted(async () => {
                 type: 'pie',
                 radius: ['20%', '50%'],
                 data: data,
+                itemStyle: {
+                    borderRadius: 0,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
                 label: {
                     show: true,
                     position: 'outside',
@@ -137,7 +183,7 @@ onMounted(async () => {
                     rich: {
                         a: {
                             backgroundColor: '#f0f0f0',
-                            borderColor: '#d9d9d9',
+                            borderColor: 'auto',
                             borderWidth: 1,
                             borderRadius: 4,
                             padding: [3, 4],
@@ -157,7 +203,7 @@ onMounted(async () => {
                     label: {
                         show: true,
                         backgroundColor: 'auto',
-                        padding: [3, 4],
+                        padding: [2, 3],
                         borderRadius: 4,
                     }
                 }
@@ -166,11 +212,56 @@ onMounted(async () => {
     };
 
     chartInstance.setOption(option);
+    chartInstance = echarts.init(chartRef.value);
+
+    chartColors.value = chartInstance.getOption().color;
+
 });
 </script>
 
 <style scoped>
-.sliders-container {
-    margin-left: 10px;
+.page-container {
+    margin: -20px;
+    background-color: #f0f2f5;
+    min-height: 92vh;    
+    box-sizing: border-box;
+ 
+}
+
+.chart {
+    margin-top: -80px;
+}
+
+.model-container {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;  
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.model-slider-container {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 3px dashed #215f9900 !important;
+    margin: 5px;
+    padding: 15px;
+}
+
+
+.chart-container {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+    margin: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hover-border-topic {
+    border: 3px dashed #215f99 !important;
 }
 </style>
