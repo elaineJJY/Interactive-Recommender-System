@@ -18,10 +18,13 @@ public class User {
 	@Id
 	private String userId;
 
-	// Pablo defines
-	private HashMap<String, String> models;
-
 	private Date feedbackLastUsed;
 
 	private ArrayList<Double> topic_preferences; // topic preferences of the user
+
+	// model parameters
+	private HashMap<String,Integer> n_recs_per_model;
+
+	private Double exploit_coeff;
+
 }

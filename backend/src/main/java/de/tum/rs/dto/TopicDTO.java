@@ -9,12 +9,13 @@ public class TopicDTO {
 	private Integer id;
 	Double score;
 	private String description;
-	private LinkedHashMap<Object,Object> tokens;
+
+	public TopicDTO() {
+	}
+
 	public TopicDTO(Double score, Topic topic) {
 		this.score = score;
 		this.id = topic.getTopicNumber();
 		this.description = topic.getDescription();
-		this.tokens = topic.getTokens();
-
 	}
 }

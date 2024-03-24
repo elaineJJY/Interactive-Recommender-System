@@ -33,6 +33,15 @@ export default {
             ElMessage.error('Please login first');
         }
     },
+    async updateUser(user) {
+        try {
+            let response = await apiClient.post(`/users/${globalState.userId}`, user);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw error;
+        }
+    },
     async getRecommendations() {
 
         try {

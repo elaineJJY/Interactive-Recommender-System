@@ -19,4 +19,13 @@ public class Topic {
 
 	@Field(type = FieldType.Object)
 	private LinkedHashMap<Object,Object> tokens;
+
+	public Topic() {
+	}
+	public Topic(Integer topicNumber, String description, Long document_count, LinkedHashMap<Object,Object> tokens) {
+		this.topicNumber = topicNumber;
+		this.description = description;
+		this.document_count = document_count;
+		this.tokens = tokens;
+	}
 }
