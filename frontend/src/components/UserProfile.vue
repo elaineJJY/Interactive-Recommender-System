@@ -2,7 +2,7 @@
     <div class="page-container">
         <a-spin size="large" class="spin-overlay" v-if="showSpin"></a-spin>
         <a-row align="top" justify="space-between">
-            <a-col :span="6">
+            <a-col :span="5">
                 <div class="model-container">
                     <div v-if="!inEdit" class="button-container">
                         <el-button type="primary" @click="inEdit = true" :icon="Edit">Edit</el-button>
@@ -64,7 +64,7 @@
 
             </a-col>
 
-            <a-col :span="18" @mouseenter="isHovering[0] = true" @mouseleave="isHovering[0] = false">
+            <a-col :span="19" @mouseenter="isHovering[0] = true" @mouseleave="isHovering[0] = false">
                 <div class="chart-container" :class="{ 'hover-border-topic': isHovering[0] }">
                     <h2>Topic Preferences</h2>
 

@@ -34,6 +34,11 @@ public class RecommenderEngine {
 
 	ObjectMapper mapper = new ObjectMapper();
 
+	public void regiserUser(String userId) {
+		String url = PYTHON_SERVICE_URL + "/register?userId=" + userId;
+		restTemplate.postForObject(url, null, Void.class);
+	}
+
 	/**
 	 * Get recommendations for the given user
 	 * @param userId

@@ -33,6 +33,9 @@ public class UserController {
 	@Autowired
 	private TopicRepository topicRepository;
 
+	@Autowired
+	private RecommenderEngine recommenderEngine;
+
 	@PostMapping
 	@RequestMapping("/login")
 	public ResponseEntity<?> loginUser(@RequestBody User user) {
@@ -57,6 +60,7 @@ public class UserController {
 		if(!userRepository.findByUserId(user.getUserId()).isPresent()) {
 			user.setFeedbackLastUsed(new Date());
 			userRepository.save(user);
+			recommenderEngine.regiserUser(user.getUserId());
 			return ResponseEntity.ok().body("Registration successful!");
 		}
 		log.info("User already exists!");
