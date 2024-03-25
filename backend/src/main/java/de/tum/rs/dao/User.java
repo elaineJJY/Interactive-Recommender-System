@@ -25,6 +25,8 @@ public class User {
 	// model parameters
 	private HashMap<String,Integer> n_recs_per_model;
 
+	private ArrayList<Double> recommended_topics_in_top_popular_rs;
+
 	private Double exploit_coeff;
 
 }
