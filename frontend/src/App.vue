@@ -31,7 +31,7 @@
 
         <!-- Login Component -->
         <el-col :span="7">
-          <LoginCommponent />
+          <LoginCommponent @refresh="handleRefresh" />
         </el-col>
       </el-row>
     </el-header>
@@ -46,10 +46,7 @@
       <el-main>
         <!-- Content for Videos -->
         <div v-if="state.selectedKeys[0] === '1'">
-         
-          
-          
-          <VideoList @videoListEnded="getRecommendations" />
+          <VideoList ref="videoListRef" />
         </div>
 
         <!-- Content for Hot Videos-->
@@ -67,7 +64,7 @@ import LoginCommponent from '@/components/LoginComponent.vue';
 import VideoList from './components/VideoList.vue';
 import UserProfile from './components/UserProfile.vue';
 import apiClient from '@/config/apiClient';
-import { reactive, watch, h, onMounted, onUnmounted } from 'vue';
+import { reactive, watch, h, onMounted, onUnmounted,ref} from 'vue';
 import globalState from '@/config/globalState';
 
 import {
@@ -78,7 +75,7 @@ import { Fold, Expand } from '@element-plus/icons-vue';
 
 const state = reactive({
   collapsed: false,
-  selectedKeys: ['2'],
+  selectedKeys: ['1'],
   openKeys: ['sub1'],
   preOpenKeys: ['sub1']
 });
@@ -109,6 +106,13 @@ const toggleCollapsed = () => {
   state.openKeys = state.collapsed ? [] : state.preOpenKeys;
 };
 
+const videoListRef = ref(null);
+function handleRefresh() {
+  if (videoListRef.value) {
+    videoListRef.value.refreshList();
+  }
+}
+
 onMounted(() => {
   globalState.userId = JSON.parse(localStorage.getItem('userId'));
   
@@ -125,10 +129,6 @@ onUnmounted(() => {
     display: none;
 }
 
-body {
-    -ms-overflow-style: none;  /* IE & Edge */
-    scrollbar-width: none;  /* Firefox */
-}
 
 .el-header {
   background-color: #fff;

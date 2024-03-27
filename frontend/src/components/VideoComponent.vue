@@ -472,16 +472,18 @@ const toggleOption = (option) => {
 }
 
 .description-container {
+    scrollbar-width: thin;
+    -ms-overflow-style: thin;
     max-height: 300px;
     overflow-y: auto;
 }
 
 .tags-container {
     margin: 5px;
-    margin-bottom: 16px;    /* Adds space below the entire tags container */
-    display: flex;  /* Enables flexbox layout for the tags */
-    flex-wrap: wrap;    /* Allows tags to wrap onto multiple lines */
-    gap: 8px 8px;    /* Creates a gap between tags and between lines */
+    margin-bottom: 16px;   
+    display: flex; 
+    flex-wrap: wrap;   
+    gap: 8px 8px;   
 }
 
 .topic-image {

@@ -15,6 +15,25 @@ export default {
     register(userId) {
         return apiClient.post('/users/register', { userId: userId });
     },
+    async getTopics(){
+        try {
+            let response = await apiClient.get('/topics');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching topics:', error);
+            throw error;
+        }
+    },
+    async registerTopics(topics) {
+        try {
+            console.log('registerTopics', topics);
+            let response = await apiClient.post(`/topics/${globalState.userId}`,topics);
+            return response;
+        } catch (error) {
+            console.error('Error registering topics:', error);
+            throw error;
+        }
+    },
     login(userId) {
         return apiClient.post('/users/login', { userId: userId });
     },

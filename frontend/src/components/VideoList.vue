@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, defineEmits, nextTick} from 'vue';
+import { ref, onMounted, onUnmounted, defineEmits, nextTick, defineExpose } from 'vue';
 import VideoComponent from './VideoComponent.vue';
 import { ElNotification } from 'element-plus';
 import { h } from 'vue';
@@ -31,6 +31,11 @@ const recommendations = ref([]);
 onMounted(() => {
     getRecommendations();
 });
+
+const refreshList = async () => {
+    recommendations.value = [];
+    getRecommendations();
+}
 const getRecommendations = async () => {
     try {
         // add all videos to the videos array
@@ -159,6 +164,10 @@ onUnmounted(() => {
     window.removeEventListener('wheel', handleWheelOrKeyDown);
     window.removeEventListener('keydown', handleWheelOrKeyDown);
 });
+
+defineExpose({
+    refreshList
+})
 </script>
 
 <style>
@@ -186,5 +195,10 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
     background: rgba(255, 255, 255, 0.8);
+}
+
+body {
+    -ms-overflow-style: none;  /* IE & Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 </style>

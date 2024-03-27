@@ -60,7 +60,6 @@ public class UserController {
 		if(!userRepository.findByUserId(user.getUserId()).isPresent()) {
 			user.setFeedbackLastUsed(new Date());
 			userRepository.save(user);
-			recommenderEngine.regiserUser(user.getUserId());
 			return ResponseEntity.ok().body("Registration successful!");
 		}
 		log.info("User already exists!");
@@ -113,7 +112,6 @@ public class UserController {
 	public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO) {
 		if(userRepository.findByUserId(userId).isPresent()) {
 			User user = userRepository.findByUserId(userId).get();
-
 
 			ArrayList<TopicDTO> topicDTOs = userDTO.getTopic_preferences();
 			double ratio = topicDTOs.get(topicDTOs.size()-1).getScore() / userDTO.getOrigin_other_topics().getScore();

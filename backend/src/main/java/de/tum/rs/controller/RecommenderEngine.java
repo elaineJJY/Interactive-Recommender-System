@@ -29,14 +29,15 @@ public class RecommenderEngine {
 	@Autowired
 	private RecommendationBuilder recommendationBuilder;
 
-	@Autowired
-	private VideoRepository videoRepository;
-
-	ObjectMapper mapper = new ObjectMapper();
-
-	public void regiserUser(String userId) {
+	/**
+	 * Register the user with the given topics
+	 * @param userId
+	 * @param topicIds
+	 */
+	public void regiserUser(String userId, List<Integer> topicIds) {
 		String url = PYTHON_SERVICE_URL + "/register?userId=" + userId;
-		restTemplate.postForObject(url, null, Void.class);
+		restTemplate.postForObject(url, topicIds, Void.class);
+		log.info("Called Model to register user {} with topics {}", userId, topicIds);
 	}
 
 	/**
