@@ -418,8 +418,10 @@ const onSubmitRatingModal = () => {
 
 const options = [
     { value: 'Too much similar content', label: 'Too much similar content' },
-    { value: 'Advertising and marketing', label: 'Advertising and marketing' }
+    { value: 'Not interested in content', label: 'Not interested in content' },
+    { value: 'Dislike the creator', label: 'Dislike the creator' + (props.videoInfo ? ": "+props.videoInfo.snippet.channelTitle : "") }
 ];
+
 const selectedOptions = ref([]);
 const toggleOption = (option) => {
     const index = selectedOptions.value.indexOf(option);
@@ -474,7 +476,7 @@ const toggleOption = (option) => {
 .description-container {
     scrollbar-width: thin;
     -ms-overflow-style: thin;
-    max-height: 300px;
+    max-height: 500px;
     overflow-y: auto;
 }
 

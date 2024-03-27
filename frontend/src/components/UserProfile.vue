@@ -155,9 +155,9 @@ watch(() => n_recs_per_model.value.unpersonalised, (newValue) => {
 const updateUserPreferences = async () => {
     try {
         userData.exploit_coeff = exploit_coeff.value;
-        userData.topic_preferences = topic_preferences.value;  
-        userData.n_recs_per_model = n_recs_per_model.value;
-        userData.origin_other_topics = origin_other_topics.value;
+        userData.topic_preferences = JSON.parse(JSON.stringify(topic_preferences.value));
+        userData.n_recs_per_model = JSON.parse(JSON.stringify(n_recs_per_model.value));
+        userData.origin_other_topics = JSON.parse(JSON.stringify(origin_other_topics.value));
         inEdit.value = false;
         apiClient.updateUser(userData);
         ElNotification({
@@ -173,10 +173,27 @@ const updateUserPreferences = async () => {
 };
 
 const resetUserPreferences = () => {
+
     exploit_coeff.value = userData.exploit_coeff;
-    topic_preferences.value = userData.topic_preferences;
-    n_recs_per_model.value = userData.n_recs_per_model;
-    origin_other_topics.value = userData.origin_other_topics;
+    topic_preferences.value = JSON.parse(JSON.stringify(userData.topic_preferences));
+    n_recs_per_model.value = JSON.parse(JSON.stringify(userData.n_recs_per_model));
+    origin_other_topics.value = JSON.parse(JSON.stringify(userData.origin_other_topics));
+
+    const updatedData = topic_preferences.value.map((pref) => ({
+        name: pref.description,
+        value: pref.score * 100,
+        selected: false,
+    }));
+
+    const updatedOption = {
+        series: [{
+            data: updatedData,
+        }],
+    };
+
+    if (chartInstance) {
+        chartInstance.setOption(updatedOption);
+    }
     inEdit.value = false;
 };
 
@@ -244,7 +261,11 @@ const downplayChartSection = (index) => {
              type: 'showTip',
              seriesIndex: 0,
              dataIndex: index
-         });
+        });
+        chartInstance.dispatchAction({
+            type: 'hideTip'
+        });
+        
     }
 };
 
@@ -252,10 +273,11 @@ onMounted(async () => {
     const fetchedUserData = await apiClient.getUser();
     showSpin.value = false;
     userData = fetchedUserData;
+    
     exploit_coeff.value = userData.exploit_coeff;
-    topic_preferences.value = userData.topic_preferences;
-    n_recs_per_model.value = userData.n_recs_per_model;
-    origin_other_topics.value = userData.origin_other_topics;
+    topic_preferences.value = JSON.parse(JSON.stringify(userData.topic_preferences));
+    n_recs_per_model.value = JSON.parse(JSON.stringify(userData.n_recs_per_model));
+    origin_other_topics.value = JSON.parse(JSON.stringify(userData.origin_other_topics));
    
     chartInstance = echarts.init(chartRef.value);
     const data = topic_preferences.value.map(pref => ({
@@ -344,7 +366,7 @@ onMounted(async () => {
 
 .chart {
     margin-top: -60px;
-    margin-bottom: -40px;
+    margin-bottom: 10px;
 }
 
 .model-container {
