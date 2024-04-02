@@ -75,7 +75,7 @@ import { Fold, Expand } from '@element-plus/icons-vue';
 
 const state = reactive({
   collapsed: false,
-  selectedKeys: ['2'],
+  selectedKeys: ['1'],
   openKeys: ['sub1'],
   preOpenKeys: ['sub1']
 });

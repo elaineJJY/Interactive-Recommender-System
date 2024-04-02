@@ -481,10 +481,14 @@ const onSubmitRatingModal = () => {
         recordInteraction('dislikeReasons: ' + selectedOptions.value);
         feedback.dislikeReasons = selectedOptions.value;
     }
-    let value = {};
-    value.dislikeReasons = selectedOptions.value;
-    value.rating = rating.value;
-    saveInteraction('\'...\' button',value);
+   
+    if(selectedOptions.value.length > 0){
+        saveInteraction('\'...\' button: Dislike reasons', JSON.stringify(selectedOptions.value));
+    }
+    if(rating.value > 0){
+        saveInteraction('\'...\' button: Five-star rating', rating.value);
+    }
+    saveInteraction('\'...\' button',"Submit");
     
 };
 
