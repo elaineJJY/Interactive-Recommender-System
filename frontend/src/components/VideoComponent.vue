@@ -262,7 +262,7 @@ const scrollIntoView = async () => {
     await new Promise(resolve => setTimeout(resolve, 700));
 
     // Show tour
-    if(props.videoIndex === 2 && globalState.round === 0){
+    if(props.videoIndex === 2 && globalState.round === 1){
         open.value = true;
     }
     else {

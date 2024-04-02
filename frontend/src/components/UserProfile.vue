@@ -294,7 +294,7 @@ const updateChartData = (id) => {
     for (var j = 0; j < topic_preferences.value.length; j++) {
         topic_preferences.value[j].score = topic_preferences.value[j].score / sum;
     }
-
+    saveInteraction('Topic Preferences: Sliders', topic_preferences.value[id].description);
 };
 
 
@@ -339,6 +339,7 @@ const handleExploitCoeffChange = (value) => {
     if (value === 0.5) {
         exploit_coeff.value = value > 0.5 ? 0.6 : 0.4;
     }
+    saveInteraction('Personalisation slider: Slider', exploit_coeff.value);
 };
 
 onMounted(async () => {

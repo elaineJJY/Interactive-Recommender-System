@@ -111,7 +111,7 @@ export default {
         }
     },
     async submitInteraction(interaction) {
-        console.log('submitInteraction', interaction);
+        
         try {
             interaction.userId = globalState.userId;
             if (!interaction.userId) {
@@ -119,9 +119,8 @@ export default {
             }
             interaction.timestamp = new Date().toISOString();
             interaction.round = globalState.round;
-            if(!globalState.interactions) {
-                globalState.interactions = new Array();
-            }
+            console.log('submitInteraction', interaction);
+            
             globalState.interactions.push(interaction);
             if (globalState.interactions.length >= 5) {
                 await apiClient.post(`/interactions`, globalState.interactions);

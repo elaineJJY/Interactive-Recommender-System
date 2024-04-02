@@ -75,7 +75,7 @@ import { Fold, Expand } from '@element-plus/icons-vue';
 
 const state = reactive({
   collapsed: false,
-  selectedKeys: ['1'],
+  selectedKeys: ['2'],
   openKeys: ['sub1'],
   preOpenKeys: ['sub1']
 });
@@ -118,6 +118,12 @@ const userProfileRef = ref(null);
 
 onMounted(() => {
   globalState.userId = JSON.parse(localStorage.getItem('userId'));
+  if (!globalState.round) {
+    globalState.round = 1;
+  }
+  if(!globalState.interactions) {
+    globalState.interactions = new Array();
+  }
   provide('userProfileRef ', userProfileRef);
 });
 
