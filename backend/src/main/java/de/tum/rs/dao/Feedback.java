@@ -43,6 +43,8 @@ public class Feedback {
 	@Nullable
 	private ArrayList<String> dislikeReasons;
 
+	private Integer round;
+
 	public void generateId() {
 		this.id = this.userId + "_" + this.videoId;
 	}

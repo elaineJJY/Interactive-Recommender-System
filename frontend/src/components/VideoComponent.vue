@@ -135,13 +135,11 @@ import { YoutubeVue3 } from 'youtube-vue3'
 import { ElMessage } from 'element-plus';
 import { message, Tag } from 'ant-design-vue';
 
-
 const props = defineProps({
     videoInfo: Object,
     explanation: String,
     topics: Array,
     videoIndex: Number,
-    round: Number,
 });
 
 const emit = defineEmits(['videoEnded', 'updateIndex']);
@@ -164,6 +162,7 @@ let feedback = {
     more: new Array(),
     less: new Array(),
 };
+
 
 const overlayStyle = ref({
     width: '480x',
@@ -261,9 +260,9 @@ const scrollIntoView = async () => {
     }
     videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
     await new Promise(resolve => setTimeout(resolve, 700));
-    if(props.videoIndex === 2 && props.round === 0){
-        userProfileRef = document.querySelector('.user-profile-button')
-        console.log("userProfileRef: ", userProfileRef);
+
+    // Show tour
+    if(props.videoIndex === 2 && globalState.round === 0){
         open.value = true;
     }
     else {
@@ -312,7 +311,6 @@ let observer;
 const infoButtonRef = ref(null);
 const likeButtonRef = ref(null);
 const moreButtonRef = ref(null);
-let userProfileRef = ref(null);
 const current = ref(0);
 const open = ref(false);
 const steps = ref([

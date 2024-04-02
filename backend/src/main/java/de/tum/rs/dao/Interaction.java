@@ -23,6 +23,8 @@ public class Interaction {
 	@Nullable
 	private String videoId;
 
+	private Integer round;
+
 	private String component;
 
 	@Nullable

@@ -92,6 +92,7 @@ export default {
                 return false;
             }
             feedback.timestamp = new Date().toISOString();
+            feedback.round = globalState.round;
             if(!globalState.feedbacks) {
                 globalState.feedbacks = new Array();
             }
@@ -117,6 +118,7 @@ export default {
                 return false;
             }
             interaction.timestamp = new Date().toISOString();
+            interaction.round = globalState.round;
             if(!globalState.interactions) {
                 globalState.interactions = new Array();
             }

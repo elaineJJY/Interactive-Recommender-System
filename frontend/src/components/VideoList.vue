@@ -4,7 +4,6 @@
         <VideoComponent :ref="setVideoRef(index)" :videoInfo="recommendation.video"
             :explanation="recommendation.explanation" :topics="recommendation.topics" 
             :videoIndex="index"
-            :round="round"
             @videoEnded="() => handleVideoEnded(index)" @updateIndex="handleUpdateIndex(index)" />
         <div v-if="index < recommendations.length - 1" class="divider"></div>
     </div>
@@ -18,6 +17,7 @@ import { h } from 'vue';
 import { ElIcon } from 'element-plus';
 import { Loading } from '@element-plus/icons-vue';
 import apiClient from '@/config/apiClient';
+import globalState from '@/config/globalState';
 
 // const props = defineProps({
 //     recommendations: Array,
@@ -27,7 +27,6 @@ import apiClient from '@/config/apiClient';
 const videoElements = ref([]);
 let currentIndex = ref(0);
 let isScrolling = ref(false);
-let round = 0;
 
 const emit = defineEmits(['videoListEnded']);
 
@@ -63,7 +62,7 @@ const handleUpdateIndex = (index) => {
         })
         getRecommendations();
         emit('videoListEnded');
-        round++;
+        globalState.round++;
     }
 };
 
