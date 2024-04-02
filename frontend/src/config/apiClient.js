@@ -97,7 +97,6 @@ export default {
             }
             globalState.feedbacks.push(feedback);
             if (globalState.feedbacks.length >= 5) {
-                //TODO: send feedback to server
                 await apiClient.post(`/feedback`, globalState.feedbacks);
                 console.log('submitFeedback', globalState.feedbacks);
                 globalState.feedbacks = new Array();
@@ -110,9 +109,35 @@ export default {
             throw error;
         }
     },
+    async submitInteraction(interaction) {
+        console.log('submitInteraction', interaction);
+        try {
+            interaction.userId = globalState.userId;
+            if (!interaction.userId) {
+                return false;
+            }
+            interaction.timestamp = new Date().toISOString();
+            if(!globalState.interactions) {
+                globalState.interactions = new Array();
+            }
+            globalState.interactions.push(interaction);
+            if (globalState.interactions.length >= 5) {
+                await apiClient.post(`/interactions`, globalState.interactions);
+                globalState.interactions = new Array();
+            }
+            return true;
+        }
+        catch (error) {
+            console.error('Error saving interaction:', error);
+            throw error;
+        }
+    },
     async onWebClose() {    
         if (globalState.feedbacks && globalState.feedbacks.length > 0) {
-            await apiClient.post(`/feedback`, globalState.feedbacks);
+            apiClient.post(`/feedback`, globalState.feedbacks);
+        }
+        if (globalState.interactions && globalState.interactions.length > 0) {
+            apiClient.post(`/interactions`, globalState.interactions);
         }
     },
     async downloadData(data, filename) {

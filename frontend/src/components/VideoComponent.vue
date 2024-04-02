@@ -16,26 +16,32 @@
 
 
                 <!-- Info Button -->
-                <a-button @click="showInfoModal = true" shape="circle" size="large">
+                <a-button @click="showInfoModal = true; saveInteraction('Video: Info button')" shape="circle"
+                    size="large" ref="infoButtonRef">
                     <template #icon>
                         <InfoCircleFilled />
                     </template>
                 </a-button>
 
                 <!-- Like and Dislike Button -->
-                <a-button shape="circle" size="large" @click="setLikeFeedback">
-                    <template #icon>
-                        <LikeTwoTone :two-tone-color="likeClicked ? '#52c41a' : '#000000'" />
-                    </template>
-                </a-button>
-                <a-button shape="circle" size="large" @click="setDislikeFeedback">
-                    <template #icon>
-                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#f5222d' : '#000000'" />
-                    </template>
-                </a-button>
+                
+                    <a-button shape="circle" size="large" @click="setLikeFeedback(); saveInteraction('Like button')"
+                        ref="likeButtonRef">
+                        <template #icon>
+                            <LikeTwoTone :two-tone-color="likeClicked ? '#52c41a' : '#000000'" />
+                        </template>
+                    </a-button>
+                    <a-button shape="circle" size="large"
+                        @click="setDislikeFeedback(); saveInteraction('Dislike button')">
+                        <template #icon>
+                            <DislikeTwoTone :two-tone-color="dislikeClicked ? '#f5222d' : '#000000'" />
+                        </template>
+                    </a-button>
+                
 
-                <!-- Rating Button -->
-                <a-button @click="showRatingModal = true" shape="circle" size="large">
+                <!-- More Button -->
+                <a-button @click="showRatingModal = true; saveInteraction('\'...\' button', 'Open')" shape="circle"
+                    size="large" ref="moreButtonRef">
                     <template #icon>
                         <EllipsisOutlined />
                     </template>
@@ -46,22 +52,26 @@
             <!-- Info Modal -->
             <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null">
                 <div class="description-container">
-                    
+
                     <div class="tags-container" v-if="topics">
 
-                        <a-popover v-for="(topic, index) in topics" :key="index" placement="top"
-                            trigger="hover"
-                            >
+                        <a-popover v-for="(topic, index) in topics" :key="index" placement="top" trigger="hover">
                             <template #content>
-                                <div >
+                                <div>
                                     <p>
                                         <b>{{ topic.description }}</b>
                                     </p>
-                                    <img class="topic-image" :src="require(`@/assets/topics/topic_${topic.id}_wordcloud.png`)" alt="Topic image">
-                                    <a-space >
-                                        <a-button size="small" class="see-more-btn" :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(topic.id) }" @click="adaptTopicGroup(index, 1)">See
+                                    <img class="topic-image"
+                                        :src="require(`@/assets/topics/topic_${topic.id}_wordcloud.png`)"
+                                        alt="Topic image">
+                                    <a-space>
+                                        <a-button size="small" class="see-more-btn"
+                                            :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(topic.id) }"
+                                            @click="adaptTopicGroup(index, 1); saveInteraction('\'See more\' button', topic.id)">See
                                             more?</a-button>
-                                        <a-button size="small" class="see-less-btn" :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(topic.id) }" @click="adaptTopicGroup(index, -1)">See
+                                        <a-button size="small" class="see-less-btn"
+                                            :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(topic.id) }"
+                                            @click="adaptTopicGroup(index, -1); saveInteraction('\'See less\' button', topic.id)">See
                                             less?</a-button>
                                     </a-space>
                                 </div>
@@ -91,7 +101,7 @@
 
             <!-- Rating Modal -->
             <a-modal v-model:visible="showRatingModal" title="Rate" okText="Submit" cancelText="Cancel"
-                @ok="onSubmitRatingModal" :width="400">
+                @ok="onSubmitRatingModal();" @cancel="saveInteraction('\'...\' button', 'Cancel')" :width="400">
                 <div class="rate-container">
                     <p style="color:gray; margin-bottom: -2px;">Your rating helps us deliver more relevant content.</p>
                     <a-rate v-model:value="rating" />
@@ -99,7 +109,8 @@
                     <span v-else style="margin-left: 16px;">You have not rated yet.</span>
                 </div>
                 <div class="not-recommend-text">I don't want to see it.</div>
-                <p style="color:gray">We will reduce the recommendation of related videos based on the reasons you give us
+                <p style="color:gray">We will reduce the recommendation of related videos based on the reasons you give
+                    us
                 </p>
                 <a-space direction="vertical">
                     <a-button v-for="(option, index) in options" :key="index"
@@ -111,11 +122,12 @@
             </a-modal>
 
         </div>
+        <a-tour v-model:current="current" :open="open" :steps="steps" @close="handleTourFinish" />
     </div>
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, onMounted, onUnmounted, nextTick, defineExpose, computed,h } from 'vue';
+import { ref, defineProps, defineEmits, onMounted, onUnmounted, nextTick, defineExpose, computed,h, createVNode } from 'vue';
 import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone, EllipsisOutlined, PlusSquareOutlined, MinusSquareFilled} from '@ant-design/icons-vue';
 import apiClient from '@/config/apiClient';
 import globalState from '@/config/globalState';
@@ -127,7 +139,9 @@ import { message, Tag } from 'ant-design-vue';
 const props = defineProps({
     videoInfo: Object,
     explanation: String,
-    topics: Array
+    topics: Array,
+    videoIndex: Number,
+    round: Number,
 });
 
 const emit = defineEmits(['videoEnded', 'updateIndex']);
@@ -166,6 +180,15 @@ const recordInteraction = async (type) => {
 
     // console.log("record interaction: ", props.videoInfo.snippet.title+" "+type);
 }
+const saveInteraction = (component, value = "") => {
+    const interaction = {
+        page: 'Video',
+        videoId: props.videoInfo.id,
+        component: component,
+        componentValue: value,
+    };
+    apiClient.submitInteraction(interaction);
+};
 
 function onPaused() {
     // feedback.totalWatchTime += Date.now() - watchStartTime;
@@ -237,7 +260,17 @@ const scrollIntoView = async () => {
         return false;
     }
     videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 700));
+    if(props.videoIndex === 2 && props.round === 0){
+        userProfileRef = document.querySelector('.user-profile-button')
+        console.log("userProfileRef: ", userProfileRef);
+        open.value = true;
+    }
+    else {
+        youtubePlayer.value.player.playVideo();
+        youtubePlayer.value.player.unMute();
+        emit('updateIndex');
+    }
     return true;
 }
 
@@ -275,27 +308,63 @@ defineExpose({
 
 let observer;
 
+// Tour
+const infoButtonRef = ref(null);
+const likeButtonRef = ref(null);
+const moreButtonRef = ref(null);
+let userProfileRef = ref(null);
+const current = ref(0);
+const open = ref(false);
+const steps = ref([
+    {
+        target: () => infoButtonRef.value && infoButtonRef.value.$el,
+        title: 'Info Button',
+        description: 'Click here to view more information about the video and modify the tags.',
+        cover: createVNode('img', {
+            alt: 'tour.png',
+            src: require(`@/assets/tour/infoButton.png`),
+        }),
+    },
+    {
+        target: () => likeButtonRef.value && likeButtonRef.value.$el,
+        title: 'Like or Dislike',
+        description: 'You can express your liking or disliking of the video here.',
+    },
+    {
+        target: () => moreButtonRef.value && moreButtonRef.value.$el,
+        title: 'More Button',
+        description: 'Click here to provide a more detailed evaluation of the video, including specific reasons for disliking it.',
+        cover: createVNode('img', {
+            alt: 'tour.png',
+            src: require(`@/assets/tour/moreButton.png`),
+        }),
+    },
+    {
+        target: null,//() =>userProfileRef.value && userProfileRef.value.$el,
+        title: 'User Profile',
+        description: 'Click here to view your user profile and see your viewing history.',
+        cover: createVNode('img', {
+            alt: 'tour.png',
+            src: require(`@/assets/tour/userProfile.png`),
+        }),
+    },
+]);
+
+
+const handleTourFinish = () => {
+    open.value = false;
+    saveInteraction('Tour', 'Finish');
+    youtubePlayer.value.player.playVideo();
+    youtubePlayer.value.player.unMute();
+    emit('updateIndex');
+};
+
 onMounted(() => {
 
     nextTick(() => {
         observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry.intersectionRatio > 0.5) { // when 50% of the video is visible
-
-                    youtubePlayer.value.player.playVideo();
-                    youtubePlayer.value.player.unMute();
-
-
-                    // scroll to the center of the video automatically
-                    // entry.target.scrollIntoView({
-                    //     behavior: 'smooth',
-                    //     block: 'center'
-                    // });
-
-                    emit('updateIndex');
-
-
-                } else {
+                if (entry.intersectionRatio <= 0.5) { 
                     youtubePlayer.value.player.pauseVideo();
 
                 }
@@ -320,6 +389,7 @@ onUnmounted(() => {
 });
 
 
+
 function getColor(id) {
     return predefinedColors[id % predefinedColors.length];
 }
@@ -340,7 +410,7 @@ const truncatedDescription = computed(() => {
     return props.videoInfo.snippet.description;
 });
 
-//TODO
+
 const selectedMoreTopicGroups = ref([]);
 const selectedLessTopicGroups = ref([]);
 
@@ -413,12 +483,16 @@ const onSubmitRatingModal = () => {
         recordInteraction('dislikeReasons: ' + selectedOptions.value);
         feedback.dislikeReasons = selectedOptions.value;
     }
+    let value = {};
+    value.dislikeReasons = selectedOptions.value;
+    value.rating = rating.value;
+    saveInteraction('\'...\' button',value);
     
 };
 
 const options = [
     { value: 'Too much similar content', label: 'Too much similar content' },
-    { value: 'Not interested in content', label: 'Not interested in content' },
+    { value: 'Not interested in this content', label: 'Not interested in this content' },
     { value: 'Dislike the creator', label: 'Dislike the creator' + (props.videoInfo ? ": "+props.videoInfo.snippet.channelTitle : "") }
 ];
 

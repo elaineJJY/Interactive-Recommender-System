@@ -1,10 +1,12 @@
 package de.tum.rs.controller;
 
 import de.tum.rs.dao.User;
+import de.tum.rs.model.Recommendation;
 import de.tum.rs.repository.UserRepository;
 import java.util.List;
 import de.tum.rs.dao.Feedback;
 import de.tum.rs.repository.FeedbackRepository;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -29,26 +31,31 @@ public class FeedbackController {
 
 	@PostMapping
 	@Async
-	public void saveFeedbacks(@RequestBody List<Feedback> feedbacks) {
+	public CompletableFuture<Void> saveFeedbacks(List<Feedback> feedbacks) {
 
-		feedbacks.stream().forEach(feedback -> {
-			feedback.generateId();
-			feedbackRepository.save(feedback);
-		});
-		log.info("Saving feedbacks: {}", feedbacks);
+		CompletableFuture.runAsync(() -> {
+			feedbacks.forEach(feedback -> {
+				feedback.generateId();
+				feedbackRepository.save(feedback);
+			});
+			log.info("Saving feedbacks: {}", feedbacks);
 
-		// check if the user has given enough feedbacks to update the model
-		User user = userRepository.findById(feedbacks.get(0).getUserId()).get();
-		feedbacks = feedbackRepository.findByUserIdAndTimestampGreaterThan(user.getUserId(), user.getFeedbackLastUsed());
-		if(feedbacks.size() >= 5) {
-			log.info("Invoking model update for User {}", user.getUserId());
-			try {
-				recommenderEngine.invokeUpdate(feedbacks);
-				user.setFeedbackLastUsed(feedbacks.get(feedbacks.size() - 1).getTimestamp());
-				userRepository.save(user);
-			} catch (Exception e) {
-				log.error("Error while invoking model update", e);
+			User user = userRepository.findById(feedbacks.get(0).getUserId()).get();
+			List<Feedback> recentFeedbacks = feedbackRepository.findByUserIdAndTimestampGreaterThan(
+				user.getUserId(), user.getFeedbackLastUsed()
+			);
+			if (recentFeedbacks.size() >= 5) {
+				log.info("Invoking model update for User {}", user.getUserId());
+				try {
+					recommenderEngine.invokeUpdate(recentFeedbacks);
+					user.setFeedbackLastUsed(recentFeedbacks.get(recentFeedbacks.size() - 1).getTimestamp());
+					userRepository.save(user);
+				} catch (Exception e) {
+					log.error("Error while invoking model update", e);
+				}
 			}
-		}
+		});
+
+		return CompletableFuture.completedFuture(null);
 	}
 }

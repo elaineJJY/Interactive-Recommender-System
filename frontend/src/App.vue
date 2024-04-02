@@ -51,7 +51,7 @@
 
         <!-- Content for Hot Videos-->
         <div v-else-if="state.selectedKeys[0] === '2'">
-          <UserProfile />
+          <UserProfile ref="userProfileRef" class="user-profile-button"/>
         </div>
 
       </el-main>
@@ -64,7 +64,7 @@ import LoginCommponent from '@/components/LoginComponent.vue';
 import VideoList from './components/VideoList.vue';
 import UserProfile from './components/UserProfile.vue';
 import apiClient from '@/config/apiClient';
-import { reactive, watch, h, onMounted, onUnmounted,ref} from 'vue';
+import { reactive, watch, h, onMounted, onUnmounted, ref, provide } from 'vue';
 import globalState from '@/config/globalState';
 
 import {
@@ -113,15 +113,19 @@ function handleRefresh() {
   }
 }
 
+const userProfileRef = ref(null);
+
+
 onMounted(() => {
   globalState.userId = JSON.parse(localStorage.getItem('userId'));
-  
+  provide('userProfileRef ', userProfileRef);
 });
 
 
 onUnmounted(() => {
   apiClient.onWebClose();
 });
+
 </script>
 
 <style>

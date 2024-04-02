@@ -34,6 +34,13 @@ public class TopicController {
 	public ArrayList<Topic> getTopics() {
 		ArrayList<Topic> topics = new ArrayList<>();
 		topicRepository.findAll().forEach(topics::add);
+		// shuffle the topics
+		for (int i = 0; i < topics.size(); i++) {
+			int j = (int) (Math.random() * topics.size());
+			Topic temp = topics.get(i);
+			topics.set(i, topics.get(j));
+			topics.set(j, temp);
+		}
 		return topics;
 	}
 

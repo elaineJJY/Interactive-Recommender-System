@@ -2,7 +2,9 @@
     <a-spin size="large" class="spin-overlay" v-if="recommendations.length === 0"></a-spin>
     <div v-for="(recommendation, index) in recommendations" :key="index" class="video-row">
         <VideoComponent :ref="setVideoRef(index)" :videoInfo="recommendation.video"
-            :explanation="recommendation.explanation" :topics="recommendation.topics"
+            :explanation="recommendation.explanation" :topics="recommendation.topics" 
+            :videoIndex="index"
+            :round="round"
             @videoEnded="() => handleVideoEnded(index)" @updateIndex="handleUpdateIndex(index)" />
         <div v-if="index < recommendations.length - 1" class="divider"></div>
     </div>
@@ -21,9 +23,11 @@ import apiClient from '@/config/apiClient';
 //     recommendations: Array,
 // });
 
+
 const videoElements = ref([]);
 let currentIndex = ref(0);
 let isScrolling = ref(false);
+let round = 0;
 
 const emit = defineEmits(['videoListEnded']);
 
@@ -59,6 +63,7 @@ const handleUpdateIndex = (index) => {
         })
         getRecommendations();
         emit('videoListEnded');
+        round++;
     }
 };
 

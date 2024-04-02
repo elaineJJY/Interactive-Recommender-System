@@ -17,44 +17,60 @@
                     <h2>Models</h2>
                     <a-typography-text strong style="color: gray;">
                         <blockquote>
-                            Here, you can tailor your video feed by modifying the balance among various recommendation
-                            models, shaping the selection of every 10-video batch to better match your interests.
+                            Here you can tailor what your video feed looks like. In each recommendation round, 10 videos
+                            will be recommended. Out of our 2 models, you can chose how many videos each model
+                            recommends.
                         </blockquote>
                     </a-typography-text>
 
 
                     <!-- Models -->
-                    <!-- topic preferences -->
+                    <!-- Model 1 -->
                     <div class="model-slider-container" @mouseenter="isHovering[0] = true"
                         @mouseleave="isHovering[0] = false" :class="{ 'hover-border-topic': isHovering[0] }">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="font-size: 16px; font-weight: bold;">Model: Topic Preferences</div>
-                            <a-button @click="showDetails[0] = true" shape="circle" :icon="h(InfoOutlined)"
-                                size="small">
+                            <div style="font-size: 16px; font-weight: bold;">Model 1: Personalised Topic-based</div>
+                            <a-button @click="showDetails[0] = true; saveInteraction('Model1: Info button')"
+                                shape="circle" :icon="h(InfoOutlined)" size="small">
                             </a-button>
                         </div>
 
                         <el-input-number class="input-spacing" v-model="n_recs_per_model.personalised" :min="0"
-                            :max="10" :step="1" :disabled="!inEdit" />
+                            :max="10" :step="1" :disabled="!inEdit"
+                            @change="saveInteraction('Model1: Input Number',n_recs_per_model.personalised)" />
                         <el-dialog v-model="showDetails[0]" title="Model Details" width="30%" center>
-                            <p>XXXXXX</p>
+                            <p>Personalised model: it takes into account your personal preferences.</p>
+                            <p>
+                                The recommendations will represent a balance between topics you like and topics you have
+                                not come across yet. The goal is for you to enjoy what you already like (exploitation)
+                                while allowing you to discover new content (exploration). You can decide how this
+                                balance is made using the slider on the top right.
+                            </p>
                         </el-dialog>
                     </div>
 
-                    <!-- top-popular -->
+                    <!-- Model 2 -->
                     <div class="model-slider-container" @mouseenter="isHovering[1] = true"
                         @mouseleave="isHovering[1] = false" :class="{ 'hover-border-topic': isHovering[1] }">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="font-size: 16px; font-weight: bold;">Model: Top-popular</div>
-                            <a-button @click="showDetails[1] = true" shape="circle" :icon="h(InfoOutlined)"
-                                size="small">
+                            <div style="font-size: 16px; font-weight: bold;">Model 2: Non-personalised Top-popular</div>
+                            <a-button @click="showDetails[1] = true; saveInteraction('Model2: Info button')"
+                                shape="circle" :icon="h(InfoOutlined)" size="small">
                             </a-button>
                         </div>
 
                         <el-input-number class="input-spacing" v-model="n_recs_per_model.unpersonalised" :min="0"
-                            :max="10" :step="1" :disabled="!inEdit" />
+                            @change="saveInteraction('Model2: Input Number', 10-n_recs_per_model.personalised)"
+                            :max=" 10" :step="1" :disabled="!inEdit" />
                         <el-dialog v-model="showDetails[1]" title="Model Details" width="30%" center>
-                            <p>XXXXXX</p>
+                            <p>
+                                Unpersonalised model: it does not take your personal preferences into account. All users
+                                get similar recommendations.
+                            </p>
+                            <p>
+                                It recommends the most viewed videos from each topic, choosing topics randomly. It shows
+                                you which videos were the most popular among other users.
+                            </p>
                         </el-dialog>
                     </div>
 
@@ -66,23 +82,55 @@
 
             <a-col :span="19" @mouseenter="isHovering[0] = true" @mouseleave="isHovering[0] = false">
                 <div class="chart-container" :class="{ 'hover-border-topic': isHovering[0] }">
-                    <h2>Topic Preferences</h2>
 
-                    <!-- Explorative Slider -->
-                    <div class="custom-slider-container">
+                    <!-- Exploit Title-->
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 20px; font-weight: bold;">Personalisation slider</div>
+                        <a-button @click="showDetails[2] = true; saveInteraction('Personalisation slider: Info button')"
+                            shape="circle" :icon="h(InfoOutlined)" size="small">
+                        </a-button>
+                        <el-dialog v-model="showDetails[2]" title="How it works?" width="30%" center>
+                            <p>This slider defines how the personalised model makes recommendations.</p>
+                            <p> The more exploitation, the more you recommendations will focus on topics you seem to
+                                like.
+                            </p>
+                            <p>The more exploration, the more your recommendations will focus on topics you have not
+                                come across much yet.
+                            </p>
+                        </el-dialog>
+                    </div>
+
+                    <!--  ExploitCoeffSlider -->
+                    <div class="exloitative-slider-container">
                         <a-row justify="center" align="middle">
-                            <a-col :span="5">
+                            <a-col :span="4" offset="1">
                                 <b>Pure exloitative</b>
                             </a-col>
                             <a-col :span="10">
                                 <el-slider v-model="exploit_coeff" :min="0" :max="1" :step="0.1" :disabled="!inEdit"
-                                    show-stops>
+                                    show-stops @change="handleExploitCoeffChange" :marks="marks">
                                 </el-slider>
                             </a-col>
-                            <a-col :span="5">
+                            <a-col :span="4" offset="1">
                                 <b>Pure explorative</b>
                             </a-col>
                         </a-row>
+                    </div>
+
+                    <!-- Topic Preferences -->
+                    <div style="display: flex; align-items: center; gap: 10px; z-index: 1000;">
+                        <div style="font-size: 20px; font-weight: bold;">Topic Preferences</div>
+                        <a-button style="z-index: 500;"
+                            @click="showDetails[3] = true; saveInteraction('Topic Preferences: Info button')"
+                            shape="circle" :icon="h(InfoOutlined)" size="small">
+                        </a-button>
+                        <el-dialog v-model="showDetails[3]" title="How it works?" width="30%" center>
+                            <p>
+                                This menu visualises what the system knows about your topic preferences. For each topic,
+                                it estimates how much you like it. The higher the score of a topic, the more the system
+                                believes you to like that topic.
+                            </p>
+                        </el-dialog>
                     </div>
                     <!-- Charts -->
                     <div style="width: 100%; height: 400px" ref="chartRef" class="chart"></div>
@@ -92,7 +140,7 @@
                         <a-row>
                             <a-col :span="12" v-for="(item, index) in topic_preferences" :key="item.id">
                                 <a-row align="middle">
-                                    <a-col :span="14">
+                                    <a-col :span="8">
                                         <a-tag :style="{ borderColor: chartColors[index] }"
                                             @mouseover="highlightChartSection(index)"
                                             @mouseleave="downplayChartSection(index)">
@@ -106,7 +154,7 @@
                                             :tipFormatter="value => `${(value * 100).toFixed(0)}%`"
                                             :style="{ color: chartColors[index] }" :disabled="!inEdit" />
                                     </a-col>
-                                    <a-col :span="1">
+                                    <a-col :span="1" offset="1">
                                         {{ (item.score * 100).toFixed(0) }}%
                                     </a-col>
                                 </a-row>
@@ -126,6 +174,15 @@ import apiClient from '@/config/apiClient';
 import { InfoOutlined } from '@ant-design/icons-vue';
 import {Edit} from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
+
+const marks = reactive ({
+    0.5: {
+        style: {
+            color: 'gray',
+        },
+        label: '0.5(disabled)',
+    },
+})
 const chartRef = ref(null);
 const chartColors = ref([]);
 const isHovering = ref([]);
@@ -151,6 +208,15 @@ watch(() => n_recs_per_model.value.personalised, (newValue) => {
 watch(() => n_recs_per_model.value.unpersonalised, (newValue) => {
     n_recs_per_model.value.personalised = 10 - newValue;
 });
+
+const saveInteraction = (component, value = "") => {
+    const interaction = {
+        page: 'Profile',
+        component: component,
+        componentValue: value,
+    };
+    apiClient.submitInteraction(interaction);
+};
 
 const updateUserPreferences = async () => {
     try {
@@ -269,6 +335,12 @@ const downplayChartSection = (index) => {
     }
 };
 
+const handleExploitCoeffChange = (value) => {
+    if (value === 0.5) {
+        exploit_coeff.value = value > 0.5 ? 0.6 : 0.4;
+    }
+};
+
 onMounted(async () => {
     const fetchedUserData = await apiClient.getUser();
     showSpin.value = false;
@@ -365,7 +437,7 @@ onMounted(async () => {
 }
 
 .chart {
-    margin-top: -60px;
+    margin-top: -70px;
     margin-bottom: 10px;
 }
 
@@ -406,17 +478,18 @@ onMounted(async () => {
     margin-left: 20px;
     margin-top: 10px;
 }
-.custom-slider-container{
+.exloitative-slider-container{
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     margin: 20px;
+    padding: 20px;
 }
-.custom-slider-container .ant-slider {
+.exloitative-slider-container .ant-slider {
     width: 80%;
     margin: 20px auto;
 }
 
-.custom-slider-container .ant-slider-mark-text {
+.exloitative-slider-container .ant-slider-mark-text {
     white-space: nowrap;
 }
 
@@ -443,5 +516,10 @@ onMounted(async () => {
 .button-container .el-button {
     width: 80%;
     display: block;
+}
+
+.sliders-container {
+    margin-left: 20px;
+    margin-right: 20px;
 }
 </style>
