@@ -108,10 +108,10 @@ const toggleCollapsed = () => {
 
 const videoListRef = ref(null);
 function handleRefresh() {
-  if (videoListRef.value) {
+  if (videoListRef.value && state.selectedKeys[0] === '1') {
     videoListRef.value.refreshList();
   }
-  if (userProfileRef.value) {
+  if (userProfileRef.value && state.selectedKeys[0] === '2') {
     userProfileRef.value.refreshUserProfile();
   }
 }

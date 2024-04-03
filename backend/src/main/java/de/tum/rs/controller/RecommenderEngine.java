@@ -34,9 +34,10 @@ public class RecommenderEngine {
 	 * @param userId
 	 * @param topicIds
 	 */
-	public void regiserUser(String userId, List<Integer> topicIds) {
+	public void regiserUser(String userId, List<Integer> topicIds) throws InterruptedException {
 		String url = PYTHON_SERVICE_URL + "/register?userId=" + userId;
 		restTemplate.postForObject(url, topicIds, Void.class);
+		Thread.sleep(1000);
 		log.info("Called Model to register user {} with topics {}", userId, topicIds);
 	}
 
