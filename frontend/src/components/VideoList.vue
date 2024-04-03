@@ -32,6 +32,7 @@ const emit = defineEmits(['videoListEnded']);
 
 const recommendations = ref([]);
 onMounted(() => {
+    globalState.userId = JSON.parse(localStorage.getItem('userId'));
     getRecommendations();
 });
 
@@ -63,8 +64,10 @@ const handleUpdateIndex = (index) => {
         })
         getRecommendations();
         emit('videoListEnded');
-        globalState.round++;
-        console.log('Round:', globalState.round);
+        if (globalState.userId) {
+            globalState.round++;
+            console.log('Round:', globalState.round);
+        }
     }
 };
 
