@@ -37,6 +37,7 @@ onMounted(() => {
 
 const refreshList = async () => {
     recommendations.value = [];
+    console.log('Refreshing video list...');
     getRecommendations();
 }
 const getRecommendations = async () => {

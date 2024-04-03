@@ -161,6 +161,7 @@ const login = async () => {
             isLoggedIn.value = formState.userId !== null;
             globalState.userId = isLoggedIn.value ? formState.userId : null;
             openNotification('success', 'Logged in successfully!');
+            emit('refresh');
         } else {
             openNotification('error', response.data.message);
         }
