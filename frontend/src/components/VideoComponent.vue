@@ -24,20 +24,19 @@
                 </a-button>
 
                 <!-- Like and Dislike Button -->
-                
-                    <a-button shape="circle" size="large" @click="setLikeFeedback(); saveInteraction('Like button')"
-                        ref="likeButtonRef">
-                        <template #icon>
-                            <LikeTwoTone :two-tone-color="likeClicked ? '#52c41a' : '#000000'" />
-                        </template>
-                    </a-button>
-                    <a-button shape="circle" size="large"
-                        @click="setDislikeFeedback(); saveInteraction('Dislike button')">
-                        <template #icon>
-                            <DislikeTwoTone :two-tone-color="dislikeClicked ? '#f5222d' : '#000000'" />
-                        </template>
-                    </a-button>
-                
+
+                <a-button shape="circle" size="large" @click="setLikeFeedback(); saveInteraction('Like button')"
+                    ref="likeButtonRef">
+                    <template #icon>
+                        <LikeTwoTone :two-tone-color="likeClicked ? '#52c41a' : '#000000'" />
+                    </template>
+                </a-button>
+                <a-button shape="circle" size="large" @click="setDislikeFeedback(); saveInteraction('Dislike button')">
+                    <template #icon>
+                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#f5222d' : '#000000'" />
+                    </template>
+                </a-button>
+
 
                 <!-- More Button -->
                 <a-button @click="showRatingModal = true; saveInteraction('\'...\' button', 'Open')" shape="circle"
@@ -93,8 +92,15 @@
                     </a-typography-paragraph>
 
                     <div class="explanation-container">
-                        <h3>Why this video is recommended:</h3>
-                        <p>{{ explanation }}</p>
+                        <a-collapse v-model:activeKey="activeKey" @change="handleExplainationCollapse">
+                            <a-collapse-panel key="1" header="Why this video is recommended:"
+                                expand-icon-position="end">
+                                <p>{{ explanation }}</p>
+                                <template #extra>
+                                    <QuestionCircleOutlined />
+                                </template>
+                            </a-collapse-panel>
+                        </a-collapse>
                     </div>
                 </div>
             </a-modal>
@@ -128,7 +134,7 @@
 
 <script setup>
 import { ref, defineProps, defineEmits, onMounted, onUnmounted, nextTick, defineExpose, computed,h, createVNode } from 'vue';
-import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone, EllipsisOutlined, PlusSquareOutlined, MinusSquareFilled} from '@ant-design/icons-vue';
+import { InfoCircleFilled, LikeTwoTone, DislikeTwoTone, EllipsisOutlined, PlusSquareOutlined, MinusSquareFilled,QuestionCircleOutlined} from '@ant-design/icons-vue';
 import apiClient from '@/config/apiClient';
 import globalState from '@/config/globalState';
 import { YoutubeVue3 } from 'youtube-vue3'
@@ -523,6 +529,13 @@ const toggleOption = (option) => {
     }
 };
 
+
+const activeKey = ref([]);
+const handleExplainationCollapse = (key) => {
+    activeKey.value = key;
+    let type = key.includes('1') ? 'open' : 'close';
+    saveInteraction('Info Button: Explaination', type);
+};
 </script>
 
 <style scoped>

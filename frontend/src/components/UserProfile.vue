@@ -216,8 +216,9 @@ watch(() => n_recs_per_model.value.unpersonalised, (newValue) => {
 });
 
 const refreshUserProfile = async () => {
+    showSpin.value = true;
+    showEmpty.value = false;
     const fetchedUserData = await apiClient.getUser();
-    showSpin.value = false;
     userData = fetchedUserData;
     
     exploit_coeff.value = userData.exploit_coeff;
@@ -297,6 +298,7 @@ const refreshUserProfile = async () => {
     chartInstance = echarts.init(chartRef.value);
 
     chartColors.value = chartInstance.getOption().color;
+    showSpin.value = false;
 };
 defineExpose({
     refreshUserProfile
@@ -541,4 +543,5 @@ onMounted(async () => {
     margin-left: 20px;
     margin-right: 20px;
 }
+
 </style>
