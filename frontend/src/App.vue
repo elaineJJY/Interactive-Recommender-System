@@ -18,7 +18,7 @@
             style="height: 30px; width: auto; margin-left: 10px;"> -->
         </el-col>
         <el-col :span="6">
-          <h1 style="font-size: 18px; font-weight: bold; margin-top: 5px;">
+          <h1 style="font-size: 18px; font-weight: bold; margin-top: 5px; ">
             <span v-if="state.selectedKeys[0] === '1'">Videos</span>
             <span v-else-if="state.selectedKeys[0] === '2'">User Profile</span>
           </h1>
@@ -51,7 +51,7 @@
 
         <!-- Content for Hot Videos-->
         <div v-else-if="state.selectedKeys[0] === '2'">
-          <UserProfile ref="userProfileRef" class="user-profile-button"/>
+          <UserProfile ref="userProfileRef" class="user-profile-button" />
         </div>
 
       </el-main>
@@ -111,6 +111,9 @@ function handleRefresh() {
   if (videoListRef.value) {
     videoListRef.value.refreshList();
   }
+  if (userProfileRef.value) {
+    userProfileRef.value.refreshUserProfile();
+  }
 }
 
 const userProfileRef = ref(null);
@@ -143,7 +146,7 @@ onUnmounted(() => {
 .el-header {
   background-color: #fff;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
-  z-index: 1000;
+  z-index: 300;
   position: fixed;
   width: 100%;
   margin-top: 2px;
@@ -157,6 +160,10 @@ onUnmounted(() => {
 .el-main {
   height: 100%;
   overflow-y: auto;
+}
+
+.sidebar {
+  z-index: 300;
 }
 
 </style>

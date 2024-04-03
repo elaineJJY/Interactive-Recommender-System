@@ -2,7 +2,7 @@
 import globalState from './globalState';
 import axios from 'axios';
 import JSZip from 'jszip';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
 
 const apiClient = axios.create({
     baseURL: '/api',
@@ -53,8 +53,18 @@ export default {
         }
     },
     async updateUser(user) {
+        if (!globalState.userId) {
+            ElMessage.error('Please login first');
+            return;
+        }
         try {
             let response = await apiClient.post(`/users/${globalState.userId}`, user);
+            ElNotification({
+                title: 'Success',
+                message: 'User preferences updated successfully',
+                type: 'success',
+                duration: 2000,
+            });
             return response.data;
         } catch (error) {
             console.error('Error updating user:', error);

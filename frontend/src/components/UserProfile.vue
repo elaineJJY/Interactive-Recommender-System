@@ -1,7 +1,12 @@
 <template>
     <div class="page-container">
+        <div v-if="showEmpty"
+            style="display: flex; justify-content: center; align-items: center; height: 100vh; border: 100px solid #f0f2f5;">
+            <a-empty description="Please log in first to see your profile" />
+        </div>
+
         <a-spin size="large" class="spin-overlay" v-if="showSpin"></a-spin>
-        <a-row align="top" justify="space-between">
+        <a-row align="top" justify="space-between" v-if="!showEmpty">
             <a-col :span="5">
                 <div class="model-container">
                     <div v-if="!inEdit" class="button-container">
@@ -118,9 +123,9 @@
                     </div>
 
                     <!-- Topic Preferences -->
-                    <div style="display: flex; align-items: center; gap: 10px; z-index: 1000;">
+                    <div style="display: flex; align-items: center; gap: 10px; z-index: 100;">
                         <div style="font-size: 20px; font-weight: bold;">Topic Preferences</div>
-                        <a-button style="z-index: 500;"
+                        <a-button style="z-index: 100;"
                             @click="showDetails[3] = true; saveInteraction('Topic Preferences: Info button')"
                             shape="circle" :icon="h(InfoOutlined)" size="small">
                         </a-button>
@@ -168,12 +173,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, h, watch} from 'vue';
+import { ref, onMounted, reactive, h, watch,defineExpose} from 'vue';
 import * as echarts from 'echarts';
 import apiClient from '@/config/apiClient';
 import { InfoOutlined } from '@ant-design/icons-vue';
 import {Edit} from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
+import globalState from '@/config/globalState';
 
 const marks = reactive ({
     0.5: {
@@ -196,7 +202,7 @@ let userData = reactive({
     origin_other_topics: {},
 });
 
-const exploit_coeff = ref(0.5);
+const exploit_coeff = ref(0.6);
 const topic_preferences = ref([]);
 const n_recs_per_model = ref({ personalised: 5, unpersonalised: 5 });
 const origin_other_topics = ref({});
@@ -208,6 +214,93 @@ watch(() => n_recs_per_model.value.personalised, (newValue) => {
 watch(() => n_recs_per_model.value.unpersonalised, (newValue) => {
     n_recs_per_model.value.personalised = 10 - newValue;
 });
+
+const refreshUserProfile = async () => {
+    const fetchedUserData = await apiClient.getUser();
+    showSpin.value = false;
+    userData = fetchedUserData;
+    
+    exploit_coeff.value = userData.exploit_coeff;
+    topic_preferences.value = JSON.parse(JSON.stringify(userData.topic_preferences));
+    n_recs_per_model.value = JSON.parse(JSON.stringify(userData.n_recs_per_model));
+    origin_other_topics.value = JSON.parse(JSON.stringify(userData.origin_other_topics));
+   
+    chartInstance = echarts.init(chartRef.value);
+    const data = topic_preferences.value.map(pref => ({
+        name: pref.description,
+        value: pref.score * 100,
+    }));
+
+    const option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: function (params) {
+                const topic = topic_preferences.value.find(pref => pref.description === params.name);
+                if (topic && topic.id !== -1) {
+                    const imgPath = require(`@/assets/topics/topic_${topic.id}_wordcloud.png`);
+                    const percentage = params.percent.toFixed(2);
+                    return `<b>${topic.description}: ${percentage}%</b><br/><img src="${imgPath}" alt="${topic.description}" style="width: 200px; height: auto;"/>`;
+
+                }
+                return '<b>' + params.name + '</b>: ' + params.percent + '%';
+            }
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: ['20%', '50%'],
+                data: data,
+                itemStyle: {
+                    borderRadius: 0,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: true,
+                    position: 'outside',
+                    formatter: params => {
+                        const percentage = params.percent.toFixed(2);
+                        return `{a|${params.name}: ${percentage}%}`;
+                    },
+                    rich: {
+                        a: {
+                            backgroundColor: '#f0f0f0',
+                            borderColor: 'auto',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            padding: [3, 4],
+                            color: '#000',
+                            fontSize: 14,
+                            lineHeight: 22,
+                            align: 'center',
+                        }
+                    }
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                    label: {
+                        show: true,
+                        backgroundColor: 'auto',
+                        padding: [2, 3],
+                        borderRadius: 4,
+                    }
+                }
+            }
+        ]
+    };
+
+    chartInstance.setOption(option);
+    chartInstance = echarts.init(chartRef.value);
+
+    chartColors.value = chartInstance.getOption().color;
+};
+defineExpose({
+    refreshUserProfile
+})
 
 const saveInteraction = (component, value = "") => {
     const interaction = {
@@ -226,12 +319,6 @@ const updateUserPreferences = async () => {
         userData.origin_other_topics = JSON.parse(JSON.stringify(origin_other_topics.value));
         inEdit.value = false;
         apiClient.updateUser(userData);
-        ElNotification({
-            title: 'Success',
-            message: 'User preferences updated successfully',
-            type: 'success',
-            duration: 2000,
-        });
         
     } catch (error) {
         console.error('Error updating user preferences:', error);
@@ -342,88 +429,21 @@ const handleExploitCoeffChange = (value) => {
     saveInteraction('Personalisation slider: Slider', exploit_coeff.value);
 };
 
+const showEmpty = ref(false);
 onMounted(async () => {
-    const fetchedUserData = await apiClient.getUser();
-    showSpin.value = false;
-    userData = fetchedUserData;
-    
-    exploit_coeff.value = userData.exploit_coeff;
-    topic_preferences.value = JSON.parse(JSON.stringify(userData.topic_preferences));
-    n_recs_per_model.value = JSON.parse(JSON.stringify(userData.n_recs_per_model));
-    origin_other_topics.value = JSON.parse(JSON.stringify(userData.origin_other_topics));
-   
-    chartInstance = echarts.init(chartRef.value);
-    const data = topic_preferences.value.map(pref => ({
-        name: pref.description,
-        value: pref.score * 100,
-    }));
-
-    const option = {
-        tooltip: {
-            trigger: 'item',
-            formatter: function (params) {
-                const topic = topic_preferences.value.find(pref => pref.description === params.name);
-                if (topic && topic.id !== -1) {
-                    const imgPath = require(`@/assets/topics/topic_${topic.id}_wordcloud.png`);
-                    const percentage = params.percent.toFixed(2);
-                    return `<b>${topic.description}: ${percentage}%</b><br/><img src="${imgPath}" alt="${topic.description}" style="width: 200px; height: auto;"/>`;
-
-                }
-                return '<b>' + params.name + '</b>: ' + params.percent + '%';
-            }
-        },
-        series: [
-            {
-                type: 'pie',
-                radius: ['20%', '50%'],
-                data: data,
-                itemStyle: {
-                    borderRadius: 0,
-                    borderColor: '#fff',
-                    borderWidth: 2
-                },
-                label: {
-                    show: true,
-                    position: 'outside',
-                    formatter: params => {
-                        const percentage = params.percent.toFixed(2);
-                        return `{a|${params.name}: ${percentage}%}`;
-                    },
-                    rich: {
-                        a: {
-                            backgroundColor: '#f0f0f0',
-                            borderColor: 'auto',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                            padding: [3, 4],
-                            color: '#000',
-                            fontSize: 14,
-                            lineHeight: 22,
-                            align: 'center',
-                        }
-                    }
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    },
-                    label: {
-                        show: true,
-                        backgroundColor: 'auto',
-                        padding: [2, 3],
-                        borderRadius: 4,
-                    }
-                }
-            }
-        ]
-    };
-
-    chartInstance.setOption(option);
-    chartInstance = echarts.init(chartRef.value);
-
-    chartColors.value = chartInstance.getOption().color;
+    if (globalState.userId === null) {
+        ElNotification({
+            title: 'Error',
+            message: 'Please log in first to see your profile',
+            type: 'error',
+            duration: 2000,
+        });
+        showEmpty.value = true;
+        showSpin.value = false;
+        return;
+    }
+    showEmpty.value = false;
+    refreshUserProfile();
 
 });
 </script>
@@ -496,15 +516,13 @@ onMounted(async () => {
 
 .spin-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    height: 100vh;
+    border: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
     background: rgba(255, 255, 255, 0.8);
-    z-index: 1000;
+    z-index: 200;
 }
 
 .button-container {
