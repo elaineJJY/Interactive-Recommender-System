@@ -129,6 +129,11 @@ public class UserController {
 			user.setExploit_coeff(userDTO.getExploit_coeff());
 			user.setN_recs_per_model(userDTO.getN_recs_per_model());
 			userRepository.save(user);
+			try {
+				recommenderEngine.invokeUpdateTopicRating(userId);
+			} catch (Exception e) {
+				log.error("Error while invoking model update", e);
+			}
 			return ResponseEntity.ok().body("User updated successfully!");
 		}
 		log.info("User does not exist!");

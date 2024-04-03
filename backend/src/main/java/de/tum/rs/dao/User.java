@@ -29,4 +29,6 @@ public class User {
 
 	private Double exploit_coeff;
 
+	private HashMap<String, ArrayList<Integer>> topic_ratings;
+
 }

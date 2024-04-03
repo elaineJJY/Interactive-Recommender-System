@@ -75,4 +75,10 @@ public class RecommenderEngine {
 		String url = PYTHON_SERVICE_URL + "/feedback";
 		restTemplate.postForObject(url, feedbacks, Void.class);
 	}
+
+	public void invokeUpdateTopicRating(String userId) {
+		log.info("Invoke model updating the topic rating", userId);
+		String url = PYTHON_SERVICE_URL + "/topic_rating";
+		restTemplate.postForObject(url, userId, Void.class);
+	}
 }
