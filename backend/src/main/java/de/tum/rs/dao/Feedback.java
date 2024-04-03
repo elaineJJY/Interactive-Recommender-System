@@ -54,4 +54,8 @@ public class Feedback {
 		private String type;
 		private float time; // watched time in seconds
 	}
+
+	public Feedback() {
+
+	}
 }

@@ -3,6 +3,7 @@ package de.tum.rs.controller;
 import de.tum.rs.dao.User;
 import de.tum.rs.model.Recommendation;
 import de.tum.rs.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import de.tum.rs.dao.Feedback;
 import de.tum.rs.repository.FeedbackRepository;
@@ -31,7 +32,7 @@ public class FeedbackController {
 
 	@PostMapping
 	@Async
-	public CompletableFuture<Void> saveFeedbacks(List<Feedback> feedbacks) {
+	public CompletableFuture<Void> saveFeedbacks(@RequestBody List<Feedback> feedbacks) {
 
 		CompletableFuture.runAsync(() -> {
 			feedbacks.forEach(feedback -> {

@@ -63,6 +63,7 @@ const handleUpdateIndex = (index) => {
         getRecommendations();
         emit('videoListEnded');
         globalState.round++;
+        console.log('Round:', globalState.round);
     }
 };
 

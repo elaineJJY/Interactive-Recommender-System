@@ -261,9 +261,18 @@ const scrollIntoView = async () => {
     videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
     await new Promise(resolve => setTimeout(resolve, 700));
 
-    // Show tour
-    if(props.videoIndex === 2 && globalState.round === 1){
-        open.value = true;
+    // Show tour when the video index reaches the specific index
+    let i = props.videoIndex % 10;
+    let indexReached = i === 2 || i === 6;
+    let roundReached = globalState.round === 1 || globalState.round === 2;
+    if(indexReached && roundReached){
+        // switch to the corresponding step in the tour
+        if (globalState.round === 1) {
+            currentStep.value = i === 2 ? 0 : 1;
+        } else {
+            currentStep.value = i === 2 ? 2 : 3;
+        }
+        showTour();
     }
     else {
         youtubePlayer.value.player.playVideo();
@@ -313,7 +322,9 @@ const likeButtonRef = ref(null);
 const moreButtonRef = ref(null);
 const current = ref(0);
 const open = ref(false);
-const steps = ref([
+const currentStep = ref(0);
+const steps = ref([]);
+const tour = ref([
     {
         target: () => infoButtonRef.value && infoButtonRef.value.$el,
         title: 'Info Button',
@@ -340,7 +351,7 @@ const steps = ref([
     {
         target: null,//() =>userProfileRef.value && userProfileRef.value.$el,
         title: 'User Profile',
-        description: 'Click here to view your user profile and see your viewing history.',
+        description: 'Click the menu to view your user profile and control your preferences in this panel.',
         cover: createVNode('img', {
             alt: 'tour.png',
             src: require(`@/assets/tour/userProfile.png`),
@@ -348,10 +359,14 @@ const steps = ref([
     },
 ]);
 
-
+const showTour = () => {
+    steps.value[0] = tour.value[currentStep.value];
+    open.value = true;
+};
 const handleTourFinish = () => {
     open.value = false;
     saveInteraction('Tour', 'Finish');
+
     youtubePlayer.value.player.playVideo();
     youtubePlayer.value.player.unMute();
     emit('updateIndex');

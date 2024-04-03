@@ -2,6 +2,7 @@ package de.tum.rs.controller;
 
 import de.tum.rs.dao.Interaction;
 import de.tum.rs.repository.InteractionRepository;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
