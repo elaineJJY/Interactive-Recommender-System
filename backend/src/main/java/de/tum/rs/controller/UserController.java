@@ -82,7 +82,7 @@ public class UserController {
 				topicDTOs.add(topicDTO);
 			}
 
-			// find top 13 topics from topic DTOs
+			// find top 11 topics from topic DTOs
 			ArrayList<TopicDTO> top11 = new ArrayList<>();
 			Double score = 0.0;
 			for (int i = 0; i < 11; i++) {
@@ -93,7 +93,7 @@ public class UserController {
 				}
 			}
 
-			// create a new topic DTO for others
+			// create a new topic DTO for "others"
 			Topic others = new Topic();
 			others.setTopicNumber(-1);
 			others.setDescription("Others");
@@ -102,6 +102,7 @@ public class UserController {
 
 			top11.add(othersDTO);
 			userDTO.setTopic_preferences(top11);
+			log.info("User {} retrieved successfully!", userId);
 			return ResponseEntity.ok().body(userDTO);
 		}
 		log.info("User does not exist!");
@@ -134,6 +135,7 @@ public class UserController {
 			} catch (Exception e) {
 				log.error("Error while invoking model update", e);
 			}
+			log.info("User {} updated successfully!", userId);
 			return ResponseEntity.ok().body("User updated successfully!");
 		}
 		log.info("User does not exist!");

@@ -26,7 +26,7 @@ public class InteractionController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public void saveInteractions(@RequestBody List<Interaction> interactions) {
-		log.info("Saving interactions: {}", interactions);
 		interactionRepository.saveAll(interactions);
+		log.info("Saved interactions: {}", interactions);
 	}
 }

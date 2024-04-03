@@ -25,7 +25,6 @@ public class RecommenderEngine {
 	@Value("${python.rs.service.url}")
 	private String PYTHON_SERVICE_URL;
 	private final RestTemplate restTemplate = new RestTemplate();
-
 	@Autowired
 	private RecommendationBuilder recommendationBuilder;
 
@@ -72,14 +71,19 @@ public class RecommenderEngine {
 	 * @param feedbacks
 	 */
 	public void invokeUpdate(List<Feedback> feedbacks) {
-		log.info("Invoke model update with {} feedbacks", feedbacks.size());
 		String url = PYTHON_SERVICE_URL + "/feedback";
 		restTemplate.postForObject(url, feedbacks, Void.class);
+		log.info("Invoked model update with {} feedbacks", feedbacks.size());
 	}
 
+	/**
+	 * Invoke the model updateing the topic rating
+	 * (this function is called from the TopicController.initializeTopics() method, when the user has selected the initial topics)
+	 * @param userId
+	 */
 	public void invokeUpdateTopicRating(String userId) {
-		log.info("Invoke model updating the topic rating", userId);
 		String url = PYTHON_SERVICE_URL + "/topic_rating";
 		restTemplate.postForObject(url, userId, Void.class);
+		log.info("Invoked model updating the topic rating", userId);
 	}
 }

@@ -182,8 +182,6 @@ const recordInteraction = async (type) => {
         type,
         time: currentTime
     });
-
-    // console.log("record interaction: ", props.videoInfo.snippet.title+" "+type);
 }
 const saveInteraction = (component, value = "") => {
     const interaction = {
@@ -269,14 +267,14 @@ const scrollIntoView = async () => {
 
     // Show tour when the video index reaches the specific index
     let i = props.videoIndex % 10;
-    let indexReached = i === 2 || i === 6;
+    let indexReached = i === 3 || i === 9;
     let roundReached = globalState.round === 1 || globalState.round === 2;
     if(indexReached && roundReached){
         // switch to the corresponding step in the tour
         if (globalState.round === 1) {
-            currentStep.value = i === 2 ? 0 : 1;
+            currentStep.value = i === 3 ? 0 : 1;
         } else {
-            currentStep.value = i === 2 ? 2 : 3;
+            currentStep.value = i === 3 ? 2 : 3;
         }
         showTour();
     }

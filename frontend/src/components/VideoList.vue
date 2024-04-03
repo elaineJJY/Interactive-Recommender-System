@@ -19,10 +19,6 @@ import { Loading } from '@element-plus/icons-vue';
 import apiClient from '@/config/apiClient';
 import globalState from '@/config/globalState';
 
-// const props = defineProps({
-//     recommendations: Array,
-// });
-
 
 const videoElements = ref([]);
 let currentIndex = ref(0);

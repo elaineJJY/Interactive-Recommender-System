@@ -39,16 +39,19 @@ public class FeedbackController {
 				feedback.generateId();
 				feedbackRepository.save(feedback);
 			});
-			log.info("Saving feedbacks: {}", feedbacks);
+			log.info("Saved feedbacks: {}", feedbacks);
 
+			// Check if the user has provided enough feedbacks to update the model
 			User user = userRepository.findById(feedbacks.get(0).getUserId()).get();
 			List<Feedback> recentFeedbacks = feedbackRepository.findByUserIdAndTimestampGreaterThan(
 				user.getUserId(), user.getFeedbackLastUsed()
 			);
+
 			if (recentFeedbacks.size() >= 5) {
 				log.info("Invoking model update for User {}", user.getUserId());
 				try {
 					recommenderEngine.invokeUpdate(recentFeedbacks);
+					// Update the last used timestamp so that the same feedbacks are not used again for model update
 					user.setFeedbackLastUsed(recentFeedbacks.get(recentFeedbacks.size() - 1).getTimestamp());
 					userRepository.save(user);
 				} catch (Exception e) {

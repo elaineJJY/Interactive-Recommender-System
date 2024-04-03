@@ -181,6 +181,7 @@ import {Edit} from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
 import globalState from '@/config/globalState';
 
+// Exploit coefficient marks to show the disabled value 0.5
 const marks = reactive ({
     0.5: {
         style: {
@@ -194,7 +195,10 @@ const chartColors = ref([]);
 const isHovering = ref([]);
 const showDetails = ref([]);
 const showSpin = ref(true);
+const showEmpty = ref(false);
 const inEdit = ref(false);
+
+// User data from the API, which is used by resetting the user preferences
 let userData = reactive({
     exploit_coeff: 0.5,
     topic_preferences: [],
@@ -202,11 +206,13 @@ let userData = reactive({
     origin_other_topics: {},
 });
 
+// User data that can be edited
 const exploit_coeff = ref(0.6);
 const topic_preferences = ref([]);
 const n_recs_per_model = ref({ personalised: 5, unpersonalised: 5 });
 const origin_other_topics = ref({});
 
+// Watchers that ensure the sum of the recommendations is always 10
 watch(() => n_recs_per_model.value.personalised, (newValue) => {
     n_recs_per_model.value.unpersonalised = 10 - newValue;
 });
@@ -215,23 +221,30 @@ watch(() => n_recs_per_model.value.unpersonalised, (newValue) => {
     n_recs_per_model.value.personalised = 10 - newValue;
 });
 
+
+// Load user data and update the chart
 const refreshUserProfile = async () => {
+
+    // Show the loading spinner and hide the empty message
     showSpin.value = true;
     showEmpty.value = false;
+
+    // Fetch the user data from the API
     const fetchedUserData = await apiClient.getUser();
+
+    // Update the user data
     userData = fetchedUserData;
-    
     exploit_coeff.value = userData.exploit_coeff;
     topic_preferences.value = JSON.parse(JSON.stringify(userData.topic_preferences));
     n_recs_per_model.value = JSON.parse(JSON.stringify(userData.n_recs_per_model));
     origin_other_topics.value = JSON.parse(JSON.stringify(userData.origin_other_topics));
    
+    // Update the chart
     chartInstance = echarts.init(chartRef.value);
     const data = topic_preferences.value.map(pref => ({
         name: pref.description,
         value: pref.score * 100,
     }));
-
     const option = {
         tooltip: {
             trigger: 'item',
@@ -293,10 +306,10 @@ const refreshUserProfile = async () => {
             }
         ]
     };
-
     chartInstance.setOption(option);
     chartInstance = echarts.init(chartRef.value);
 
+    // Fetch the chart colors to color the tags in the sliders
     chartColors.value = chartInstance.getOption().color;
     showSpin.value = false;
 };
@@ -327,6 +340,7 @@ const updateUserPreferences = async () => {
     }
 };
 
+// Reset the user preferences to the original values
 const resetUserPreferences = () => {
 
     exploit_coeff.value = userData.exploit_coeff;
@@ -431,7 +445,6 @@ const handleExploitCoeffChange = (value) => {
     saveInteraction('Personalisation slider: Slider', exploit_coeff.value);
 };
 
-const showEmpty = ref(false);
 onMounted(async () => {
     if (globalState.userId === null) {
         ElNotification({
