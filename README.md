@@ -16,6 +16,25 @@ This project is designed to:
 + **Enhance Transparency**: With the European Union's Digital Services Act as a backdrop, this system seeks to bring transparency to recommendation algorithms, allowing users to understand and even modify the parameters driving their content suggestions.
 + **Simulate Real-world Scenarios**: Through an interface-based simulation of recommender systems, users can interact with various settings, mimicking real-world algorithms used by major online platforms.
 
+## Overview
+
+<img src="document/pics/RS-control-level.png" alt="RS-control-level">
+
+<table>
+  <tr>
+    <td><img align="center" src="document/pics/h1.png" alt="h1" /></td>
+    <td><img align="center" src="document/pics/h2.png" alt="h2"/></td>
+    <td><img align="center" src="document/pics/h3.png" alt="h3" /></td>
+  </tr>
+</table>
+
+<table>
+     <tr>
+    <td><img align="center" src="document/pics/up1.png" alt="up1"/></td>
+    <td><img align="center" src="document/pics/up2.png" alt="up2" /></td>
+  </tr>
+</table>
+
 
 ## Setup and Installation
 
@@ -28,7 +47,7 @@ This project is containerized using Docker and orchestrated using Docker Compose
 ### Steps
 
 1. **Clone the Repository**:
-   
+  
    Download the rs-0.0.1-SNAPSHOT.jar from `Release` and put it into folder `Interactive-Recommender-System/backend/target`
    ```bash
    cd Interactive-Recommender-System

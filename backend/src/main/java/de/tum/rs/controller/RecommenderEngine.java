@@ -1,14 +1,9 @@
 package de.tum.rs.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.tum.rs.dao.Feedback;
-import de.tum.rs.model.Recommendation;
-import de.tum.rs.repository.VideoRepository;
+import de.tum.rs.dto.Recommendation;
 import de.tum.rs.util.RecommendationBuilder;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;

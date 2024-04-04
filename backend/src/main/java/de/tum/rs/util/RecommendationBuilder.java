@@ -2,23 +2,19 @@ package de.tum.rs.util;
 
 import de.tum.rs.dao.Topic;
 import de.tum.rs.dao.TopicDistribution;
-import de.tum.rs.dao.TopicDistribution.TopicScore;
 import de.tum.rs.dao.YouTubeVideo;
 import de.tum.rs.dto.TopicDTO;
-import de.tum.rs.model.Recommendation;
+import de.tum.rs.dto.Recommendation;
 import de.tum.rs.repository.TopicDistributionRepository;
 import de.tum.rs.repository.TopicRepository;
 import de.tum.rs.repository.VideoRepository;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

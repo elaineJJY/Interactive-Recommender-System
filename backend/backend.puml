@@ -1,0 +1,339 @@
+@startuml
+class de.tum.rs.dao.Interaction {
+- String id
+- String userId
+- String page
+- Date timestamp
+- String videoId
+- Integer round
+- String component
+- String componentValue
+}
+
+interface de.tum.rs.repository.FeedbackRepository {
+~ List<Feedback> findByUserIdAndTimestampGreaterThan(String,Date)
+}
+
+class de.tum.rs.config.WebConfig {
++ void addCorsMappings(CorsRegistry)
+}
+
+class de.tum.rs.dao.Feedback {
+- String id
+- Date timestamp
+- String userId
+- String videoId
+- int rating
+- float totalWatchTime
+- LinkedList<Interaction> interactions
+- ArrayList<String> more
+- ArrayList<String> less
+- ArrayList<String> dislikeReasons
+- Integer round
++ void generateId()
+}
+
+
+class de.tum.rs.dao.Feedback$Interaction {
+- String type
+- float time
+}
+
+class de.tum.rs.controller.FeedbackController {
+- FeedbackRepository feedbackRepository
+- UserRepository userRepository
+- RecommenderEngine recommenderEngine
++ CompletableFuture<Void> saveFeedbacks(List<Feedback>)
+}
+
+
+class de.tum.rs.controller.InteractionController {
+- InteractionRepository interactionRepository
++ void saveInteractions(List<Interaction>)
+}
+
+
+class de.tum.rs.controller.RecommenderEngine {
+- String PYTHON_SERVICE_URL
+- RestTemplate restTemplate
+- RecommendationBuilder recommendationBuilder
++ void regiserUser(String,List<Integer>)
++ List<Recommendation> getRecommendations(String)
++ void invokeUpdate(List<Feedback>)
++ void invokeUpdateTopicRating(String)
+}
+
+
+class de.tum.rs.handler.GlobalExceptionHandler {
++ void handleConnectException(ConnectException,HttpServletRequest)
+}
+
+interface de.tum.rs.repository.InteractionRepository {
+}
+class de.tum.rs.config.AsyncConfig {
+}
+class de.tum.rs.dao.YouTubeVideo {
+- String id
+- String etag
+- String kind
+- Snippet snippet
+- Statistics statistics
+- Status status
+- ContentDetails contentDetails
+- VideoTopicDetails topicDetails
+}
+
+class de.tum.rs.dao.YouTubeVideo$Snippet {
+- String categoryId
+- String channelId
+- String channelTitle
+- String defaultAudioLanguage
+- String defaultLanguage
+- String description
+- String liveBroadcastContent
+- Localized localized
+- PublishedAt publishedAt
+- List<String> tags
+- Thumbnails thumbnails
+- String title
+}
+
+class de.tum.rs.dao.YouTubeVideo$Localized {
+- String description
+- String title
+}
+
+class de.tum.rs.dao.YouTubeVideo$PublishedAt {
+- Long value
+- Boolean dateOnly
+- Integer timeZoneShift
+}
+
+class de.tum.rs.dao.YouTubeVideo$Thumbnails {
+- Thumbnail Default
+- Thumbnail high
+- Thumbnail maxres
+- Thumbnail medium
+- Thumbnail standard
+}
+
+class de.tum.rs.dao.YouTubeVideo$Thumbnail {
+- Integer height
+- String url
+- Integer width
+}
+
+class de.tum.rs.dao.YouTubeVideo$Statistics {
+- Long commentCount
+- Long favoriteCount
+- Long likeCount
+- Long viewCount
+}
+
+class de.tum.rs.dao.YouTubeVideo$Status {
+- Boolean embeddable
+- String license
+- Boolean madeForKids
+- String privacyStatus
+- Boolean publicStatsViewable
+- String uploadStatus
+}
+
+class de.tum.rs.dao.YouTubeVideo$ContentDetails {
+- String caption
+- ContentRating contentRating
+- AccessPolicy countryRestriction
+- String definition
+- String dimension
+- String duration
+- Boolean hasCustomThumbnail
+- Boolean licensedContent
+- String projection
+- VideoContentDetailsRegionRestriction regionRestriction
+}
+
+interface de.tum.rs.repository.TopicRepository {
+}
+class de.tum.rs.controller.UserController {
+- UserRepository userRepository
+- TopicRepository topicRepository
+- RecommenderEngine recommenderEngine
++ ResponseEntity<?> loginUser(User)
++ ResponseEntity<?> registerUser(User)
++ ResponseEntity<?> getUser(String)
++ ResponseEntity<?> updateUser(String,UserDTO)
+}
+
+
+interface de.tum.rs.repository.VideoRepository {
+~ Page<YouTubeVideo> findAll(Pageable)
+~ Page<YouTubeVideo> findByKeyword(String,Pageable)
+~ Page<YouTubeVideo> findBySnippetTagsIsNotNull(Pageable)
+}
+
+interface de.tum.rs.repository.TopicDistributionRepository {
+}
+interface de.tum.rs.repository.UserRepository {
+~ Optional<User> findByUserId(String)
+}
+
+class de.tum.rs.aop.YouTubeApiInterceptorAspect {
+- APIController apiController
++ Object aroundYouTubeControllerMethods(ProceedingJoinPoint)
+- boolean isApiKeyExhausted(Exception)
+}
+
+
+class de.tum.rs.controller.TopicController {
+~ TopicRepository topicRepository
+~ RecommenderEngine recommenderEngine
++ ArrayList<Topic> getTopics()
++ void initializeTopics(String,ArrayList<Integer>)
+}
+
+
+class de.tum.rs.controller.TestController {
+~ VideoRepository videoRepository
+- String elasticsearchUri
+- String username
+- String password
+- RestHighLevelClient createClient()
++ void uploadData(String)
++ void downloadData(String)
+- void saveVideo(YouTubeVideo,String)
++ List<YouTubeVideo> getAllVideos(int,int)
+}
+
+
+class de.tum.rs.dto.UserDTO {
+- String userId
+- HashMap<String,Integer> n_recs_per_model
+- ArrayList<TopicDTO> topic_preferences
+- Double exploit_coeff
+- TopicDTO origin_other_topics
+}
+
+class de.tum.rs.config.OpenApiConfig {
++ OpenAPI springOpenAPI()
+}
+
+class de.tum.rs.handler.VideoConverter {
+}
+class de.tum.rs.controller.LocalVideoController {
+~ VideoRepository videoRepository
+~ RecommenderEngine recommenderEngine
+- RecommendationBuilder recommendationBuilder
++ CompletableFuture<List<Recommendation>> getRecommendations(String)
++ CompletableFuture<List<Recommendation>> searchVideos(String,int)
+}
+
+
+class de.tum.rs.dao.TopicDistribution {
+- String videoId
+- List<TopicScore> most_relevant_topics
+}
+
+class de.tum.rs.dao.TopicDistribution$TopicScore {
+~ Integer topic_index
+~ Double score
+}
+
+class de.tum.rs.dto.TopicDTO {
+- Integer id
+~ Double score
+- String description
+}
+
+class de.tum.rs.InteractiveRecommenderSystemApplication {
++ {static} void main(String[])
+}
+
+class de.tum.rs.controller.APIController {
+- List<String> apiKeys
+- int currentKeyIndex
++ List<String> getApiKeys()
++ void addApiKey(String)
++ String getCurrentApiKey()
++ void switchToNextKey()
+}
+
+
+class de.tum.rs.controller.YouTubeController {
+- {static} String VIDEO_INDEX_NAME
+- {static} String SHORTS_INDEX_NAME
+- {static} Long MAX_RESULTS
+- {static} String REGION_CODE
+- {static} String DEFAULT_SEARCH_TERM
+- ElasticsearchOperations elasticsearchOperations
+- YouTube youtube
+- APIController apiController
++ List<Video> getMostPopularVideos()
++ List<Video> searchVideos(String,String,String)
++ List<String> searchVideosBatch(String,String,String,String,int)
++ List<Video> getDetails(List<String>)
+- List<String[]> calculateDateRanges(String,String,int)
+- void save(Video)
+- void saveToLocal(Video)
+}
+
+
+class de.tum.rs.dto.Recommendation {
+- String videoId
+- String explanation
+- YouTubeVideo video
+- List<TopicDTO> topics
+}
+
+class de.tum.rs.util.RecommendationBuilder {
+- Random random
+~ VideoRepository videoRepository
+~ TopicRepository topicRepository
+~ TopicDistributionRepository topicDistributionRepository
++ Recommendation build(YouTubeVideo)
++ Recommendation build(String,String)
++ Recommendation build(YouTubeVideo,String)
++ List<Recommendation> buildList(List<YouTubeVideo>,String)
++ Recommendation fillBlank(Recommendation)
++ Recommendation addVideoDetail(Recommendation)
++ Recommendation addTopics(Recommendation)
++ List<Recommendation> getRandomRecommendations()
+}
+
+
+class de.tum.rs.dao.Topic {
+- Integer topicNumber
+- String description
+- Long document_count
+- LinkedHashMap<Object,Object> tokens
+}
+
+class de.tum.rs.dao.User {
+- String userId
+- Date feedbackLastUsed
+- ArrayList<Double> topic_preferences
+- HashMap<String,Integer> n_recs_per_model
+- ArrayList<Double> recommended_topics_in_top_popular_rs
+- Double exploit_coeff
+- HashMap<String,ArrayList<Integer>> topic_ratings
+}
+
+
+
+org.springframework.data.elasticsearch.repository.ElasticsearchRepository <|-- de.tum.rs.repository.FeedbackRepository
+org.springframework.web.servlet.config.annotation.WebMvcConfigurer <|.. de.tum.rs.config.WebConfig
+de.tum.rs.dao.Feedback +.. de.tum.rs.dao.Feedback$Interaction
+org.springframework.data.elasticsearch.repository.ElasticsearchRepository <|-- de.tum.rs.repository.InteractionRepository
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$Snippet
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$Localized
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$PublishedAt
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$Thumbnails
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$Thumbnail
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$Statistics
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$Status
+de.tum.rs.dao.YouTubeVideo +.. de.tum.rs.dao.YouTubeVideo$ContentDetails
+org.springframework.data.elasticsearch.repository.ElasticsearchRepository <|-- de.tum.rs.repository.TopicRepository
+org.springframework.data.elasticsearch.repository.ElasticsearchRepository <|-- de.tum.rs.repository.VideoRepository
+org.springframework.data.elasticsearch.repository.ElasticsearchRepository <|-- de.tum.rs.repository.TopicDistributionRepository
+org.springframework.data.elasticsearch.repository.ElasticsearchRepository <|-- de.tum.rs.repository.UserRepository
+de.tum.rs.dao.TopicDistribution +.. de.tum.rs.dao.TopicDistribution$TopicScore
+@enduml

@@ -1,0 +1,179 @@
+@startuml
+
+class YouTubeVideo {
+  - id : String
+  - etag : String
+  - kind : String
+  - snippet : Snippet
+  - statistics : Statistics
+  - status : Status
+  - contentDetails : ContentDetails
+  - topicDetails : VideoTopicDetails
+  - topicDestribution : TopicDistribution
+}
+
+class Snippet {
+  - categoryId : String
+  - channelId : String
+  - channelTitle : String
+  - defaultAudioLanguage : String
+  - defaultLanguage : String
+  - description : String
+  - liveBroadcastContent : String
+  - localized : Localized
+  - publishedAt : PublishedAt
+  - tags : List<String>
+  - thumbnails : Thumbnails
+  - title : String
+}
+
+class Localized {
+  - description : String
+  - title : String
+}
+
+class PublishedAt {
+  - value : Long
+  - dateOnly : Boolean
+  - timeZoneShift : Integer
+}
+
+class Thumbnails {
+  - Default : Thumbnail
+  - high : Thumbnail
+  - maxres : Thumbnail
+  - medium : Thumbnail
+  - standard : Thumbnail
+}
+
+class Thumbnail {
+  - height : Integer
+  - url : String
+  - width : Integer
+}
+
+class Statistics {
+  - commentCount : Long
+  - favoriteCount : Long
+  - likeCount : Long
+  - viewCount : Long
+}
+
+class Status {
+  - embeddable : Boolean
+  - license : String
+  - madeForKids : Boolean
+  - privacyStatus : String
+  - publicStatsViewable : Boolean
+  - uploadStatus : String
+}
+
+class ContentDetails {
+  - caption : String
+  - contentRating : ContentRating
+  - countryRestriction : AccessPolicy
+  - definition : String
+  - dimension : String
+  - duration : String
+  - hasCustomThumbnail : Boolean
+  - licensedContent : Boolean
+  - projection : String
+  - regionRestriction : VideoContentDetailsRegionRestriction
+}
+
+class VideoTopicDetails {
+  - relevantTopicIds : List<String>
+  - topicCategories : List<String>
+  - topicIds : List<String>
+}
+
+class Recommendation {
+  - video : YouTubeVideo
+  - explanation : String
+  - videoId : String
+  - topics : List<TopicDTO>
+}
+
+class Feedback {
+  - id : String
+  - userId : String
+  - videoId : String
+  - rating : int
+  - totalWatchTime : float
+  - interactions : LinkedList<Interaction>
+  - more : ArrayList<String>
+  - less : ArrayList<String>
+  - dislikeReasons : ArrayList<String>
+  - round : int
+  - timestamp : Date
+  + generateId()
+}
+
+class User {
+  - userId : String
+  - feedbackLastUsed : Date
+  - topic_preferences : List<Double>
+  - n_recs_per_model : HashMap<String, Integer>
+  - recommended_topics_in_top_popular_rs : List<Double>
+  - exploit_coeff : Double
+  - topic_ratings : HashMap<String, List<Integer>>
+}
+
+class Topic {
+  - topicNumber : Integer
+  - description : String
+  - document_count : Long
+  - tokens : LinkedHashMap<Object, Object>
+}
+
+class TopicDistribution {
+  - videoId : String
+  - most_relevant_topics : List<TopicScore>
+}
+
+class TopicScore {
+  - topic_index : Integer
+  - score : Double
+}
+
+class TopicDTO {
+  - id : Integer
+  - score : Double
+  - description : String
+}
+
+class UserDTO {
+  - userId : String
+  - n_recs_per_model : HashMap<String, Integer>
+  - topic_preferences : List<TopicDTO>
+  - exploit_coeff : Double
+  - origin_other_topics : TopicDTO
+}
+
+
+
+
+User --|> UserDTO : Data transfer
+Topic --|> TopicDTO : Data transfer
+User "1" -- "*" TopicDTO : Has preferences
+TopicDistribution "1" -- "N" TopicScore : Contains scores
+User "1" <.. "N" Feedback : references
+Recommendation "1" -- "1"  YouTubeVideo : contains
+Recommendation "1" -- "N" TopicDTO : Contains topics
+Feedback "1"..> "1" YouTubeVideo : references
+YouTubeVideo "1" -- "1" TopicDistribution : contains
+YouTubeVideo "1" -- "1" Snippet : contains
+YouTubeVideo "1" -- "1" Statistics : contains
+YouTubeVideo "1" -- "1" Status : contains
+YouTubeVideo "1" -- "1" ContentDetails : contains
+YouTubeVideo "1" -- "1" VideoTopicDetails : contains
+Snippet --> Localized : localized
+Snippet --> PublishedAt : publishedAt
+Snippet --> Thumbnails : thumbnails
+Thumbnails --> Thumbnail : Default
+Thumbnails --> Thumbnail : high
+Thumbnails --> Thumbnail : maxres
+Thumbnails --> Thumbnail : medium
+Thumbnails --> Thumbnail : standard
+
+@enduml

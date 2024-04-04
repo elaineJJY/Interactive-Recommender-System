@@ -1,4 +1,4 @@
-package de.tum.rs.model;
+package de.tum.rs.dto;
 
 import de.tum.rs.dao.Topic;
 import de.tum.rs.dao.TopicDistribution.TopicScore;
