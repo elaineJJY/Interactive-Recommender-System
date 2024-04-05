@@ -89,13 +89,6 @@ const selectedTopic = ref([]);
 const predefinedColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 const topicColor = reactive(new Map());
 
-onMounted(async () => {
-
-    topics.value = await apiClient.getTopics();
-    registerSuccessModalVisible.value = true;
-    console.log('Topics:', topics.value);
-});
-
 const toggleTopicSelection = (topicNumber) => {
     const current = topicColor.get(topicNumber) || { selected: false, color: 'gray' };
     const selected = !current.selected;
