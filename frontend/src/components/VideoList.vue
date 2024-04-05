@@ -2,11 +2,27 @@
     <a-spin size="large" class="spin-overlay" v-if="recommendations.length === 0"></a-spin>
     <div v-for="(recommendation, index) in recommendations" :key="index" class="video-row">
         <VideoComponent :ref="setVideoRef(index)" :videoInfo="recommendation.video"
-            :explanation="recommendation.explanation" :topics="recommendation.topics" 
-            :videoIndex="index"
+            :explanation="recommendation.explanation" :topics="recommendation.topics" :videoIndex="index"
             @videoEnded="() => handleVideoEnded(index)" @updateIndex="handleUpdateIndex(index)" />
         <div v-if="index < recommendations.length - 1" class="divider"></div>
     </div>
+    <a-modal v-model:open="endModalVisible" title="Completion Notice" :closable=false>
+        <template #footer>
+            <a-button type="primary" @click="handleModalSubmit">
+                Begin Questionnaire
+            </a-button>
+        </template>
+
+        <p>
+            You've successfully reached the end of this section. Thank you for your participation.
+            The next step involves answering a questionnaire to gather your feedback.
+        </p>
+        <p> 
+            Please remember to use your username <strong>{{ globalState.userId }}</strong> when submitting your
+            responses.
+        </p>
+    </a-modal>
+
 </template>
 
 <script setup>
@@ -26,11 +42,21 @@ let isScrolling = ref(false);
 
 const emit = defineEmits(['videoListEnded']);
 
+const endModalVisible = ref(false);
+
 const recommendations = ref([]);
+
 onMounted(() => {
     globalState.userId = JSON.parse(localStorage.getItem('userId'));
     getRecommendations();
 });
+
+const handleModalSubmit = async() => {
+    await apiClient.onWebClose();
+    endModalVisible.value = false;
+    
+    window.location.href = 'https://example.com';
+};
 
 const refreshList = async () => {
     recommendations.value = [];
@@ -63,6 +89,11 @@ const handleUpdateIndex = (index) => {
         if (globalState.userId) {
             globalState.round++;
             console.log('Round:', globalState.round);
+
+            // finish the test after 10 rounds
+            if (globalState.round > 10) {
+                endModalVisible.value = true;
+            }
         }
     }
 };
