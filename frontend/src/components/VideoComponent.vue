@@ -268,10 +268,10 @@ const scrollIntoView = async () => {
     // Show tour when the video index reaches the specific index
     let i = props.videoIndex % 10;
     let indexReached = i === 3 || i === 9;
-    let roundReached = globalState.round === 1 || globalState.round === 2;
+    let roundReached = globalState.round === 5 || globalState.round === 6;
     if(indexReached && roundReached){
         // switch to the corresponding step in the tour
-        if (globalState.round === 1) {
+        if (globalState.round === 5) {
             currentStep.value = i === 3 ? 0 : 1;
         } else {
             currentStep.value = i === 3 ? 2 : 3;

@@ -8,6 +8,7 @@ import 'element-plus/dist/index.css'
 // import 'ant-design-vue/dist/antd.css';
 
 const app = createApp(App)
+
 app.use(globalState);
 app.use(Antd);
 app.use(ElementPlus)

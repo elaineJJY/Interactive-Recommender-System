@@ -40,8 +40,10 @@ public class LocalVideoController {
 	public CompletableFuture<List<Recommendation>> getRecommendations(@Nullable String userId) {
 		return CompletableFuture.supplyAsync(() -> {
 			List<Recommendation> recommendations;
+
 			try {
-				if(userId == null) {
+				if(userId == null || userId.isEmpty() || userId.equals("null")) {
+					log.info("Getting recommendations for user {}", userId);
 					throw new IllegalArgumentException("Not logged in");
 				}
 				recommendations = recommenderEngine.getRecommendations(userId);

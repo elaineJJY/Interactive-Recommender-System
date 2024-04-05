@@ -457,8 +457,11 @@ onMounted(async () => {
         return;
     }
     showEmpty.value = false;
-    refreshUserProfile();
-
+    try {
+        await refreshUserProfile();
+    } catch (error) {
+        console.error('Error loading user profile:', error);
+    }
 });
 </script>
 

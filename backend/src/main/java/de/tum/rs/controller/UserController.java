@@ -52,9 +52,14 @@ public class UserController {
 	@RequestMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody User user) {
 
-		if(user.getUserId().equals("") || user.getUserId() == null) {
+		if( user.getUserId() == null || user.getUserId().equals("")) {
 			log.info("User ID cannot be empty!");
 			return ResponseEntity.badRequest().body("User ID cannot be empty!");
+		}
+
+		if ( user.getUserId().equals("null") ) {
+			log.info("User ID cannot be null!");
+			return ResponseEntity.badRequest().body("User ID cannot be null!");
 		}
 
 		if(!userRepository.findByUserId(user.getUserId()).isPresent()) {
