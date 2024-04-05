@@ -33,9 +33,9 @@
         <el-button @click="logout" color="#2c71b4">Logout</el-button>
     </div>
 
-    <!-- Registration Success Modal -->
+    <!-- Registration Success Modal: Preference Elicitation-->
     <a-modal v-model:open="registerSuccessModalVisible" title="Please select the topics you are interested in"
-        style="width: 800px;">
+        style="width: 800px;" :closable=false>
 
         <template #footer>
             <a-button type="primary" @click="handleTopicSubmit">
@@ -43,24 +43,25 @@
             </a-button>
         </template>
 
-        <div class="tags-container" v-if="topics">
-
-            <a-popover v-for="(topic) in topics" :key="topic.topicNumber" placement="top" trigger="hover">
-                <template #content>
-                    <div>
-                        <p>
-                            <b>{{ topic.description }}</b>
-                        </p>
-                        <img class="topic-image"
-                            :src="require(`@/assets/topics/topic_${topic.topicNumber}_wordcloud.png`)"
-                            alt="Topic image">
-                    </div>
-                </template>
-                <a-tag :color="topicColor.get(topic.topicNumber)?.color || 'gray'" class="custom-tag"
-                    @click="registerForTopic(topic.topicNumber)">
-                    {{ topic.description }}
-                </a-tag>
-            </a-popover>
+        <div v-if="topics">
+            <PerfectScrollbar class="tags-container">
+                <a-popover v-for="(topic) in topics" :key="topic.topicNumber" placement="top" trigger="hover">
+                    <template #content>
+                        <div>
+                            <p>
+                                <b>{{ topic.description }}</b>
+                            </p>
+                            <img class="topic-image"
+                                :src="require(`@/assets/topics/topic_${topic.topicNumber}_wordcloud.png`)"
+                                alt="Topic image">
+                        </div>
+                    </template>
+                    <a-tag :color="topicColor.get(topic.topicNumber)?.color || 'gray'" class="custom-tag"
+                        @click="registerForTopic(topic.topicNumber)">
+                        {{ topic.description }}
+                    </a-tag>
+                </a-popover>
+                </PerfectScrollbar>
         </div>
 
     </a-modal>
@@ -72,6 +73,8 @@ import apiClient from '@/config/apiClient';
 import { ElMessage, ElButton, ElAvatar } from 'element-plus';
 import { UserFilled } from '@element-plus/icons-vue';
 import globalState from '@/config/globalState';
+import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
+import 'vue3-perfect-scrollbar/style.css';
 
 const emit = defineEmits(['refresh']);
 const isLoggedIn = ref(false);
@@ -86,6 +89,12 @@ const selectedTopic = ref([]);
 const predefinedColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 const topicColor = reactive(new Map());
 
+onMounted(async () => {
+
+    topics.value = await apiClient.getTopics();
+    registerSuccessModalVisible.value = true;
+    console.log('Topics:', topics.value);
+});
 
 const toggleTopicSelection = (topicNumber) => {
     const current = topicColor.get(topicNumber) || { selected: false, color: 'gray' };
@@ -125,6 +134,7 @@ onMounted(() => {
     formState.userId = JSON.parse(localStorage.getItem('userId'));
     isLoggedIn.value = formState.userId !== null;
 });
+
 
 const showModal = () => {
     modalVisible.value = true;
@@ -218,10 +228,11 @@ const openNotification = (type, message) => {
     display: flex;
     flex-wrap: wrap;
     gap: 8px 8px;
-    scrollbar-width: thin;
-    -ms-overflow-style: thin;
     max-height: 300px;
-    overflow-y: auto;
+    overflow-y: scroll;
+    position: relative;
+    -ms-overflow-style: thin;
+    scrollbar-width: thin;
 }
 
 .topic-image {
@@ -232,6 +243,18 @@ const openNotification = (type, message) => {
 
 .custom-tag {
     transition: box-shadow 0.3s ease;
+}
+
+.custom-tag:hover {
+   cursor: pointer;
+}
+
+.ps .ps__thumb-y {
+    opacity: 1 !important;
+}
+
+.ps {
+    max-height: 300px;
 }
 </style>
 

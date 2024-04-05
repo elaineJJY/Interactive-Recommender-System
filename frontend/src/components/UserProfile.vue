@@ -109,7 +109,7 @@
                     <div class="exloitative-slider-container">
                         <a-row justify="center" align="middle">
                             <a-col :span="4" offset="1">
-                                <b>Pure exloitative</b>
+                                <b>Pure exploitative</b>
                             </a-col>
                             <a-col :span="10">
                                 <el-slider v-model="exploit_coeff" :min="0" :max="1" :step="0.1" :disabled="!inEdit"
@@ -155,7 +155,7 @@
                                     <a-col :span="8">
                                         <el-slider v-model="item.score" :min="0" :max="1" :step="0.01"
                                             @input="() => updateChartData(index)"
-                                            @change="() => downplayChartSection(index)"
+                                            @change="downplayChartSection(index); saveInteraction('Topic Preferences: Sliders', item.description)"
                                             :tipFormatter="value => `${(value * 100).toFixed(0)}%`"
                                             :style="{ color: chartColors[index] }" :disabled="!inEdit" />
                                     </a-col>
@@ -397,7 +397,6 @@ const updateChartData = (id) => {
     for (var j = 0; j < topic_preferences.value.length; j++) {
         topic_preferences.value[j].score = topic_preferences.value[j].score / sum;
     }
-    saveInteraction('Topic Preferences: Sliders', topic_preferences.value[id].description);
 };
 
 

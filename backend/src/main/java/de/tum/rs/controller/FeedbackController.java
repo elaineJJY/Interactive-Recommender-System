@@ -49,9 +49,6 @@ public class FeedbackController {
 				log.info("Invoking model update for User {}", user.getUserId());
 				try {
 					recommenderEngine.invokeUpdate(recentFeedbacks);
-					// Update the last used timestamp so that the same feedbacks are not used again for model update
-					user.setFeedbackLastUsed(recentFeedbacks.get(recentFeedbacks.size() - 1).getTimestamp());
-					userRepository.save(user);
 				} catch (Exception e) {
 					log.error("Error while invoking model update", e);
 				}
