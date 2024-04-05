@@ -109,9 +109,19 @@
             <a-modal v-model:visible="showRatingModal" title="Rate" okText="Submit" cancelText="Cancel"
                 @ok="onSubmitRatingModal();" @cancel="saveInteraction('\'...\' button', 'Cancel')" :width="400">
                 <div class="rate-container">
-                    <p style="color:gray; margin-bottom: -2px;">Your rating helps us deliver more relevant content.</p>
+                    <p style="color:gray; margin-bottom: -2px;">You can use this five-star rating to express
+                        satisfaction, offering more nuanced feedback than mere likes or dislikes. Based on this
+                        rating, we'll adjust our recommendations.</p>
                     <a-rate v-model:value="rating" />
-                    <span v-if="rating > 0" style="margin-left: 16px;">Score: {{ rating }}</span>
+                    <span v-if="rating > 0" style="margin-left: 16px;">Score: {{ rating }}
+                        <span v-if="rating === 5">
+                            <LikeTwoTone two-tone-color="#52c41a" />
+                        </span>
+                        <span v-if="rating === 1"> 
+                            <DislikeTwoTone two-tone-color="#f5222d" />
+                        </span>
+                    </span>
+
                     <span v-else style="margin-left: 16px;">You have not rated yet.</span>
                 </div>
                 <div class="not-recommend-text">I don't want to see it.</div>
@@ -513,7 +523,7 @@ const onSubmitRatingModal = () => {
 
 const options = [
     { value: 'Too much similar content', label: 'Too much similar content' },
-    { value: 'Not interested in this content', label: 'Not interested in this content' },
+    { value: 'Not interested in topics', label: 'Not interested in topics' },
     { value: 'Dislike the creator', label: 'Dislike the creator' + (props.videoInfo ? ": "+props.videoInfo.snippet.channelTitle : "") }
 ];
 
