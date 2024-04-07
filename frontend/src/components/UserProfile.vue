@@ -205,14 +205,12 @@ let userData = reactive({
     exploit_coeff: 0.5,
     topic_preferences: [],
     n_recs_per_model: { personalised: 5, unpersonalised: 5 },
-    origin_other_topics: {},
 });
 
 // User data that can be edited
 const exploit_coeff = ref(0.6);
 const topic_preferences = ref([]);
 const n_recs_per_model = ref({ personalised: 5, unpersonalised: 5 });
-const origin_other_topics = ref({});
 
 // Watchers that ensure the sum of the recommendations is always 10
 watch(() => n_recs_per_model.value.personalised, (newValue) => {
@@ -239,7 +237,6 @@ const refreshUserProfile = async () => {
     exploit_coeff.value = userData.exploit_coeff;
     topic_preferences.value = JSON.parse(JSON.stringify(userData.topic_preferences));
     n_recs_per_model.value = JSON.parse(JSON.stringify(userData.n_recs_per_model));
-    origin_other_topics.value = JSON.parse(JSON.stringify(userData.origin_other_topics));
    
     // Update the chart
     chartInstance = echarts.init(chartRef.value);
@@ -333,7 +330,6 @@ const updateUserPreferences = async () => {
         userData.exploit_coeff = exploit_coeff.value;
         userData.topic_preferences = JSON.parse(JSON.stringify(topic_preferences.value));
         userData.n_recs_per_model = JSON.parse(JSON.stringify(n_recs_per_model.value));
-        userData.origin_other_topics = JSON.parse(JSON.stringify(origin_other_topics.value));
         inEdit.value = false;
         apiClient.updateUser(userData);
         
@@ -348,7 +344,6 @@ const resetUserPreferences = () => {
     exploit_coeff.value = userData.exploit_coeff;
     topic_preferences.value = JSON.parse(JSON.stringify(userData.topic_preferences));
     n_recs_per_model.value = JSON.parse(JSON.stringify(userData.n_recs_per_model));
-    origin_other_topics.value = JSON.parse(JSON.stringify(userData.origin_other_topics));
 
     const updatedData = topic_preferences.value.map((pref) => ({
         name: pref.description,
