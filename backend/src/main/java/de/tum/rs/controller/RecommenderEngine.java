@@ -2,7 +2,10 @@ package de.tum.rs.controller;
 
 
 import de.tum.rs.dao.Feedback;
+import de.tum.rs.dao.User;
 import de.tum.rs.dto.Recommendation;
+import de.tum.rs.repository.FeedbackRepository;
+import de.tum.rs.repository.UserRepository;
 import de.tum.rs.util.RecommendationBuilder;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -22,6 +25,12 @@ public class RecommenderEngine {
 	private final RestTemplate restTemplate = new RestTemplate();
 	@Autowired
 	private RecommendationBuilder recommendationBuilder;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private FeedbackRepository feedbackRepository;
 
 	/**
 	 * Register the user with the given topics
@@ -63,12 +72,22 @@ public class RecommenderEngine {
 	/**
 	 * Invoke the model update with the given feedbacks
 	 * (this function is called from the FeedbackController.saveFeedbacks() method when the user has given more than 5 unused feedbacks)
-	 * @param feedbacks
+	 * @param userId
 	 */
-	public void invokeUpdate(List<Feedback> feedbacks) {
+	public void invokeProcessFeedback(String userId) {
 		String url = PYTHON_SERVICE_URL + "/feedback";
-		restTemplate.postForObject(url, feedbacks, Void.class);
-		log.info("Invoked model update with {} feedbacks", feedbacks.size());
+
+		log.info("Invoking model update for User {}", userId);
+		try {
+			User user = userRepository.findById(userId).get();
+			List<Feedback> recentFeedbacks = feedbackRepository.findByUserIdAndTimestampGreaterThan(
+				user.getUserId(), user.getFeedbackLastUsed()
+			);
+			restTemplate.postForObject(url, recentFeedbacks, Void.class);
+			log.info("Invoked model update with {} feedbacks", recentFeedbacks.size());
+		} catch (Exception e) {
+			log.error("Error while invoking model update", e);
+		}
 	}
 
 	/**
@@ -76,8 +95,8 @@ public class RecommenderEngine {
 	 * (this function is called from the TopicController.initializeTopics() method, when the user has selected the initial topics)
 	 * @param userId
 	 */
-	public void invokeUpdateTopicRating(String userId) {
-		String url = PYTHON_SERVICE_URL + "/topic_rating";
+	public void invokeUpdateModel(String userId) {
+		String url = PYTHON_SERVICE_URL + "/model";
 		restTemplate.postForObject(url, userId, Void.class);
 		log.info("Invoked model updating the topic rating", userId);
 	}

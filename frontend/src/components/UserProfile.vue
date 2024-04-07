@@ -96,12 +96,13 @@
                         </a-button>
                         <el-dialog v-model="showDetails[2]" title="How it works?" width="30%" center>
                             <p>This slider defines how the personalised model makes recommendations.</p>
-                            <p> The more exploitation, the more you recommendations will focus on topics you seem to
-                                like.
-                            </p>
                             <p>The more exploration, the more your recommendations will focus on topics you have not
                                 come across much yet.
                             </p>
+                            <p> The more exploitation, the more you recommendations will focus on topics you seem to
+                                like.
+                            </p>
+
                         </el-dialog>
                     </div>
 
@@ -109,15 +110,16 @@
                     <div class="exloitative-slider-container">
                         <a-row justify="center" align="middle">
                             <a-col :span="4" offset="1">
-                                <b>Pure exploitative</b>
+                                <b>Pure explorative</b>
                             </a-col>
                             <a-col :span="10">
                                 <el-slider v-model="exploit_coeff" :min="0" :max="1" :step="0.1" :disabled="!inEdit"
-                                    show-stops @change="handleExploitCoeffChange" :marks="marks">
+                                    show-stops :show-tooltip="false" @change="handleExploitCoeffChange" :marks="marks"
+                                    class="exploit-slider">
                                 </el-slider>
                             </a-col>
                             <a-col :span="4" offset="1">
-                                <b>Pure explorative</b>
+                                <b>Pure exploitative</b>
                             </a-col>
                         </a-row>
                     </div>
@@ -187,7 +189,7 @@ const marks = reactive ({
         style: {
             color: 'gray',
         },
-        label: '0.5(disabled)',
+        label: 'disabled',
     },
 })
 const chartRef = ref(null);
@@ -557,6 +559,16 @@ onMounted(async () => {
 .sliders-container {
     margin-left: 20px;
     margin-right: 20px;
+}
+
+
+.exploit-slider .el-slider_runway {
+            height: 32px;
+            margin-top: 0;
+            margin-bottom: 0 !important;
+            background-color: #a62fc1 !important;
+            border: 1px solid #DCDFE6;
+    
 }
 
 </style>

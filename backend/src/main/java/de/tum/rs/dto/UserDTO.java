@@ -14,10 +14,7 @@ public class UserDTO {
 
 	private HashMap<String,Integer> n_recs_per_model;
 
-	// Top-11 most relevant topics and their scores
+	// Top-10 most relevant topics and their scores
 	private ArrayList<TopicDTO> topic_preferences; // topic preferences of the user
 	private Double exploit_coeff;
-
-	// sum of all other topic preferences
-	private TopicDTO origin_other_topics;
 }

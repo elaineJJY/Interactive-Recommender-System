@@ -31,4 +31,6 @@ public class User {
 
 	private HashMap<String, ArrayList<Integer>> topic_ratings;
 
+	private HashMap<Integer,Double> top_10_topics; // <topic_id, score>
+
 }

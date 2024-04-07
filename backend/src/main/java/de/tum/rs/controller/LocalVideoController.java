@@ -46,6 +46,7 @@ public class LocalVideoController {
 					log.info("Getting recommendations for user {}", userId);
 					throw new IllegalArgumentException("Not logged in");
 				}
+				recommenderEngine.invokeProcessFeedback(userId);
 				recommendations = recommenderEngine.getRecommendations(userId);
 				recommendations.forEach(recommendation -> {
 					recommendation.setVideo(
