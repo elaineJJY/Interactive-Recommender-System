@@ -101,6 +101,10 @@ const registerForTopic = async (topicNumber) => {
     if (selectedTopic.value.includes(topicNumber)) {
         selectedTopic.value = selectedTopic.value.filter((topic) => topic !== topicNumber);
     } else {
+        if (selectedTopic.value.length >= 10) {
+            openNotification('error', 'You can only select up to 10 topics');
+            return;
+        }
         selectedTopic.value.push(topicNumber);
     }
     toggleTopicSelection(topicNumber);
