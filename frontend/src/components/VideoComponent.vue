@@ -16,7 +16,7 @@
 
 
                 <!-- Info Button -->
-                <a-button @click="showInfoModal = true; saveInteraction('Video: Info button')" shape="circle"
+                <a-button @click="showInfoModal=true; saveInteraction('Video: Info button')" shape="circle"
                     size="large" ref="infoButtonRef">
                     <template #icon>
                         <InfoCircleFilled />
@@ -49,7 +49,7 @@
             </a-space-compact>
 
             <!-- Info Modal -->
-            <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null">
+            <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null" >
                 <div class="description-container">
 
                     <div class="tags-container" v-if="topics">
@@ -150,6 +150,7 @@ import globalState from '@/config/globalState';
 import { YoutubeVue3 } from 'youtube-vue3'
 import { ElMessage } from 'element-plus';
 import { message, Tag } from 'ant-design-vue';
+import { watch } from 'vue';
 
 const props = defineProps({
     videoInfo: Object,
@@ -219,6 +220,13 @@ function onEnded() {
     recordInteraction('ended');
 }
 
+watch(() => showInfoModal.value, (value) => {
+    if (value) {
+        youtubePlayer.value.player.pauseVideo();
+    } else {
+        youtubePlayer.value.player.playVideo();
+    }
+});
 
 const submitFeedback = async () => {
     feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
@@ -393,7 +401,6 @@ onMounted(() => {
             ([entry]) => {
                 if (entry.intersectionRatio <= 0.5) { 
                     youtubePlayer.value.player.pauseVideo();
-
                 }
             },
             { threshold: [0.5] }

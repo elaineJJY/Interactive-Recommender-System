@@ -17,7 +17,7 @@
             You've successfully reached the end of this section. Thank you for your participation.
             The next step involves answering a questionnaire to gather your feedback.
         </p>
-        <p> 
+        <p>
             Please remember to use your username <strong>{{ globalState.userId }}</strong> when submitting your
             responses.
         </p>
@@ -46,9 +46,10 @@ const endModalVisible = ref(false);
 
 const recommendations = ref([]);
 
-onMounted(() => {
+onMounted(async() => {
     globalState.userId = JSON.parse(localStorage.getItem('userId'));
-    getRecommendations();
+    await getRecommendations();
+    videoElements.value[0].scrollIntoView();
 });
 
 const handleModalSubmit = async() => {

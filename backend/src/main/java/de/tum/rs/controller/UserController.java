@@ -9,7 +9,6 @@ import de.tum.rs.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.PriorityQueue;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +80,7 @@ public class UserController {
 
 			// find top 10 topics
 			ArrayList<TopicDTO> top10TopicDto = new ArrayList<>();
-			user.getTop_10_topics().forEach((topicId, score) -> {
+			user.getProcessed_topic_scores().forEach((topicId, score) -> {
 				Topic topic = topicRepository.findById(topicId).get();
 				TopicDTO topicDTO = new TopicDTO(score, topic);
 				top10TopicDto.add(topicDTO);
@@ -108,7 +107,7 @@ public class UserController {
 			for (TopicDTO topicDTO : topicDTOs) {
 				top10Topics.put(topicDTO.getId(), topicDTO.getScore());
 			}
-			user.setTop_10_topics(top10Topics);
+			user.setProcessed_topic_scores(top10Topics);
 			userRepository.save(user);
 			try {
 				recommenderEngine.invokeUpdateModel(userId);

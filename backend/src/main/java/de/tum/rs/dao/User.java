@@ -1,12 +1,9 @@
 package de.tum.rs.dao;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import lombok.Builder.Default;
 import lombok.Data;
-import org.checkerframework.checker.optional.qual.OptionalBottom;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
@@ -25,12 +22,14 @@ public class User {
 	// model parameters
 	private HashMap<String,Integer> n_recs_per_model;
 
-	private ArrayList<Double> recommended_topics_in_top_popular_rs;
+	private HashMap<String,ArrayList<Integer>> topic_categories;
+
+	private ArrayList<Integer> recommended_topics_in_top_popular_rs;
 
 	private Double exploit_coeff;
 
 	private HashMap<String, ArrayList<Integer>> topic_ratings;
 
-	private HashMap<Integer,Double> top_10_topics; // <topic_id, score>
+	private HashMap<Integer,Double> processed_topic_scores; // <topic_id, percentage_score>
 
 }
