@@ -16,8 +16,8 @@
 
 
                 <!-- Info Button -->
-                <a-button @click="showInfoModal=true; saveInteraction('Video: Info button')" shape="circle"
-                    size="large" ref="infoButtonRef">
+                <a-button @click="showInfoModal=true; saveInteraction('Video: Info button')" shape="circle" size="large"
+                    ref="infoButtonRef">
                     <template #icon>
                         <InfoCircleFilled />
                     </template>
@@ -49,7 +49,7 @@
             </a-space-compact>
 
             <!-- Info Modal -->
-            <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null" >
+            <a-modal v-model:visible="showInfoModal" :title="videoInfo.snippet.title" :footer="null">
                 <div class="description-container">
 
                     <div class="tags-container" v-if="topics">
@@ -66,12 +66,10 @@
                                     <a-space>
                                         <a-button size="small" class="see-more-btn"
                                             :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(topic.id) }"
-                                            @click="adaptTopicGroup(index, 1); saveInteraction('\'See more\' button', topic.id)">See
-                                            more?</a-button>
+                                            @click="adaptTopicGroup(index, 1); saveInteraction('\'See more\' button', topic.id)">I like this topic</a-button>
                                         <a-button size="small" class="see-less-btn"
                                             :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(topic.id) }"
-                                            @click="adaptTopicGroup(index, -1); saveInteraction('\'See less\' button', topic.id)">See
-                                            less?</a-button>
+                                            @click="adaptTopicGroup(index, -1); saveInteraction('\'See less\' button', topic.id)">I do not like this topic</a-button>
                                     </a-space>
                                 </div>
                             </template>
@@ -117,7 +115,7 @@
                         <span v-if="rating === 5">
                             <LikeTwoTone two-tone-color="#52c41a" />
                         </span>
-                        <span v-if="rating === 1"> 
+                        <span v-if="rating === 1">
                             <DislikeTwoTone two-tone-color="#f5222d" />
                         </span>
                     </span>
