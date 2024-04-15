@@ -23,7 +23,7 @@
                     <a-typography-text strong style="color: gray;">
                         <blockquote>
                             Here you can tailor what your video feed looks like. In each recommendation round, 10 videos
-                            will be recommended. Out of our 2 models, you can chose how many videos each model
+                            will be recommended. Out of our 2 models, you can choose how many videos each model
                             recommends.
                         </blockquote>
                     </a-typography-text>
@@ -114,7 +114,7 @@
                             </a-col>
                             <a-col :span="10">
                                 <el-slider v-model="exploit_coeff" :min="0" :max="1" :step="0.1" :disabled="!inEdit"
-                                    show-stops :show-tooltip="false" @change="handleExploitCoeffChange" :marks="marks"
+                                    show-stops :show-tooltip="false" @change="handleExploitCoeffChange" 
                                     class="exploit-slider">
                                 </el-slider>
                             </a-col>
@@ -183,15 +183,6 @@ import {Edit} from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
 import globalState from '@/config/globalState';
 
-// Exploit coefficient marks to show the disabled value 0.5
-const marks = reactive ({
-    0.5: {
-        style: {
-            color: 'gray',
-        },
-        label: 'disabled',
-    },
-})
 const chartRef = ref(null);
 const chartColors = ref([]);
 const isHovering = ref([]);
@@ -435,10 +426,7 @@ const downplayChartSection = (index) => {
 };
 
 const handleExploitCoeffChange = (value) => {
-    if (value === 0.5) {
-        exploit_coeff.value = value > 0.5 ? 0.6 : 0.4;
-    }
-    saveInteraction('Personalisation slider: Slider', exploit_coeff.value);
+    saveInteraction('Personalisation slider: Slider', value);
 };
 
 onMounted(async () => {
@@ -558,11 +546,11 @@ onMounted(async () => {
 
 
 .exploit-slider .el-slider_runway {
-            height: 32px;
-            margin-top: 0;
-            margin-bottom: 0 !important;
-            background-color: #a62fc1 !important;
-            border: 1px solid #DCDFE6;
+    height: 32px;
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    background-color: #a62fc1 !important;
+    border: 1px solid #DCDFE6;
     
 }
 

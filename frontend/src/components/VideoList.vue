@@ -6,7 +6,7 @@
             @videoEnded="() => handleVideoEnded(index)" @updateIndex="handleUpdateIndex(index)" />
         <div v-if="index < recommendations.length - 1" class="divider"></div>
     </div>
-    <a-modal v-model:open="endModalVisible" title="Completion Notice" :closable=false>
+    <a-modal v-model:open="endModalVisible" title="Notice" :closable=false>
         <template #footer>
             <a-button type="primary" @click="handleModalSubmit">
                 Begin Questionnaire
@@ -14,7 +14,7 @@
         </template>
 
         <p>
-            You've successfully reached the end of this section. Thank you for your participation.
+            You've successfully reached the end of this session. Thank you for your participation.
             The next step involves answering a questionnaire to gather your feedback.
         </p>
         <p>
@@ -91,7 +91,7 @@ const handleUpdateIndex = (index) => {
             globalState.round++;
             console.log('Round:', globalState.round);
 
-            // finish the test after 10 rounds
+            // finish the test after 10 rounds and navigate to the questionnaire page
             if (globalState.round > 10) {
                 endModalVisible.value = true;
             }

@@ -28,12 +28,12 @@
                 <a-button shape="circle" size="large" @click="setLikeFeedback(); saveInteraction('Like button')"
                     ref="likeButtonRef">
                     <template #icon>
-                        <LikeTwoTone :two-tone-color="likeClicked ? '#52c41a' : '#000000'" />
+                        <LikeTwoTone :two-tone-color="rating==5 ? '#52c41a' : '#000000'" />
                     </template>
                 </a-button>
                 <a-button shape="circle" size="large" @click="setDislikeFeedback(); saveInteraction('Dislike button')">
                     <template #icon>
-                        <DislikeTwoTone :two-tone-color="dislikeClicked ? '#f5222d' : '#000000'" />
+                        <DislikeTwoTone :two-tone-color="rating==1 ? '#f5222d' : '#000000'" />
                     </template>
                 </a-button>
 
@@ -66,10 +66,12 @@
                                     <a-space>
                                         <a-button size="small" class="see-more-btn"
                                             :class="{ 'see-more-btn-active': selectedMoreTopicGroups.includes(topic.id) }"
-                                            @click="adaptTopicGroup(index, 1); saveInteraction('\'See more\' button', topic.id)">I like this topic</a-button>
+                                            @click="adaptTopicGroup(index, 1); saveInteraction('\'See more\' button', topic.id)">I
+                                            like this topic</a-button>
                                         <a-button size="small" class="see-less-btn"
                                             :class="{ 'see-less-btn-active': selectedLessTopicGroups.includes(topic.id) }"
-                                            @click="adaptTopicGroup(index, -1); saveInteraction('\'See less\' button', topic.id)">I do not like this topic</a-button>
+                                            @click="adaptTopicGroup(index, -1); saveInteraction('\'See less\' button', topic.id)">I
+                                            do not like this topic</a-button>
                                     </a-space>
                                 </div>
                             </template>
@@ -122,17 +124,19 @@
 
                     <span v-else style="margin-left: 16px;">You have not rated yet.</span>
                 </div>
-                <div class="not-recommend-text">I don't want to see it.</div>
-                <p style="color:gray">We will reduce the recommendation of related videos based on the reasons you give
-                    us
-                </p>
-                <a-space direction="vertical">
-                    <a-button v-for="(option, index) in options" :key="index"
-                        :class="{ 'selected-option': selectedOptions.includes(option.value), 'hover-option': !selectedOptions.includes(option.value) }"
-                        @click="toggleOption(option.value)">
-                        {{ option.label }}
-                    </a-button>
-                </a-space>
+                <div v-if="rating < 5">
+                    <div class="not-recommend-text">I don't want to see it.</div>
+                    <p style="color:gray">We will reduce the recommendation of related videos based on the reasons you
+                        give us
+                    </p>
+                    <a-space direction="vertical">
+                        <a-button v-for="(option, index) in options" :key="index"
+                            :class="{ 'selected-option': selectedOptions.includes(option.value), 'hover-option': !selectedOptions.includes(option.value) }"
+                            @click="toggleOption(option.value)">
+                            {{ option.label }}
+                        </a-button>
+                    </a-space>
+                </div>
             </a-modal>
 
         </div>
