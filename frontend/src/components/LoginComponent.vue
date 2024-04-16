@@ -6,7 +6,7 @@
         <el-button @click="showModal" color="#2c71b4">Sign In</el-button>
 
         <!-- Login/Register modal -->
-        <a-modal v-model:visible="modalVisible" title="Sign In" footer="" style="width: 300px;">
+        <a-modal v-model:visible="loginModalVisible" title="Sign In" footer="" style="width: 300px;">
             <a-form model="formState">
                 <a-form-item label="Username">
                     <a-input v-model:value="formState.userId" placeholder="Enter your username"></a-input>
@@ -14,7 +14,7 @@
             </a-form>
             <div style="display: flex; justify-content: space-between;">
                 <a-tooltip title="Create a new user">
-                    <a-button @click="register">Register</a-button>
+                    <a-button @click="questionnaireModalVisible = true; loginModalVisible=false">Register</a-button>
                 </a-tooltip>
                 <a-tooltip title="Click to log in">
                     <a-button type="primary" @click="login">Login</a-button>
@@ -27,11 +27,107 @@
     <!-- Show if logged in -->
     <div v-else class="user-info-container">
         <el-avatar :icon="UserFilled">
-
         </el-avatar>
         <b>{{ formState.userId }}</b>
         <el-button @click="logout" color="#2c71b4">Logout</el-button>
     </div>
+
+    <!-- Questionnaire Modal -->
+    <a-modal v-model:open="questionnaireModalVisible"
+        title="Welcome to the platform! Please fill out all the questions to complete your registration." width="1100px"
+        :closable=false style="top: 20px">
+        <div class="regiester-form">
+            <a-form model="formState" style="margin-bottom: -10px;">
+                <a-form-item label="Username" style="width: 300px;">
+                    <a-input v-model:value="formState.userId" placeholder="Enter your username"></a-input>
+                </a-form-item>
+            </a-form>
+        </div>
+
+        <div class="questionnaire-content">
+            <h4>Social Media Use and Familiarity</h4>
+            <!-- Social Media Usage Frequency -->
+            <div>
+                <b style="margin-right: 20px;">How often do you use social media platforms?</b>
+                <a-radio-group v-model:value="answers.socialMediaFrequency" required>
+                    <a-radio value="never">Never</a-radio>
+                    <a-radio value="rarely">Rarely</a-radio>
+                    <a-radio value="weekly">Weekly</a-radio>
+                    <a-radio value="daily">Daily</a-radio>
+                    <a-radio value="multiple_times">Multiple times a day</a-radio>
+                </a-radio-group>
+            </div>
+
+            <!-- Familiarity with Recommender Systems -->
+            <div>
+                <b>How familiar are you with the features of social media platforms that use recommender systems
+                    (e.g.,
+                    content feeds, personalized suggestions)?</b>
+                <a-radio-group v-model:value="answers.recommenderSystemFamiliarity">
+                    <a-radio value="not_familiar">Not familiar</a-radio>
+                    <a-radio value="slightly_familiar">Slightly familiar</a-radio>
+                    <a-radio value="familiar">Familiar</a-radio>
+                    <a-radio value="very_familiar">Very familiar</a-radio>
+                </a-radio-group>
+            </div>
+
+            <!-- Uniform Options for Several Questions -->
+            <div v-for="(question, index) in dsiQuestions" :key="index" class="inline-question">
+                <!-- <a-flex justify="space-between" align="flex-end"> -->
+                <b>{{ question }}</b>
+                <a-radio-group v-model:value="answers.dsiResponses[question]" size="small" class="radio-group-inline"
+                    button-style="solid">
+                    <a-radio-button value="strongly_disagree">Strongly Disagree</a-radio-button>
+                    <a-radio-button value="disagree">Disagree</a-radio-button>
+                    <a-radio-button value="neutral">Neutral</a-radio-button>
+                    <a-radio-button value="agree">Agree</a-radio-button>
+                    <a-radio-button value="strongly_agree">Strongly Agree</a-radio-button>
+                </a-radio-group>
+                <!-- </a-flex> -->
+            </div>
+
+            <!-- Technical Knowledge -->
+            <h4>Technical Knowledge</h4>
+            <div>
+                <b>After watching several short science fiction videos on a short-video platform, you noticed the
+                    platform recommended more videos in the science fiction genre to you. What is this
+                    recommendation
+                    most likely based on?</b>
+                <a-radio-group v-model:value="answers.videoRecommendationBasis">
+                    <a-radio value="listening_conversations">The platform listened to your conversations</a-radio>
+                    <a-radio value="assume_preference">The platform assumes all users like science fiction
+                        videos</a-radio>
+                    <a-radio value="viewing_history">The platform analyzed your viewing history and recommended
+                        similar
+                        videos</a-radio>
+                    <a-radio value="random">The platform randomly recommends videos</a-radio>
+                    <a-radio value="genre_popularity">Science fiction videos are the current most-watched genre on
+                        the
+                        platform</a-radio>
+                </a-radio-group>
+            </div>
+            <div>
+                <b>If I want the recommender system to suggest more of a certain type of items, what method(s) can I use to get it to recommend more? Please select all that you think are correct.</b>
+                <a-checkbox-group v-model:value="answers.methodsToInfluenceRS">
+                    <a-checkbox value="like_favorite">Click “Like” or “Favorite” on items of that type</a-checkbox>
+                    <a-checkbox value="delete_history">Regularly delete browsing history of other
+                        content</a-checkbox>
+                    <a-checkbox value="contact_service">Directly contact customer service to request changes to the
+                        content recommendations</a-checkbox>
+                    <a-checkbox value="use_search">Use the search function more to search for the type of items I am
+                        interested in</a-checkbox>
+                    <a-checkbox value="disable_cookies">Disable cookies on your browser</a-checkbox>
+                </a-checkbox-group>
+            </div>
+        </div>
+
+
+        <template #footer>
+            <a-button type="primary" @click="register">
+                Submit
+            </a-button>
+        </template>
+    </a-modal>
 
     <!-- Registration Success Modal: Preference Elicitation-->
     <a-modal v-model:open="registerSuccessModalVisible" title="Please select the topics you are interested in"
@@ -61,7 +157,7 @@
                         {{ topic.description }}
                     </a-tag>
                 </a-popover>
-                </PerfectScrollbar>
+            </PerfectScrollbar>
         </div>
 
     </a-modal>
@@ -81,8 +177,9 @@ const isLoggedIn = ref(false);
 const formState = reactive({
     userId: null
 });
-const modalVisible = ref(false);
+const loginModalVisible = ref(false);
 const registerSuccessModalVisible = ref(false);
+const questionnaireModalVisible = ref(false);
 const topics = ref([]);
 const selectedTopic = ref([]);
 
@@ -134,21 +231,26 @@ onMounted(() => {
 
 
 const showModal = () => {
-    modalVisible.value = true;
+    loginModalVisible.value = true;
 };
 
 const register = async () => {
     try {
-       
-        const response = await apiClient.register(formState.userId);
+        // Check if all questions are answered
+        if (!answers.socialMediaFrequency || !answers.recommenderSystemFamiliarity || Object.keys(answers.dsiResponses).length !== dsiQuestions.length || !answers.videoRecommendationBasis || answers.methodsToInfluenceRS.length === 0) {
+            openNotification('error', 'Please answer all questions');
+            return;
+        }
+        const response = await apiClient.register(formState.userId, answers);
 
         if (response.status === 200) {
+            questionnaireModalVisible.value = false;
             localStorage.setItem('userId', JSON.stringify(formState.userId));
             isLoggedIn.value = formState.userId !== null;
             globalState.userId = isLoggedIn.value ? formState.userId : null;
             topics.value = await apiClient.getTopics();
-            registerSuccessModalVisible.value = true;
             openNotification('success', 'Registered successfully!');
+            registerSuccessModalVisible.value = true;
         } else {
             openNotification('error', response.data.message);
         }
@@ -173,7 +275,6 @@ const login = async () => {
             openNotification('error', response.data.message);
         }
     } catch (error) {
-        console.error('Error logging in:', error);
         openNotification('error', error.response.data);
     }
 };
@@ -192,6 +293,29 @@ const openNotification = (type, message) => {
         type: type,
     });
 };
+
+
+
+// Questionnaire Answers
+const answers = reactive({
+    socialMediaFrequency: null,
+    recommenderSystemFamiliarity: null,
+    dsiResponses: {},
+    videoRecommendationBasis: null,
+    methodsToInfluenceRS: []
+});
+
+const dsiQuestions = [
+    'Checked truthfulness of online content past 3 months',
+    'Seen doubtful online content past 3 months',
+    'Expressed opinions on civic or political issues on websites or social media past 3 months',
+    'Read privacy policy statements before providing data past 3 months',
+    'Limited access to profile or content on social networks or online storage past 3 months',
+    'Refused the use of personal data for advertising past 3 months',
+    'Is concerned that online activities are being used for tailored advertising',
+    'Changed settings of software, app or device past 3 months'
+];
+
 </script>
 
 <style scoped>
@@ -253,5 +377,36 @@ const openNotification = (type, message) => {
 .ps {
     max-height: 300px;
 }
+
+.questionnaire-content>div {
+    margin-bottom: 10px;
+}
+.questionnaire-content>h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    background-color: rgb(214, 229, 239);
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.inline-question {
+    margin-bottom: 0px !important;
+    display: flex;
+    justify-content: space-between;
+}
+
+.radio-group-inline {
+    text-align: right !important;
+}
+
+.regiester-form {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    margin-bottom: -10px;
+}
+
+
 </style>
 

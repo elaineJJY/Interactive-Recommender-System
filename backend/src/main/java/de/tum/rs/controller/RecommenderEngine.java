@@ -79,7 +79,7 @@ public class RecommenderEngine {
 
 		log.info("Invoking model update for User {}", userId);
 		try {
-			User user = userRepository.findById(userId).get();
+			User user = userRepository.findByUserId(userId).get();
 			List<Feedback> recentFeedbacks = feedbackRepository.findByUserIdAndTimestampGreaterThan(
 				user.getUserId(), user.getFeedbackLastUsed()
 			);

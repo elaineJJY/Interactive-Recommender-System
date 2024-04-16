@@ -3,9 +3,12 @@ package de.tum.rs.dao;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 
 @Data
@@ -36,4 +39,20 @@ public class User {
 
 	private ArrayList<String> disliked_creators_video_ids;
 
+	// for user study
+	private Date registrationDate;
+
+	private Answers answers;
+
+	@Data
+	public static class Answers {
+		// Social media usage
+		private String socialMediaFrequency;  // Frequency of social media usage
+		private String recommenderSystemFamiliarity;  // Familiarity with recommender systems
+		private HashMap<String, String> dsiResponses;  // Responses to DSI questions
+
+		// Technical knowledge
+		private String videoRecommendationBasis;  // Basis of video recommendations
+		private List<String> methodsToInfluenceRS;  // Methods to influence the recommender system
+	}
 }

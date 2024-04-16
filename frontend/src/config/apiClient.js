@@ -12,8 +12,8 @@ const apiClient = axios.create({
 });
 
 export default {
-    register(userId) {
-        return apiClient.post('/users/register', { userId: userId });
+    register(userId, answers) {
+        return apiClient.post('/users/register', { userId: userId, answers: answers});
     },
     async getTopics(){
         try {

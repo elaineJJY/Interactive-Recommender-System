@@ -91,11 +91,11 @@
 
                     <!-- Exploit Title-->
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="font-size: 20px; font-weight: bold;">Personalisation slider</div>
+                        <div style="font-size: 20px; font-weight: bold;">Personalisation Slider</div>
                         <a-button @click="showDetails[2] = true; saveInteraction('Personalisation slider: Info button')"
                             shape="circle" :icon="h(InfoOutlined)" size="small">
                         </a-button>
-                        <el-dialog v-model="showDetails[2]" title="How it works?" width="30%" center>
+                        <el-dialog v-model="showDetails[2]" title="How does it work?" width="30%" center>
                             <p>This slider defines how the personalised model makes recommendations.</p>
                             <p>The more exploration, the more your recommendations will focus on topics you have not
                                 come across much yet.
@@ -132,7 +132,7 @@
                             @click="showDetails[3] = true; saveInteraction('Topic Preferences: Info button')"
                             shape="circle" :icon="h(InfoOutlined)" size="small">
                         </a-button>
-                        <el-dialog v-model="showDetails[3]" title="How it works?" width="30%" center>
+                        <el-dialog v-model="showDetails[3]" title="How does it work?" width="30%" center>
                             <p>
                                 This menu visualises which video topics the system believes you like. The higher the
                                 score of a topic, the more it will be featured in your exploitative recommendations.

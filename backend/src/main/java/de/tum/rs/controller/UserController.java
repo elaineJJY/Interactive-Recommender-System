@@ -37,7 +37,6 @@ public class UserController {
 	@RequestMapping("/login")
 	public ResponseEntity<?> loginUser(@RequestBody User user) {
 		log.info("User: {}", user);
-
 		if(userRepository.findByUserId(user.getUserId()).isPresent()) {
 			return ResponseEntity.ok().body("Login successful!");
 		}
@@ -61,7 +60,9 @@ public class UserController {
 
 		if(!userRepository.findByUserId(user.getUserId()).isPresent()) {
 			user.setFeedbackLastUsed(new Date());
+			user.setRegistrationDate(new Date());
 			userRepository.save(user);
+			log.info("User {} registered successfully!", user.getUserId());
 			return ResponseEntity.ok().body("Registration successful!");
 		}
 		log.info("User already exists!");
@@ -70,6 +71,7 @@ public class UserController {
 
 	@GetMapping("/{userId}")
 	public ResponseEntity<?> getUser(@PathVariable String userId) {
+		userId = userId.substring(1, userId.length() - 1);
 		if(userRepository.findByUserId(userId).isPresent()) {
 			recommenderEngine.invokeProcessFeedback(userId);
 			User user = userRepository.findByUserId(userId).get();
@@ -91,12 +93,13 @@ public class UserController {
 			log.info("User {} retrieved successfully!", userId);
 			return ResponseEntity.ok().body(userDTO);
 		}
-		log.info("User does not exist!");
+		log.info("User {} does not exist!", userId);
 		return ResponseEntity.badRequest().body("User does not exist!");
 	}
 
 	@PostMapping("/{userId}")
 	public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO) {
+		userId = userId.substring(1, userId.length() - 1);
 		if(userRepository.findByUserId(userId).isPresent()) {
 			User user = userRepository.findByUserId(userId).get();
 			user.setExploit_coeff(userDTO.getExploit_coeff());
