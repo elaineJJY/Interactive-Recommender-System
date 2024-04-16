@@ -32,4 +32,8 @@ public class User {
 
 	private HashMap<Integer,Double> processed_topic_scores; // <topic_id, percentage_score>
 
+	private ArrayList<String> disliked_creators;
+
+	private ArrayList<String> disliked_creators_video_ids;
+
 }
