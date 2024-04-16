@@ -44,12 +44,13 @@
                             :max="10" :step="1" :disabled="!inEdit"
                             @change="saveInteraction('Model1: Input Number',n_recs_per_model.personalised)" />
                         <el-dialog v-model="showDetails[0]" title="Model Details" width="30%" center>
-                            <p>Personalised model: it takes into account your personal preferences.</p>
+                            <p>Personalised model: it takes your personal preferences into account.
+                            </p>
                             <p>
                                 The recommendations will represent a balance between topics you like and topics you have
                                 not come across yet. The goal is for you to enjoy what you already like (exploitation)
                                 while allowing you to discover new content (exploration). You can decide how this
-                                balance is made using the slider on the top right.
+                                balance is made using the personalisation slider.
                             </p>
                         </el-dialog>
                     </div>
@@ -99,7 +100,7 @@
                             <p>The more exploration, the more your recommendations will focus on topics you have not
                                 come across much yet.
                             </p>
-                            <p> The more exploitation, the more you recommendations will focus on topics you seem to
+                            <p> The more exploitation, the more your recommendations will focus on topics you seem to
                                 like.
                             </p>
 
@@ -114,7 +115,7 @@
                             </a-col>
                             <a-col :span="10">
                                 <el-slider v-model="exploit_coeff" :min="0" :max="1" :step="0.1" :disabled="!inEdit"
-                                    show-stops :show-tooltip="false" @change="handleExploitCoeffChange" 
+                                    show-stops :show-tooltip="false" @change="handleExploitCoeffChange"
                                     class="exploit-slider">
                                 </el-slider>
                             </a-col>
@@ -133,9 +134,8 @@
                         </a-button>
                         <el-dialog v-model="showDetails[3]" title="How it works?" width="30%" center>
                             <p>
-                                This menu visualises what the system knows about your topic preferences. For each topic,
-                                it estimates how much you like it. The higher the score of a topic, the more the system
-                                believes you to like that topic.
+                                This menu visualises which video topics the system believes you like. The higher the
+                                score of a topic, the more it will be featured in your exploitative recommendations.
                             </p>
                         </el-dialog>
                     </div>
