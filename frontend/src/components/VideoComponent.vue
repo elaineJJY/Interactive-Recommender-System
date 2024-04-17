@@ -352,7 +352,7 @@ const tour = ref([
     {
         target: () => infoButtonRef.value && infoButtonRef.value.$el,
         title: 'Info Button',
-        description: 'Click here to view more information about the video and modify the tags.',
+        description: 'Click here to view information about the video and to rate individual topics.',
         cover: createVNode('img', {
             alt: 'tour.png',
             src: require(`@/assets/tour/infoButton.png`),
@@ -361,12 +361,12 @@ const tour = ref([
     {
         target: () => likeButtonRef.value && likeButtonRef.value.$el,
         title: 'Like or Dislike',
-        description: 'You can express your liking or disliking of the video here.',
+        description: 'You can express whether you like or dislike the video here.',
     },
     {
         target: () => moreButtonRef.value && moreButtonRef.value.$el,
         title: 'More Button',
-        description: 'Click here to provide a more detailed evaluation of the video, including specific reasons for disliking it.',
+        description: 'Click here to provide a more detailed rating of the video, including specific reasons for disliking it.',
         cover: createVNode('img', {
             alt: 'tour.png',
             src: require(`@/assets/tour/moreButton.png`),
@@ -375,7 +375,7 @@ const tour = ref([
     {
         target: null,//() =>userProfileRef.value && userProfileRef.value.$el,
         title: 'User Profile',
-        description: 'Click the menu to view your user profile and control your preferences in this panel.',
+        description: 'Click here to view the User Profile page and control your system preferences.',
         cover: createVNode('img', {
             alt: 'tour.png',
             src: require(`@/assets/tour/userProfile.png`),
