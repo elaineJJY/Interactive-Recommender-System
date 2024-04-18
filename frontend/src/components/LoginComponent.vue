@@ -135,7 +135,8 @@
 
     <!-- Registration Success Modal: Preference Elicitation-->
     <a-modal v-model:open="registerSuccessModalVisible" title="Please select the topics you are interested in"
-        style="top: 20px; height: 800px; width:1200px; display: flex; flex-direction: column;"  :closable=false>
+        style="top: 20px; height: 800px; width:1200px; display: flex; flex-direction: column;" :closable=false
+        :maskClosable="false">
 
         <template #footer>
             <a-button type="primary" @click="handleTopicSubmit">

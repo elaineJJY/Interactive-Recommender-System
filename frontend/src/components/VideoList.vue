@@ -42,7 +42,7 @@ let isScrolling = ref(false);
 
 const emit = defineEmits(['videoListEnded']);
 
-const endModalVisible = ref(true);
+const endModalVisible = ref(false);
 
 const recommendations = ref([]);
 
