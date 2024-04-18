@@ -4,8 +4,8 @@
         <!-- Youtube video -->
 
         <YoutubeVue3 ref="youtubePlayer" :videoid="videoInfo.id" @ended="onEnded" @paused="onPaused" @played="onPlayed"
-            autoplay="0" controls=1 :height="'100%'" scrolling="no"
-            style="border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); overflow-y: hidden;" />
+            autoplay="0" controls=1 :height="'95%'" scrolling="no" :muted="true"
+            style="margin-top:10px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); overflow-y: hidden;" />
         <div class="overlay" :style="overlayStyle.value" @wheel.prevent="handleWheel">
         </div>
 
@@ -282,28 +282,42 @@ const scrollIntoView = async () => {
     if (showInfoModal.value) {
         return false;
     }
-    videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    await new Promise(resolve => setTimeout(resolve, 700));
+    try {
+        console.log("scroll into view" + props.videoIndex);  
+        videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        await new Promise(resolve => setTimeout(resolve, 700));
 
-    // Show tour when the video index reaches the specific index
-    let i = props.videoIndex % 10;
-    let indexReached = i === 3 || i === 9;
-    let roundReached = globalState.round === 5 || globalState.round === 6;
-    if(indexReached && roundReached){
-        // switch to the corresponding step in the tour
-        if (globalState.round === 5) {
-            currentStep.value = i === 3 ? 0 : 1;
-        } else {
-            currentStep.value = i === 3 ? 2 : 3;
+        // Show tour when the video index reaches the specific index
+        let i = props.videoIndex % 10;
+        let indexReached = i === 3 || i === 9;
+        let roundReached = globalState.round === 5 || globalState.round === 6;
+        if (indexReached && roundReached) {
+            // switch to the corresponding step in the tour
+            if (globalState.round === 5) {
+                currentStep.value = i === 3 ? 0 : 1;
+            } else {
+                currentStep.value = i === 3 ? 2 : 3;
+            }
+            showTour();
         }
-        showTour();
+        else {
+            youtubePlayer.value.player.pauseVideo();
+            youtubePlayer.value.player.mute(); 
+            await youtubePlayer.value.player.playVideo();
+            youtubePlayer.value.player.playVideo();
+            //is not IOS devices
+            let isIpad = navigator.userAgent.match(/iPad/i) !== null;
+            if (!isIpad) {
+                youtubePlayer.value.player.unMute();
+            }
+            emit('updateIndex');
+        }
+        return true;
+    } catch (error) {
+        console.log("Error: ", error);
+        return false;
     }
-    else {
-        youtubePlayer.value.player.playVideo();
-        youtubePlayer.value.player.unMute();
-        emit('updateIndex');
-    }
-    return true;
+
 }
 
 const handleWheel = (event) => {
@@ -311,9 +325,10 @@ const handleWheel = (event) => {
         return;
     }
     event.preventDefault();
-    // scroll the window with reverse direction
-    const scrollAmount = event.deltaY > 0 ? -100 : 100;
-    window.scrollBy({ top: scrollAmount, behavior: 'auto' });
+    // // scroll the window with reverse direction
+    // const scrollAmount = event.deltaY > 0 ? -100 : 100;
+    // window.scrollBy({ top: scrollAmount, behavior: 'auto' });
+    // console.log(event);
 };
 
 // eslint-disable-next-line

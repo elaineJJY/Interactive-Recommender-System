@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 @Data
-@Document(indexName = "topic_distributions")
+@Document(indexName = "topic_distributions_test")
 public class TopicDistribution {
 
 	@Id

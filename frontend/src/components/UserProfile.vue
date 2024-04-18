@@ -498,8 +498,9 @@ onMounted(async () => {
 }
 
 .input-spacing {
-    margin-left: 20px;
-    margin-top: 10px;
+    max-width: 90vh;
+    margin-top: 5px;
+    display: center;
 }
 .exloitative-slider-container{
     background-color: rgba(0, 0, 0, 0.1);

@@ -42,21 +42,25 @@ let isScrolling = ref(false);
 
 const emit = defineEmits(['videoListEnded']);
 
-const endModalVisible = ref(false);
+const endModalVisible = ref(true);
 
 const recommendations = ref([]);
 
 onMounted(async() => {
     globalState.userId = JSON.parse(localStorage.getItem('userId'));
     await getRecommendations();
-    videoElements.value[0].scrollIntoView();
+    try {
+        videoElements.value[0].scrollIntoView();
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 const handleModalSubmit = async() => {
     await apiClient.onWebClose();
-    endModalVisible.value = false;
     
-    window.location.href = 'https://example.com';
+    window.open('https://docs.google.com/forms/d/e/1FAIpQLSdjDmWhLuEAM1EuuOdTjZdlpOpmb1uRmKl38AJQC0AnhnUYNw/viewform?usp=sf_link', '_blank');
+
 };
 
 const refreshList = async () => {
@@ -151,6 +155,38 @@ const handleWheelOrKeyDown = async (event) => {
     
 };
 
+const touchStart = ref({ x: 0, y: 0 });
+const handleTouchStart = (event) => {
+    touchStart.value = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+};
+
+const handleTouchMove = async(event) => {
+    if (isScrolling.value) return;
+    await nextTick();
+    const touchEndY = event.changedTouches[0].clientY;
+    const verticalMovement = touchStart.value.y - touchEndY;
+
+    if (Math.abs(verticalMovement) > 10) { // Check if the user has moved their finger more than 10 pixels
+        nextTick().then(() => {
+            event.preventDefault();
+            const direction = verticalMovement > 0 ? 'down' : 'up';
+          
+            throttle(async () => {
+                try {
+                    videoElements.value[currentIndex.value].recordInteraction('touch-' + direction);
+                } catch (error) {
+                    console.error(error);
+                }
+                if (direction === 'down') {
+                    scrollToNextVideo(currentIndex.value);
+                } else {
+                    scrollToPrevVideo(currentIndex.value); 
+                }
+            }, 500);
+        });
+    }
+};
+
 const scrollToNextVideo = async (index) => {
     if (isScrolling.value || index >= videoElements.value.length - 1) return;
     isScrolling.value = true;
@@ -195,11 +231,15 @@ const scrollToPrevVideo = async (index) => {
 onMounted(() => {
     window.addEventListener('wheel', handleWheelOrKeyDown, { passive: false });
     window.addEventListener('keydown', handleWheelOrKeyDown, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
 });
 
 onUnmounted(() => {
     window.removeEventListener('wheel', handleWheelOrKeyDown);
     window.removeEventListener('keydown', handleWheelOrKeyDown);
+    window.removeEventListener('touchstart', handleTouchStart);
+    window.removeEventListener('touchmove', handleTouchMove);
 });
 
 defineExpose({

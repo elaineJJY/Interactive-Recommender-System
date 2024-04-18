@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Document(indexName = "videos")
+@Document(indexName = "videos_test")
 public interface VideoRepository extends ElasticsearchRepository<YouTubeVideo, String> {
 
 

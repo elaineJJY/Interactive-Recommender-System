@@ -15,7 +15,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Data
-@Document(indexName = "videos")
+@Document(indexName = "videos_test")
 @JsonIgnoreProperties("_class")
 public class YouTubeVideo{
 

@@ -86,8 +86,12 @@ public class RecommendationBuilder {
 		if (topicDistribution.isPresent()) {
 			List<TopicDTO> topics = new LinkedList<>();
 			for (TopicDistribution.TopicScore topicScore : topicDistribution.get().getMost_relevant_topics()) {
-				Topic topic = topicRepository.findById(topicScore.getTopic_index()).get();
-				topics.add(new TopicDTO(topicScore.getScore(), topic));
+				try {
+					Topic topic = topicRepository.findById(topicScore.getTopic_index()).get();
+					topics.add(new TopicDTO(topicScore.getScore(), topic));
+				} catch (Exception e) {
+					log.error("Error while fetching topic: {}", topicScore.getTopic_index());
+				}
 			}
 			recommendation.setTopics(topics);
 		}

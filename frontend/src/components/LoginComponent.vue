@@ -34,104 +34,108 @@
 
     <!-- Questionnaire Modal -->
     <a-modal v-model:open="questionnaireModalVisible"
-        title="Welcome to the platform! Please fill out all the questions to complete your registration." width="1100px"
-        :closable=false style="top: 20px">
+        title="Welcome to the platform! Please fill out all the questions to complete your registration."
+        :closable=false style="top: 20px; height: 800px; width:1200px; display: flex; flex-direction: column;">
+
         <div class="regiester-form">
-            <a-form model="formState" style="margin-bottom: -10px;">
+            <a-form model="formState" style="margin-bottom: -15px; margin-top: 10px;">
                 <a-form-item label="Username" style="width: 300px;">
                     <a-input v-model:value="formState.userId" placeholder="Enter your username"></a-input>
                 </a-form-item>
             </a-form>
         </div>
+        <PerfectScrollbar class="tags-container">
+            <div class="questionnaire-content">
+                <h4>Social Media Use and Familiarity</h4>
+                <!-- Social Media Usage Frequency -->
+                <div>
+                    <b style="margin-right: 20px;">How often do you use social media platforms?</b>
+                    <a-radio-group v-model:value="answers.socialMediaFrequency" required>
+                        <a-radio value="never">Never</a-radio>
+                        <a-radio value="rarely">Rarely</a-radio>
+                        <a-radio value="weekly">Weekly</a-radio>
+                        <a-radio value="daily">Daily</a-radio>
+                        <a-radio value="multiple_times">Multiple times a day</a-radio>
+                    </a-radio-group>
+                </div>
 
-        <div class="questionnaire-content">
-            <h4>Social Media Use and Familiarity</h4>
-            <!-- Social Media Usage Frequency -->
-            <div>
-                <b style="margin-right: 20px;">How often do you use social media platforms?</b>
-                <a-radio-group v-model:value="answers.socialMediaFrequency" required>
-                    <a-radio value="never">Never</a-radio>
-                    <a-radio value="rarely">Rarely</a-radio>
-                    <a-radio value="weekly">Weekly</a-radio>
-                    <a-radio value="daily">Daily</a-radio>
-                    <a-radio value="multiple_times">Multiple times a day</a-radio>
-                </a-radio-group>
-            </div>
+                <!-- Familiarity with Recommender Systems -->
+                <div>
+                    <b>How familiar are you with the features of social media platforms that use recommender systems
+                        (e.g.,
+                        content feeds, personalized suggestions)?</b>
+                    <a-radio-group v-model:value="answers.recommenderSystemFamiliarity">
+                        <a-radio value="not_familiar">Not familiar</a-radio>
+                        <a-radio value="slightly_familiar">Slightly familiar</a-radio>
+                        <a-radio value="familiar">Familiar</a-radio>
+                        <a-radio value="very_familiar">Very familiar</a-radio>
+                    </a-radio-group>
+                </div>
 
-            <!-- Familiarity with Recommender Systems -->
-            <div>
-                <b>How familiar are you with the features of social media platforms that use recommender systems
-                    (e.g.,
-                    content feeds, personalized suggestions)?</b>
-                <a-radio-group v-model:value="answers.recommenderSystemFamiliarity">
-                    <a-radio value="not_familiar">Not familiar</a-radio>
-                    <a-radio value="slightly_familiar">Slightly familiar</a-radio>
-                    <a-radio value="familiar">Familiar</a-radio>
-                    <a-radio value="very_familiar">Very familiar</a-radio>
-                </a-radio-group>
-            </div>
+                <!-- Uniform Options for Several Questions -->
+                <div v-for="(question, index) in dsiQuestions" :key="index" class="inline-question">
+                    <!-- <a-flex justify="space-between" align="flex-end"> -->
+                    <b>{{ question }}</b>
+                    <a-radio-group v-model:value="answers.dsiResponses[question]" size="small"
+                        class="radio-group-inline" button-style="solid">
+                        <a-radio-button value="strongly_disagree">Strongly Disagree</a-radio-button>
+                        <a-radio-button value="disagree">Disagree</a-radio-button>
+                        <a-radio-button value="neutral">Neutral</a-radio-button>
+                        <a-radio-button value="agree">Agree</a-radio-button>
+                        <a-radio-button value="strongly_agree">Strongly Agree</a-radio-button>
+                    </a-radio-group>
+                    <!-- </a-flex> -->
+                </div>
 
-            <!-- Uniform Options for Several Questions -->
-            <div v-for="(question, index) in dsiQuestions" :key="index" class="inline-question">
-                <!-- <a-flex justify="space-between" align="flex-end"> -->
-                <b>{{ question }}</b>
-                <a-radio-group v-model:value="answers.dsiResponses[question]" size="small" class="radio-group-inline"
-                    button-style="solid">
-                    <a-radio-button value="strongly_disagree">Strongly Disagree</a-radio-button>
-                    <a-radio-button value="disagree">Disagree</a-radio-button>
-                    <a-radio-button value="neutral">Neutral</a-radio-button>
-                    <a-radio-button value="agree">Agree</a-radio-button>
-                    <a-radio-button value="strongly_agree">Strongly Agree</a-radio-button>
-                </a-radio-group>
-                <!-- </a-flex> -->
+                <!-- Technical Knowledge -->
+                <h4>Technical Knowledge</h4>
+                <div>
+                    <b>After watching several short science fiction videos on a short-video platform, you noticed the
+                        platform recommended more videos in the science fiction genre to you. What is this
+                        recommendation
+                        most likely based on?</b>
+                    <a-radio-group v-model:value="answers.videoRecommendationBasis">
+                        <a-radio value="listening_conversations">The platform listened to your conversations</a-radio>
+                        <a-radio value="assume_preference">The platform assumes all users like science fiction
+                            videos</a-radio>
+                        <a-radio value="viewing_history">The platform analyzed your viewing history and recommended
+                            similar
+                            videos</a-radio>
+                        <a-radio value="random">The platform randomly recommends videos</a-radio>
+                        <a-radio value="genre_popularity">Science fiction videos are the current most-watched genre on
+                            the
+                            platform</a-radio>
+                    </a-radio-group>
+                </div>
+                <div>
+                    <b>If I want the recommender system to suggest more of a certain type of items, what method(s) can I
+                        use to get it to recommend more? Please select all that you think are correct.</b>
+                    <a-checkbox-group v-model:value="answers.methodsToInfluenceRS">
+                        <a-checkbox value="like_favorite">Click “Like” or “Favorite” on items of that type</a-checkbox>
+                        <a-checkbox value="delete_history">Regularly delete browsing history of other
+                            content</a-checkbox>
+                        <a-checkbox value="contact_service">Directly contact customer service to request changes to the
+                            content recommendations</a-checkbox>
+                        <a-checkbox value="use_search">Use the search function more to search for the type of items I am
+                            interested in</a-checkbox>
+                        <a-checkbox value="disable_cookies">Disable cookies on your browser</a-checkbox>
+                    </a-checkbox-group>
+                </div>
             </div>
-
-            <!-- Technical Knowledge -->
-            <h4>Technical Knowledge</h4>
-            <div>
-                <b>After watching several short science fiction videos on a short-video platform, you noticed the
-                    platform recommended more videos in the science fiction genre to you. What is this
-                    recommendation
-                    most likely based on?</b>
-                <a-radio-group v-model:value="answers.videoRecommendationBasis">
-                    <a-radio value="listening_conversations">The platform listened to your conversations</a-radio>
-                    <a-radio value="assume_preference">The platform assumes all users like science fiction
-                        videos</a-radio>
-                    <a-radio value="viewing_history">The platform analyzed your viewing history and recommended
-                        similar
-                        videos</a-radio>
-                    <a-radio value="random">The platform randomly recommends videos</a-radio>
-                    <a-radio value="genre_popularity">Science fiction videos are the current most-watched genre on
-                        the
-                        platform</a-radio>
-                </a-radio-group>
-            </div>
-            <div>
-                <b>If I want the recommender system to suggest more of a certain type of items, what method(s) can I use to get it to recommend more? Please select all that you think are correct.</b>
-                <a-checkbox-group v-model:value="answers.methodsToInfluenceRS">
-                    <a-checkbox value="like_favorite">Click “Like” or “Favorite” on items of that type</a-checkbox>
-                    <a-checkbox value="delete_history">Regularly delete browsing history of other
-                        content</a-checkbox>
-                    <a-checkbox value="contact_service">Directly contact customer service to request changes to the
-                        content recommendations</a-checkbox>
-                    <a-checkbox value="use_search">Use the search function more to search for the type of items I am
-                        interested in</a-checkbox>
-                    <a-checkbox value="disable_cookies">Disable cookies on your browser</a-checkbox>
-                </a-checkbox-group>
-            </div>
-        </div>
+        </PerfectScrollbar>
 
 
         <template #footer>
-            <a-button type="primary" @click="register">
+            <a-button type="primary" @click="register" style="margin-top: -20px;">
                 Submit
             </a-button>
         </template>
+
     </a-modal>
 
     <!-- Registration Success Modal: Preference Elicitation-->
     <a-modal v-model:open="registerSuccessModalVisible" title="Please select the topics you are interested in"
-        style="width: 800px;" :closable=false>
+        style="top: 20px; height: 800px; width:1200px; display: flex; flex-direction: column;"  :closable=false>
 
         <template #footer>
             <a-button type="primary" @click="handleTopicSubmit">
@@ -349,7 +353,7 @@ const dsiQuestions = [
     display: flex;
     flex-wrap: wrap;
     gap: 8px 8px;
-    max-height: 300px;
+    max-height: 80vh !important;
     overflow-y: scroll;
     position: relative;
     -ms-overflow-style: thin;
@@ -378,6 +382,9 @@ const dsiQuestions = [
     max-height: 300px;
 }
 
+.questionnaire-content {
+    margin-right: 15px;
+}
 .questionnaire-content>div {
     margin-bottom: 10px;
 }
