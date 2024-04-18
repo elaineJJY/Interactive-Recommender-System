@@ -20,13 +20,13 @@ ARG VUE_APP_API_BASE_URL
 ENV VUE_APP_API_BASE_URL=$VUE_APP_API_BASE_URL
 
 # build app for production with minification
-RUN npm run build
+RUN npm run build 
 
 EXPOSE 8080
 CMD ["npm", "run", "serve"]
 
 
-# OR: you can use nginx to serve the static files
+# OR: you can use nginx to serve the static files if your company has limited memory
 # FROM nginx:stable-alpine
 # COPY ./dist /usr/share/nginx/html
 # EXPOSE 8080
