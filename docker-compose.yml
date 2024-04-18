@@ -92,7 +92,7 @@ services:
       - SPRING_ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME}
       - SPRING_ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
       - API_KEYS=${API_KEYS}
-      - PYTHON_RS_SERVICE_URL=172.17.0.1:5000
+      - PYTHON_RS_SERVICE_URL=http://172.17.0.1:5000
     depends_on:
       es:
         condition: service_healthy
