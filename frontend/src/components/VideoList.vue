@@ -52,7 +52,7 @@ onMounted(async() => {
     try {
         videoElements.value[0].scrollIntoView();
     } catch (error) {
-        console.error(error);
+        console.log(error);
     }
 });
 
