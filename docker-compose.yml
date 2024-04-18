@@ -87,7 +87,6 @@ services:
       context: ./backend
     ports:
       - 8081:8081
-    network_mode: host
     environment:
       - SPRING_ELASTICSEARCH_URIS=http://es:9200
       - SPRING_ELASTICSEARCH_USERNAME=${ELASTIC_USERNAME}
