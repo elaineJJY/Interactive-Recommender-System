@@ -4,7 +4,7 @@
         <!-- Youtube video -->
 
         <YoutubeVue3 ref="youtubePlayer" :videoid="videoInfo.id" @ended="onEnded" @paused="onPaused" @played="onPlayed"
-            autoplay="0" controls=1 :height="'95%'" scrolling="no" :muted="true"
+            :autoplay="0" :controls="1" :height="'95%'" :scrolling="no" :muted="true"
             style="margin-top:10px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); overflow-y: hidden;" />
         <div class="overlay" :style="overlayStyle.value" @wheel.prevent="handleWheel">
         </div>
@@ -234,7 +234,6 @@ const submitFeedback = async () => {
     feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
 
     if (feedback.totalWatchTime >= 1) {  // longer than 1 second
-        console.log("Cashed feedback for video: ", feedback);
         feedback.less = selectedLessTopicGroups.value;
         feedback.more = selectedMoreTopicGroups.value;
         apiClient.submitFeedback(feedback);
@@ -283,10 +282,9 @@ const scrollIntoView = async () => {
         return false;
     }
     try {
-        console.log("scroll into view" + props.videoIndex);  
         videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
         await new Promise(resolve => setTimeout(resolve, 700));
-
+        console.log("scrollIntoView Video: " + props.videoInfo.id);
         // Show tour when the video index reaches the specific index
         let i = props.videoIndex % 10;
         let indexReached = i === 3 || i === 9;
@@ -344,7 +342,6 @@ async function updateOverlayStyle() {
     const overlayHeight = height * 0.75;
     overlayStyle.value.height = overlayHeight + 'px';
     overlayStyle.value.width = width + 'px';
-    console.log("update overlay style: ", overlayStyle.value);
 
 }
 
