@@ -198,7 +198,6 @@ const toggleTopicSelection = (topicNumber) => {
     topicColor.set(topicNumber, { selected, color });
 };
 
-
 const registerForTopic = async (topicNumber) => {
     if (selectedTopic.value.includes(topicNumber)) {
         selectedTopic.value = selectedTopic.value.filter((topic) => topic !== topicNumber);
@@ -290,6 +289,7 @@ const logout = async () => {
     openNotification('success', 'Logged out successfully!');
     isLoggedIn.value = false;
     globalState.userId = null;
+    emit('refresh');
 };
 
 const openNotification = (type, message) => {

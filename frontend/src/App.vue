@@ -46,7 +46,12 @@
       <el-main>
         <!-- Content for Videos -->
         <div v-if="state.selectedKeys[0] === '1'">
-          <VideoList ref="videoListRef" />
+          <div v-if="showEmpty"
+            style="display: flex; justify-content: center; align-items: center; height: 93vh; border: 100px solid #f0f2f5;">
+            <a-empty description="Please log in first to start the survey" />
+          </div>
+          <VideoList v-else ref="videoListRef" />
+
         </div>
 
         <!-- Content for Hot Videos-->
@@ -67,12 +72,14 @@ import apiClient from '@/config/apiClient';
 import { reactive, watch, h, onMounted, onUnmounted, ref, provide } from 'vue';
 import globalState from '@/config/globalState';
 
+// import YouTubeTest from './components/YouTubeTest.vue'; // For Test
 import {
   SettingOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons-vue';
 import { Fold, Expand } from '@element-plus/icons-vue';
 
+const showEmpty = ref(false);
 const state = reactive({
   collapsed: false,
   selectedKeys: ['1'],
@@ -114,6 +121,7 @@ function handleRefresh() {
   if (userProfileRef.value && state.selectedKeys[0] === '2') {
     userProfileRef.value.refreshUserProfile();
   }
+  showEmpty.value = globalState.userId === null;
 }
 
 const userProfileRef = ref(null);
@@ -121,6 +129,7 @@ const userProfileRef = ref(null);
 
 onMounted(() => {
   globalState.userId = JSON.parse(localStorage.getItem('userId'));
+  showEmpty.value = globalState.userId === null;
   if (!globalState.round) {
     globalState.round = 1;
   }
