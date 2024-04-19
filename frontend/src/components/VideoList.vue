@@ -48,12 +48,7 @@ const recommendations = ref([]);
 
 onMounted(async() => {
     globalState.userId = JSON.parse(localStorage.getItem('userId'));
-    await getRecommendations();
-    try {
-        videoElements.value[0].scrollIntoView();
-    } catch (error) {
-        console.log(error);
-    }
+    refreshList();
 });
 
 const handleModalSubmit = async() => {
@@ -65,10 +60,12 @@ const handleModalSubmit = async() => {
 
 const refreshList = async () => {
     recommendations.value = [];
-    console.log('Refreshing video list...');
-    await getRecommendations();
     try {
-        videoElements.value[0].scrollIntoView();
+        if(globalState.userId) {
+            console.log('Refreshing video list...');
+            await getRecommendations();
+            videoElements.value[0].scrollIntoView();
+        }
     } catch (error) {
         console.log(error);
     }
