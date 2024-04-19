@@ -66,7 +66,12 @@ const handleModalSubmit = async() => {
 const refreshList = async () => {
     recommendations.value = [];
     console.log('Refreshing video list...');
-    getRecommendations();
+    await getRecommendations();
+    try {
+        videoElements.value[0].scrollIntoView();
+    } catch (error) {
+        console.log(error);
+    }
 }
 const getRecommendations = async () => {
     try {

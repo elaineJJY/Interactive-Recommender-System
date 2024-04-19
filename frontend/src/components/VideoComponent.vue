@@ -3,8 +3,8 @@
 
         <!-- Youtube video -->
 
-        <YoutubeVue3 ref="youtubePlayer" :videoid="videoInfo.id" @ended="onEnded" @paused="onPaused" @played="onPlayed"
-            :autoplay="0" :controls="1" :height="'95%'" :scrolling="no" :muted="true"
+        <YoutubeVue3 ref="youtubePlayer" :videoid="videoInfo.id" @ended="onEnded" @paused="onPaused" @played="onPlayed" 
+            :autoplay="0" :controls="1" :height="'95%'" :muted="true"
             style="margin-top:10px; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); overflow-y: hidden;" />
         <div class="overlay" :style="overlayStyle.value" @wheel.prevent="handleWheel">
         </div>
@@ -277,13 +277,14 @@ const setDislikeFeedback = async () => {
     if (likeClicked.value) likeClicked.value = false;
 };
 
+
 const scrollIntoView = async () => {
     if (showInfoModal.value) {
         return false;
     }
     try {
         videoContainer.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await new Promise(resolve => setTimeout(resolve, 700));
+        await new Promise(resolve => setTimeout(resolve, 800));
         console.log("scrollIntoView Video: " + props.videoInfo.id);
         // Show tour when the video index reaches the specific index
         let i = props.videoIndex % 10;
@@ -299,10 +300,9 @@ const scrollIntoView = async () => {
             showTour();
         }
         else {
-            youtubePlayer.value.player.pauseVideo();
-            youtubePlayer.value.player.mute(); 
+        
+            await youtubePlayer.value.player.mute(); 
             await youtubePlayer.value.player.playVideo();
-            youtubePlayer.value.player.playVideo();
             //is not IOS devices
             let isIpad = navigator.userAgent.match(/iPad/i) !== null;
             if (!isIpad) {
