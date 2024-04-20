@@ -24,13 +24,14 @@ export default {
             throw error;
         }
     },
-    async registerTopics(topics) {
+    async registerTopics(userId, topics) {
         try {
-            console.log('registerTopics', topics);
-            let response = await apiClient.post(`/topics/${globalState.userId}`,topics);
+            let response = await apiClient.post(`/topics/${userId}`, topics);
             return response;
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error registering topics:', error);
+            // let response = { data: { message: error }, status: 500};
             throw error;
         }
     },

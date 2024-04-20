@@ -38,11 +38,13 @@
         :closable=false style="top: 20px; height: 800px; width:1200px; display: flex; flex-direction: column;">
 
         <div class="regiester-form">
-            <a-form model="formState" style="margin-bottom: -15px; margin-top: 10px;">
-                <a-form-item label="Username" style="width: 300px;">
+            <a-form model="formState" style="display: flex;">
+                <a-form-item label="Username" style="width: 300px; flex: 1;">
                     <a-input v-model:value="formState.userId" placeholder="Enter your username"></a-input>
                 </a-form-item>
             </a-form>
+            <p style="margin-left: 10px; color: gray; margin-top:-10px">Username can only contain
+                numbers and letters</p>
         </div>
         <PerfectScrollbar class="tags-container">
             <div class="questionnaire-content">
@@ -134,7 +136,7 @@
     </a-modal>
 
     <!-- Registration Success Modal: Preference Elicitation-->
-    <a-modal v-model:open="registerSuccessModalVisible" title="Please select the topics you are interested in"
+    <a-modal v-model:open="topicSelectionModalVisible" title="Please select the topics you are interested in"
         style="top: 20px; height: 800px; width:1200px; display: flex; flex-direction: column;" :closable=false
         :maskClosable="false">
 
@@ -183,7 +185,7 @@ const formState = reactive({
     userId: null
 });
 const loginModalVisible = ref(false);
-const registerSuccessModalVisible = ref(false);
+const topicSelectionModalVisible = ref(false);
 const questionnaireModalVisible = ref(false);
 const topics = ref([]);
 const selectedTopic = ref([]);
@@ -212,21 +214,7 @@ const registerForTopic = async (topicNumber) => {
     
 };
 
-const handleTopicSubmit = async () => {
-    if (selectedTopic.value.length === 0) {
-        openNotification('error', 'Please select at least one topic');
-        return;
-    }
-    
-    const response = await apiClient.registerTopics(selectedTopic.value);
 
-    if (response.status === 200) {
-        registerSuccessModalVisible.value = false;
-        openNotification('success', 'Topics registered successfully!');
-        emit('refresh');
-    }
-    
-};
 
 onMounted(() => {
     formState.userId = JSON.parse(localStorage.getItem('userId'));
@@ -240,6 +228,11 @@ const showModal = () => {
 
 const register = async () => {
     try {
+        // check if username only contains alphanumeric characters
+        if (!formState.userId || !/^[a-zA-Z0-9]+$/.test(formState.userId)) {
+            openNotification('error', 'Username can only contain numbers and letters');
+            return;
+        }
         // Check if all questions are answered
         if (!answers.socialMediaFrequency || !answers.recommenderSystemFamiliarity || Object.keys(answers.dsiResponses).length !== dsiQuestions.length || !answers.videoRecommendationBasis || answers.methodsToInfluenceRS.length === 0) {
             openNotification('error', 'Please answer all questions');
@@ -248,20 +241,38 @@ const register = async () => {
         const response = await apiClient.register(formState.userId, answers);
 
         if (response.status === 200) {
-            questionnaireModalVisible.value = false;
-            localStorage.setItem('userId', JSON.stringify(formState.userId));
-            isLoggedIn.value = formState.userId !== null;
-            globalState.userId = isLoggedIn.value ? formState.userId : null;
             topics.value = await apiClient.getTopics();
-            openNotification('success', 'Registered successfully!');
-            registerSuccessModalVisible.value = true;
+            topicSelectionModalVisible.value = true;
         } else {
             openNotification('error', response.data.message);
         }
     } catch (error) {
-        console.error('Error registering:', error);
+        console.log('Error registering:', error);
         openNotification('error', error.response.data);
     }
+};
+
+const handleTopicSubmit = async () => {
+    if (selectedTopic.value.length === 0) {
+        openNotification('error', 'Please select at least one topic');
+        return;
+    }
+
+    const response = await apiClient.registerTopics(formState.userId,selectedTopic.value);
+
+    if (response.status === 200) {
+        topicSelectionModalVisible.value = false;
+        openNotification('success', 'Registered successfully!');
+        questionnaireModalVisible.value = false;
+        localStorage.setItem('userId', JSON.stringify(formState.userId));
+        isLoggedIn.value = formState.userId !== null;
+        globalState.userId = isLoggedIn.value ? formState.userId : null;
+        emit('refresh');
+    }
+    else {
+        openNotification('error', response.data.message);
+    }
+
 };
 
 const login = async () => {
@@ -412,7 +423,8 @@ const dsiQuestions = [
     display: flex;
     align-items: center;
     justify-content: start;
-    margin-bottom: -10px;
+    margin-bottom: -20px;
+    margin-top: 10px;
 }
 
 

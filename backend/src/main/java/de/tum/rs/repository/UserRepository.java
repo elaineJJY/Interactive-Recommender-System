@@ -15,4 +15,5 @@ public interface UserRepository extends ElasticsearchRepository<User, String> {
 	@Query("{\"term\": {\"userId\": \"?0\"}}")
 	Optional<User> findByUserId(String userId);
 
+	void deleteByUserId(String userId);
 }
