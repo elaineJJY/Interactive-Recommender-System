@@ -21,7 +21,5 @@ ARG VUE_APP_API_BASE_URL
 ENV VUE_APP_API_BASE_URL=$VUE_APP_API_BASE_URL
 
 # build app for production with minification
-RUN npm run build
-
 EXPOSE 8080
-CMD ["npm", "run", "serve"]
+CMD ["npm", "run", "build"]
