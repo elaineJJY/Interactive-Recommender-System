@@ -2,7 +2,7 @@ FROM node:lts-alpine
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 # install simple http server for serving static content
-RUN npm install -g http-server
+# RUN npm install -g http-server
 
 # make the 'app' folder the current working directory
 WORKDIR /app
@@ -22,4 +22,4 @@ ENV VUE_APP_API_BASE_URL=$VUE_APP_API_BASE_URL
 
 # build app for production with minification
 EXPOSE 8080
-CMD ["npm", "run", "build"]
+CMD ["npm", "run", "serve"]
