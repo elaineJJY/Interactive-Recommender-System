@@ -53,6 +53,12 @@ public class UserController {
 			return ResponseEntity.badRequest().body("User ID cannot be empty!");
 		}
 
+		// check if user id only contains alphanumeric characters
+		if (!user.getUserId().matches("^[a-zA-Z0-9]*$")) {
+			log.info("User ID can only contain alphanumeric characters!");
+			return ResponseEntity.badRequest().body("User ID can only contain alphanumeric characters!");
+		}
+
 		if ( user.getUserId().equals("null") ) {
 			log.info("User ID cannot be null!");
 			return ResponseEntity.badRequest().body("User ID cannot be null!");
