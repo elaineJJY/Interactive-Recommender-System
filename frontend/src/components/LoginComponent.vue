@@ -239,8 +239,9 @@ const register = async () => {
             return;
         }
         const response = await apiClient.register(formState.userId, answers);
-
+        
         if (response.status === 200) {
+            openNotification('success', 'Loading topics...');
             topics.value = await apiClient.getTopics();
             topicSelectionModalVisible.value = true;
         } else {
