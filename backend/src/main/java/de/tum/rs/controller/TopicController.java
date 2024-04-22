@@ -40,14 +40,19 @@ public class TopicController {
 	public ArrayList<Topic> getTopics() {
 		ArrayList<Topic> topics = new ArrayList<>();
 		topicRepository.findAll().forEach(topics::add);
+
+		ArrayList<Topic> randomTopics = new ArrayList<>();
+		int size = 50;
 		// shuffle the topics
-		for (int i = 0; i < topics.size(); i++) {
+		for (int i = 0; i < size; i++) {
 			int j = (int) (Math.random() * topics.size());
 			Topic temp = topics.get(i);
 			topics.set(i, topics.get(j));
 			topics.set(j, temp);
+			randomTopics.add(topics.get(i));
 		}
-		return topics;
+
+		return randomTopics;
 	}
 
 	@PostMapping("/{userId}")

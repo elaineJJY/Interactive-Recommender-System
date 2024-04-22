@@ -111,7 +111,7 @@
                     <div class="exloitative-slider-container">
                         <a-row justify="center" align="middle">
                             <a-col :span="4" offset="1">
-                                <b>Pure explorative</b>
+                                <b>Purely explorative</b>
                             </a-col>
                             <a-col :span="10">
                                 <el-slider v-model="exploit_coeff" :min="0" :max="1" :step="0.1" :disabled="!inEdit"
@@ -120,7 +120,7 @@
                                 </el-slider>
                             </a-col>
                             <a-col :span="4" offset="1">
-                                <b>Pure exploitative</b>
+                                <b>Purely exploitative</b>
                             </a-col>
                         </a-row>
                     </div>
