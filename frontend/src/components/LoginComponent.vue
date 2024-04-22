@@ -137,7 +137,7 @@
 
     <!-- Registration Success Modal: Preference Elicitation-->
     <a-modal v-model:open="topicSelectionModalVisible" title="Please select the topics you are interested in"
-        style="top: 20px; height: 800px; width:1200px; display: flex; flex-direction: column;" :closable=false
+        style="top: 80px; height: 800px; width:800px; display: flex; flex-direction: column;" :closable=false
         :maskClosable="false">
 
         <template #footer>
@@ -241,7 +241,7 @@ const register = async () => {
         const response = await apiClient.register(formState.userId, answers);
         
         if (response.status === 200) {
-            openNotification('success', 'Loading topics...');
+            openNotification('info', 'Loading topics...');
             topics.value = await apiClient.getTopics();
             topicSelectionModalVisible.value = true;
         } else {
@@ -262,8 +262,8 @@ const handleTopicSubmit = async () => {
     const response = await apiClient.registerTopics(formState.userId,selectedTopic.value);
 
     if (response.status === 200) {
-        topicSelectionModalVisible.value = false;
         openNotification('success', 'Registered successfully!');
+        topicSelectionModalVisible.value = false;
         questionnaireModalVisible.value = false;
         localStorage.setItem('userId', JSON.stringify(formState.userId));
         isLoggedIn.value = formState.userId !== null;

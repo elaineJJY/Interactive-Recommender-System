@@ -8,5 +8,4 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 
 @Document(indexName = "topic_distributions_test")
 public interface TopicDistributionRepository  extends ElasticsearchRepository<TopicDistribution, String> {
-
 }

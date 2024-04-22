@@ -7,8 +7,10 @@ import de.tum.rs.dto.TopicDTO;
 import de.tum.rs.repository.TopicRepository;
 import de.tum.rs.repository.UserRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,23 +39,18 @@ public class TopicController {
 	RecommenderEngine recommenderEngine;
 
 	@GetMapping()
-	public ArrayList<Topic> getTopics() {
-		ArrayList<Topic> topics = new ArrayList<>();
-		topicRepository.findAll().forEach(topics::add);
+	public List<Topic> getTopics() {
 
-		ArrayList<Topic> randomTopics = new ArrayList<>();
-		int size = 50;
-		// shuffle the topics
-		for (int i = 0; i < size; i++) {
-			int j = (int) (Math.random() * topics.size());
-			Topic temp = topics.get(i);
-			topics.set(i, topics.get(j));
-			topics.set(j, temp);
-			randomTopics.add(topics.get(i));
-		}
+		int size = 80;
 
-		return randomTopics;
+		List<Topic> allTopics = new ArrayList<>();
+		topicRepository.findAll().forEach(allTopics::add);
+		Collections.shuffle(allTopics, new Random());
+
+		// Return only the first 50 topics, or fewer if there are not enough topics
+		return allTopics.subList(0, Math.min(size, allTopics.size()));
 	}
+
 
 	@PostMapping("/{userId}")
 	public ResponseEntity<?> initializeTopics(@PathVariable String userId, @RequestBody ArrayList<Integer> topicIds) {
@@ -62,7 +59,7 @@ public class TopicController {
 			recommenderEngine.regiserUser(userId, topicIds);
 		}
 		catch (Exception e) {
-			log.error("Error while initializing topics for user: {}", userId);
+			log.error("Error while initializing topics for user: {}, Deleted user: {}", userId);
 			userRepository.deleteByUserId(userId);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while initializing topics for user: " + userId + " Please try again later!");
 		}
