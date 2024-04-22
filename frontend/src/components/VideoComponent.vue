@@ -241,7 +241,7 @@ watch(() => showRatingModal.value, (value) => {
 const submitFeedback = async () => {
     feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
 
-    if (feedback.totalWatchTime >= 1) {  // longer than 1 second
+    if (feedback.totalWatchTime >= 0.5) {  // longer than 0..5 second
         feedback.less = selectedLessTopicGroups.value;
         feedback.more = selectedMoreTopicGroups.value;
         apiClient.submitFeedback(feedback);
@@ -264,7 +264,7 @@ const setLikeFeedback = async () => {
 
     likeClicked.value = !likeClicked.value;
     if (dislikeClicked.value) dislikeClicked.value = false;
-
+    submitFeedback();
 };
 
 const setDislikeFeedback = async () => {
@@ -283,6 +283,7 @@ const setDislikeFeedback = async () => {
 
     dislikeClicked.value = !dislikeClicked.value;
     if (likeClicked.value) likeClicked.value = false;
+    submitFeedback();
 };
 
 
@@ -517,6 +518,7 @@ const adaptTopicGroup = (index, direction) => {
         icon: null,
         duration: 3,
     });
+    submitFeedback();
 };
 
 // Rating modal
@@ -547,6 +549,7 @@ const onSubmitRatingModal = () => {
         saveInteraction('\'...\' button: Five-star rating', rating.value);
     }
     saveInteraction('\'...\' button',"Submit");
+    submitFeedback();
     
 };
 
