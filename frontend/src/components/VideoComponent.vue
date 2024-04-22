@@ -230,6 +230,14 @@ watch(() => showInfoModal.value, (value) => {
     }
 });
 
+watch(() => showRatingModal.value, (value) => {
+    if (value) {
+        youtubePlayer.value.player.pauseVideo();
+    } else {
+        youtubePlayer.value.player.playVideo();
+    }
+});
+
 const submitFeedback = async () => {
     feedback.totalWatchTime = await youtubePlayer.value?.player.getCurrentTime();
 
