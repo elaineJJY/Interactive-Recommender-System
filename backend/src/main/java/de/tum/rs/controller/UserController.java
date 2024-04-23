@@ -80,6 +80,7 @@ public class UserController {
 		userId = userId.substring(1, userId.length() - 1);
 		if(userRepository.findByUserId(userId).isPresent()) {
 			recommenderEngine.invokeProcessFeedback(userId);
+			log.info("Loading User profile from database for user {}", userId);
 			User user = userRepository.findByUserId(userId).get();
 			UserDTO userDTO = new UserDTO();
 			userDTO.setUserId(user.getUserId());

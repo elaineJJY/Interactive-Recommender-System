@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Document(indexName = "users")
 public interface UserRepository extends ElasticsearchRepository<User, String> {
 
-	@Query("{\"term\": {\"userId\": \"?0\"}}")
+	@Query("{\"term\": {\"userId.keyword\": \"?0\"}}")
 	Optional<User> findByUserId(String userId);
 
 	void deleteByUserId(String userId);

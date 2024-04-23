@@ -39,8 +39,7 @@ public class RecommenderEngine {
 	 */
 	public void regiserUser(String userId, List<Integer> topicIds) throws InterruptedException {
 		String url = PYTHON_SERVICE_URL + "/register?userId=" + userId;
-		restTemplate.postForObject(url, topicIds, Void.class);
-		Thread.sleep(1000);
+		restTemplate.postForObject(url, topicIds, String.class);
 		log.info("Called Model to register user {} with topics {}", userId, topicIds);
 	}
 
@@ -76,15 +75,14 @@ public class RecommenderEngine {
 	 */
 	public void invokeProcessFeedback(String userId) {
 		String url = PYTHON_SERVICE_URL + "/feedback";
-
-		log.info("Invoking model update for User {}", userId);
 		try {
 			User user = userRepository.findByUserId(userId).get();
 			List<Feedback> recentFeedbacks = feedbackRepository.findByUserIdAndTimestampGreaterThan(
 				user.getUserId(), user.getFeedbackLastUsed()
 			);
-			restTemplate.postForObject(url, recentFeedbacks, Void.class);
-			log.info("Invoked model update with {} feedbacks", recentFeedbacks.size());
+			log.info("Invoking model update for User {} with {} Feedbacks", userId, recentFeedbacks.size());
+			String response = restTemplate.postForObject(url, recentFeedbacks, String.class);
+			log.info("From Model: {}", response);
 		} catch (Exception e) {
 			log.error("Error while invoking model update", e);
 		}
@@ -92,7 +90,7 @@ public class RecommenderEngine {
 
 	/**
 	 * Invoke the model updateing the topic rating
-	 * (this function is called from the TopicController.initializeTopics() method, when the user has selected the initial topics)
+	 * (this function is called from the TopicController.updateUser() when the user edit the topic rating)
 	 * @param userId
 	 */
 	public void invokeUpdateModel(String userId) {
