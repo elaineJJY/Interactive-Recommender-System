@@ -40,7 +40,7 @@ public class RecommenderEngine {
 	public void regiserUser(String userId, List<Integer> topicIds) throws InterruptedException {
 		String url = PYTHON_SERVICE_URL + "/register?userId=" + userId;
 		String response = restTemplate.postForObject(url, topicIds, String.class);
-//		Thread.sleep(500);
+		Thread.sleep(500);
 		log.info("Called Model to register user {} with topics {}", userId, topicIds);
 		log.info("From Model: {}", response);
 	}
@@ -84,7 +84,7 @@ public class RecommenderEngine {
 			);
 			log.info("Invoking model update for User {} with {} Feedbacks", userId, recentFeedbacks.size());
 			String response = restTemplate.postForObject(url, recentFeedbacks, String.class);
-			//		Thread.sleep(500);
+			Thread.sleep(500);
 			log.info("From Model: {}", response);
 		} catch (Exception e) {
 			log.error("Error while invoking model update", e);
