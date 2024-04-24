@@ -76,10 +76,11 @@ public class UserController {
 	}
 
 	@GetMapping("/{userId}")
-	public ResponseEntity<?> getUser(@PathVariable String userId) {
+	public ResponseEntity<?> getUser(@PathVariable String userId) throws InterruptedException {
 		userId = userId.substring(1, userId.length() - 1);
 		if(userRepository.findByUserId(userId).isPresent()) {
 			recommenderEngine.invokeProcessFeedback(userId);
+			Thread.sleep(500);
 			log.info("Loading User profile from database for user {}", userId);
 			User user = userRepository.findByUserId(userId).get();
 			UserDTO userDTO = new UserDTO();
