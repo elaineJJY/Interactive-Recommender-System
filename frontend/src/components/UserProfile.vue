@@ -96,13 +96,11 @@
                             shape="circle" :icon="h(InfoOutlined)" size="small">
                         </a-button>
                         <el-dialog v-model="showDetails[2]" title="How does it work?" width="30%" center>
-                            <p>This slider defines how the personalised model makes recommendations.</p>
-                            <p>The more exploration, the more your recommendations will focus on topics you have not
-                                come across much yet.
-                            </p>
-                            <p> The more exploitation, the more your recommendations will focus on topics you seem to
-                                like.
-                            </p>
+                            <p>This slider defines how the personalised model makes recommendations. The closer the
+                                slider is to one end, the more recommendations of that type you will get. If the slider
+                                is in the middle, both recommendation types will be featured equally.</p>
+                            <p>Exploitative recommendations focus on topics you seem to like. </p>
+                            <p> Explorative recommendations focus on topics you have not explored much yet. </p>
 
                         </el-dialog>
                     </div>
