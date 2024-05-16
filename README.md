@@ -27,13 +27,12 @@ This project is designed to:
     <td><img align="center" src="document/pics/h3.png" alt="h3" /></td>
   </tr>
 </table>
-
 <table>
      <tr>
     <td><img align="center" src="document/pics/up1.png" alt="up1"/></td>
-    <td><img align="center" src="document/pics/up2.png" alt="up2" /></td>
   </tr>
 </table>
+
 
 
 ## Setup and Installation
